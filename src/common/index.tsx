@@ -10,6 +10,9 @@ import {
   Platform
 } from 'react-native';
 
+import colors from './colors';
+import AppText from './AppText';
+
 const LogoClear = require('../assets/images/logo_clear.png');
 
 export { default as Button } from './Button';
@@ -17,39 +20,8 @@ export { default as PhonePicker } from './PhonePicker';
 export { default as colors } from './colors';
 export { default as Container } from './Container';
 export { default as Spinner } from './Spinner';
-
-import colors from './colors';
-
-type AppTextProps = {
-  children: any;
-  style?: {};
-  color?: 'white' | 'black';
-  size?: 'small' | 'medium' | 'large' | 'xlarge';
-};
-
-export const AppText: FunctionComponent<AppTextProps> = ({
-  children,
-  style,
-  size
-}) => {
-  let fontSize = 12;
-  if (size === 'medium') fontSize = 16;
-  if (size === 'large') fontSize = 20;
-  if (size === 'xlarge') fontSize = 24;
-  return (
-    <Text
-      style={[
-        {
-          fontFamily: 'KohinoorBangla-Semibold',
-          color: colors.textGrey,
-          fontSize
-        },
-        style
-      ]}>
-      {children}
-    </Text>
-  );
-};
+export { default as AppText } from './AppText';
+export { default as Header } from './Header';
 
 type LogoProps = {
   size?: 'small' | 'medium' | 'large';
@@ -68,32 +40,6 @@ export const Logo: FunctionComponent<LogoProps> = ({ size }) => {
       style = style;
   }
   return <Image style={style} resizeMode="contain" source={LogoClear} />;
-};
-
-type TextProps = {
-  color?: string;
-  children: any;
-  alignText?: string;
-  style?: {};
-  headerNumber?: 1 | 2 | 3;
-};
-
-export const Header: FunctionComponent<TextProps> = ({
-  color = 'white',
-  children,
-  alignText = 'center',
-  style = {},
-  headerNumber = 1
-}) => {
-  let fontSize = 42;
-  if (headerNumber === 2) fontSize = 30;
-  if (headerNumber === 3) fontSize = 24;
-  const defaultStyle = {
-    fontSize,
-    color,
-    textAlign: alignText
-  };
-  return <AppText style={{ ...defaultStyle, ...style }}>{children}</AppText>;
 };
 
 type PageWrapperProps = {

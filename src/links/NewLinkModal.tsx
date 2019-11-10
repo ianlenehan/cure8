@@ -70,7 +70,9 @@ const NewLinkModal = () => {
     <Container>
       <PageWrapper>
         <Spacer size={2} />
-        <Header headerNumber={2}>Curate New Link</Header>
+        <Header color="white" headerNumber={2}>
+          Curate New Link
+        </Header>
         <Spacer size={2} />
         <Input
           label="Link URL"

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StatusBar } from 'react-native';
+import { StatusBar, StyleSheet, View } from 'react-native';
 import firebase, { RNFirebase } from 'react-native-firebase';
 import('react-native-firebase');
 import ApolloClient from 'apollo-boost/lib/index';
@@ -68,10 +68,17 @@ const App = () => {
     <ApolloProvider client={apolloClient}>
       <AppContext.Provider value={{ authUser }}>
         <StatusBar barStyle="light-content" />
-        {renderApp()}
+        <View style={styles.container}>{renderApp()}</View>
       </AppContext.Provider>
     </ApolloProvider>
   );
 };
 
 export default App;
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: 'grey',
+    flex: 1
+  }
+});

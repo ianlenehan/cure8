@@ -63,7 +63,9 @@ const CompleteSignUpScreen: FunctionComponent = () => {
 
   return (
     <Container style={{ marginTop: 30 }}>
-      <Header headerNumber={3}>What shall we call you?</Header>
+      <Header headerNumber={3} color="white">
+        What shall we call you?
+      </Header>
       <View style={styles.innerContainer}>
         <Spacer size={2} />
         <Input

@@ -113,7 +113,7 @@ class LoginScreen extends Component<Props, State> {
           contentContainerStyle={styles.keyboardScrollViewStyle}>
           <PageWrapper>
             <Spacer size={2} />
-            <Header>Login</Header>
+            <Header color="white">Login</Header>
             <Spacer size={4} />
             <InputLabel label={label} />
             <PhoneInput
