@@ -1,5 +1,5 @@
-import React, { FunctionComponent, useContext } from 'react';
-import { View, Text, StyleSheet, ScrollView, FlatList } from 'react-native';
+import React, { FunctionComponent, useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, Animated } from 'react-native';
 import { useQuery } from 'react-apollo';
 import gql from 'graphql-tag';
 import {
@@ -11,6 +11,8 @@ import IonIcon from 'react-native-vector-icons/FontAwesome';
 import { Icon } from 'react-native-elements';
 import Card from './Card';
 import AppContext from '../utils/AppContext';
+
+import { SwipeListView } from 'react-native-swipe-list-view';
 
 const FETCH_LINKS = gql`
   query curations {
@@ -33,28 +35,82 @@ type Curation = {
   date: any;
 };
 
-const LinksScreen: NavigationBottomTabScreenComponent<
-  NavigationTabScreenProps
-> = ({ navigation }) => {
+const LinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> = ({
+  navigation
+}) => {
+  const [openRows, setOpenRows] = useState<string[]>([]);
+  const [opacity, setOpacity] = useState(new Animated.Value(1));
   const { data, loading, error } = useQuery(FETCH_LINKS);
-  console.log({ data, loading, error });
+
+  const togglePlusIcon = (direction: 'show' | 'hide') => {
+    const toValue = direction === 'show' ? 1 : 0;
+    Animated.timing(opacity, {
+      toValue,
+      duration: 200
+    }).start();
+  };
 
   const handleNewLinkPress = () => {
     navigation.navigate('NewLink');
   };
 
-  const PlusIcon = () => (
-    <View style={styles.plusIconContainer}>
-      <Icon
-        color={colors.primaryGreen}
-        reverse
-        containerStyle={styles.plusIcon}
-        name="plus"
-        type="font-awesome"
-        onPress={handleNewLinkPress}
-      />
-    </View>
-  );
+  const handleScrollEnabled = (rowKey: string) => {
+    setOpenRows(openRows => [...openRows, rowKey]);
+
+    togglePlusIcon('hide');
+  };
+
+  const handleRowDidClose = (rowKey: string) => {
+    const newOpenRows = openRows.filter(row => row !== rowKey);
+    setOpenRows(newOpenRows);
+
+    if (!newOpenRows.length) {
+      togglePlusIcon('show');
+    }
+  };
+
+  const PlusIcon = () => {
+    return (
+      <Animated.View style={[styles.plusIconContainer, { opacity }]}>
+        <Icon
+          color={colors.secondaryPink}
+          reverse
+          containerStyle={styles.plusIcon}
+          name="plus"
+          type="font-awesome"
+          onPress={handleNewLinkPress}
+        />
+      </Animated.View>
+    );
+  };
+
+  const renderHiddenItem = ({ item }: { item: Curation }) => {
+    return (
+      <View style={styles.rowBack}>
+        <View></View>
+        <View style={styles.rightBack}>
+          <Icon
+            color={colors.secondaryPink}
+            name="trash"
+            type="font-awesome"
+            onPress={handleNewLinkPress}
+          />
+          <Icon
+            color={colors.secondaryPink}
+            name="archive"
+            type="font-awesome"
+            onPress={handleNewLinkPress}
+          />
+          <Icon
+            color={colors.secondaryPink}
+            name="share"
+            type="font-awesome"
+            onPress={handleNewLinkPress}
+          />
+        </View>
+      </View>
+    );
+  };
 
   const renderCurations = ({ item }: { item: Curation }) => {
     return (
@@ -87,11 +143,16 @@ const LinksScreen: NavigationBottomTabScreenComponent<
 
   return (
     <View style={styles.container}>
-      <FlatList
+      <SwipeListView
         data={data.curations}
         renderItem={renderCurations}
         keyExtractor={item => item.id.toString()}
         removeClippedSubviews={false}
+        renderHiddenItem={renderHiddenItem}
+        disableRightSwipe
+        rightOpenValue={-80}
+        onRowDidOpen={handleScrollEnabled}
+        onRowDidClose={handleRowDidClose}
       />
 
       <PlusIcon />
@@ -123,5 +184,15 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1
+  },
+  rowBack: {
+    flex: 1,
+    flexDirection: 'row',
+    paddingRight: 30
+  },
+  rightBack: {
+    justifyContent: 'space-around',
+    flex: 1,
+    alignItems: 'flex-end'
   }
 });

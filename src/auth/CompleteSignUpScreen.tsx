@@ -43,8 +43,6 @@ const CompleteSignUpScreen: FunctionComponent = () => {
   });
   const [createUser] = useMutation(CREATE_USER_MUTATION);
 
-  console.log({ data, loading, error });
-
   const handleSubmit = async () => {
     if (!data) {
       const firebaseAuthUser = firebase.auth().currentUser;
@@ -52,11 +50,9 @@ const CompleteSignUpScreen: FunctionComponent = () => {
         await firebaseAuthUser.updateProfile({
           displayName: `${firstName} ${lastName}`
         });
-        const res = await createUser({
+        await createUser({
           variables: { firstName, lastName, phone: authUser.phoneNumber }
         });
-
-        console.log({ res });
       }
     }
   };

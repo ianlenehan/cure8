@@ -5,7 +5,13 @@ const AppContext = React.createContext({
     uid: '',
     phoneNumber: '',
     displayName: ''
-  }
+  },
+  newContact: {
+    familyName: '',
+    givenName: '',
+    phoneNumbers: []
+  },
+  setNewContact: () => {}
 });
 
 export default AppContext;

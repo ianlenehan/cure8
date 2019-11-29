@@ -11,50 +11,77 @@ type ButtonProps = {
   style?: {};
   textStyle?: {};
   disabled?: boolean;
+  size?: 'small' | 'medium' | 'large';
+  raised?: boolean;
+};
+
+const getColor = (type: ButtonProps['type']) => {
+  let color = colors.primaryGreen;
+  if (type === 'secondary') {
+    color = colors.secondaryPink;
+  }
+  if (type === 'tertiary') {
+    color = colors.tertiaryBlue;
+  }
+  if (type === 'warning') {
+    color = colors.warningRed;
+  }
+  return color;
+};
+
+const getSize = (size: ButtonProps['size']) => {
+  let height = 65;
+  let fontSize = 22;
+
+  if (size === 'medium') {
+    height = 45;
+    fontSize = 18;
+  }
+  if (size === 'small') {
+    height = 35;
+    fontSize = 16;
+  }
+
+  return { height, fontSize };
 };
 
 const Button: FunctionComponent<ButtonProps> = props => {
-  let primaryColor = colors.primaryGreen;
-  let altColor = 'white';
-  let borderColor = props.disabled ? colors.darkerGreen : altColor;
-  let invert = true;
-  if (props.type === 'secondary') {
-    primaryColor = colors.secondaryPink;
-    borderColor = primaryColor;
-  }
-  if (props.type === 'tertiary') {
-    primaryColor = colors.tertiaryBlue;
-    borderColor = primaryColor;
-  }
-  if (props.type === 'warning') {
-    primaryColor = 'red';
-  }
+  const backgroundColor = getColor(props.type);
+  const { height, fontSize } = getSize(props.size);
+
   let onPress = props.onPress;
   if (props.loading || props.disabled) onPress = () => {};
+
+  const raisedStyle = props.raised
+    ? {
+        shadowColor: 'black',
+        shadowOffset: { width: 4, height: 4 },
+        shadowOpacity: props.disabled ? 0 : 0.4,
+        elevation: 8,
+        shadowRadius: 10
+      }
+    : {};
+
   return (
     <TouchableOpacity
       style={{
-        height: 65,
-        margin: 5,
-        borderColor: borderColor,
-        backgroundColor: primaryColor,
+        backgroundColor,
         borderRadius: 5,
-        borderWidth: 1,
-        shadowOffset: { width: 4, height: 7 },
-        shadowColor: 'black',
-        shadowOpacity: props.disabled ? 0 : 0.1,
+        height,
         justifyContent: 'center',
+        margin: 5,
+        ...raisedStyle,
         ...props.style
       }}
       onPress={onPress}
       {...props}>
       {props.loading ? (
-        <Loading size="small" invert={invert} />
+        <Loading size="small" invert />
       ) : (
         <AppText
           style={{
-            color: props.disabled ? colors.darkerGreen : altColor,
-            fontSize: 22,
+            color: props.disabled ? colors.darkerGreen : 'white',
+            fontSize,
             textAlign: 'center' as const,
             textTransform: 'uppercase',
             fontWeight: 'bold',

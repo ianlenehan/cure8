@@ -92,26 +92,26 @@ type InputProps = {
   error?: boolean;
   white?: boolean;
   onChangeText?: (value: string) => void;
-  onChange?: ({  }: any) => void;
+  onChange?: ({}: any) => void;
   value?: string | undefined;
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters' | undefined;
 };
 
 export const Input: FunctionComponent<InputProps> = props => {
-  let inputColor = props.white ? 'white' : colors.darkerGreen;
-  if (Platform.OS === 'android') inputColor = 'rgba(0,0,0,0)';
+  let backgroundColor = props.white
+    ? colors.backgroundGrey
+    : colors.darkerGreen;
+  // if (Platform.OS === 'android') backgroundColor = 'rgba(0,0,0,0)';
 
   const textInputStyle = {
     height: 50,
     flex: 1,
     flexShrink: 0,
-    borderColor: inputColor,
-    borderWidth: 1,
     padding: 10,
     borderRadius: 5,
     fontSize: 24,
-    backgroundColor: inputColor,
-    color: props.white ? colors.darkerGreen : 'white'
+    backgroundColor,
+    color: props.white ? colors.textGrey : 'white'
   };
 
   return (

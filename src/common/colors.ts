@@ -4,5 +4,6 @@ export default {
   secondaryPink: '#AE2775',
   tertiaryBlue: '#2732AE',
   backgroundGrey: '#ecf0f1',
-  textGrey: '#636e72'
+  textGrey: '#636e72',
+  warningRed: '#c0392b'
 };

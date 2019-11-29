@@ -17,6 +17,7 @@ const MainApp = createAppContainer(RootNavigator);
 
 const App = () => {
   const [authUser, setAuthUser] = useState<RNFirebase.User>();
+  const [newContact, setNewContact] = useState({});
   const [apolloClient, setApolloClient] = useState();
 
   useEffect(() => {
@@ -66,7 +67,7 @@ const App = () => {
 
   return (
     <ApolloProvider client={apolloClient}>
-      <AppContext.Provider value={{ authUser }}>
+      <AppContext.Provider value={{ authUser, newContact, setNewContact }}>
         <StatusBar barStyle="light-content" />
         <View style={styles.container}>{renderApp()}</View>
       </AppContext.Provider>

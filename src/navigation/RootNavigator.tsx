@@ -15,6 +15,8 @@ import { colors } from '../common';
 
 import LinksScreen from '../links/LinksScreen';
 import NewLinkModal from '../links/NewLinkModal';
+import ContactsScreen from '../contacts/ContactsScreen';
+import AddContactScreen from '../contacts/AddContactScreen';
 
 const LogoTitle = () => {
   return (
@@ -49,26 +51,38 @@ const NewLinkStack = createStackNavigator(
   }
 );
 
+const ContactsStack = createStackNavigator(
+  {
+    Contacts: ContactsScreen,
+    AddContact: AddContactScreen
+  },
+  {
+    ...defaultNavigationOptions,
+    headerMode: 'none'
+  }
+);
+
 const MainTabNavigator = createBottomTabNavigator(
   {
-    Links: LinksScreen
+    Links: LinksScreen,
+    Contacts: ContactsScreen
   },
   {
     defaultNavigationOptions: ({ navigation }) => ({
       tabBarIcon: ({ focused, horizontal, tintColor }) => {
         const { routeName } = navigation.state;
         let iconName = 'link';
-        // if (routeName === 'Stats') {
-        //   iconName = 'ios-stats';
-        // } else if (routeName === 'Players') {
-        //   iconName = 'ios-contacts';
-        // } else if (routeName === 'NewRound') {
-        //   iconName = 'ios-add-circle';
-        // } else if (routeName === 'Rounds') {
-        //   iconName = 'ios-list-box';
-        // } else if (routeName === 'Availability') {
-        //   iconName = 'ios-calendar';
-        // }
+        if (routeName === 'Contacts') {
+          iconName = 'address-book';
+          // } else if (routeName === 'Players') {
+          //   iconName = 'ios-contacts';
+          // } else if (routeName === 'NewRound') {
+          //   iconName = 'ios-add-circle';
+          // } else if (routeName === 'Rounds') {
+          //   iconName = 'ios-list-box';
+          // } else if (routeName === 'Availability') {
+          //   iconName = 'ios-calendar';
+        }
 
         // You can return any component that you like here!
         return <IonIcon name={iconName} size={25} color={tintColor} />;
@@ -87,7 +101,8 @@ const RootStackNavigator = createStackNavigator(
     Main: {
       screen: MainTabNavigator
     },
-    NewLink: NewLinkStack
+    NewLink: NewLinkStack,
+    AddContact: AddContactScreen
   },
   {
     defaultNavigationOptions
