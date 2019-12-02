@@ -2,14 +2,30 @@ import React, { useState, useEffect } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import { ListItem, Divider } from 'react-native-elements';
-import { AppText, Input } from '../common';
-
 import CountryPicker, {
   CountryCode,
   getCallingCode
 } from 'react-native-country-picker-modal';
+import {
+  NavigationStackScreenComponent,
+  NavigationStackScreenProps
+} from 'react-navigation-stack';
+import { useMutation } from 'react-apollo';
+import gql from 'graphql-tag';
+
+import { AppText, Input } from '../common';
 
 import useAppContext from '../hooks/useAppContext';
+
+const CREATE_CONTACT_MUTATION = gql`
+  mutation CreateContact($name: String!, $phone: String!) {
+    createContact(name: $name, phone: $phone) {
+      contacts {
+        id
+      }
+    }
+  }
+`;
 
 type PhoneNumbers = {
   number: string;
@@ -18,7 +34,9 @@ type PhoneNumbers = {
 
 const WhiteInput = (props: any) => <Input {...props} white />;
 
-const AddContactScreen = ({ navigation }) => {
+const AddContactScreen: NavigationStackScreenComponent<NavigationStackScreenProps> = ({
+  navigation
+}) => {
   const [callingCode, setCallingCode] = useState('');
   const [countryCode, setCountryCode] = useState<CountryCode>();
 
@@ -30,6 +48,12 @@ const AddContactScreen = ({ navigation }) => {
   useEffect(() => {
     getUserLocation();
   }, []);
+
+  const [createContact, { loading, error }] = useMutation(
+    CREATE_CONTACT_MUTATION
+  );
+
+  console.log({ loading, error });
 
   const getUserLocation = () => {
     Geolocation.getCurrentPosition(info => {
@@ -57,10 +81,14 @@ const AddContactScreen = ({ navigation }) => {
   //   // navigation.goBack();
   // };
 
-  const handleAddPress = (name, number) => {
-    console.log('TCL: handleAddPress -> name, name.number', name, number);
-    const formatted = formatNumber(number);
-    console.log('TCL: handleAddPress -> formatted', formatted);
+  const handleAddPress = async (name: string, number: string) => {
+    const phone = formatNumber(number);
+    const { data } = await createContact({
+      variables: { name, phone }
+    });
+    if (data) {
+      navigation.goBack();
+    }
   };
 
   const handleCountryChange = (data: any) => {

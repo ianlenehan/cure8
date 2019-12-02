@@ -4,7 +4,7 @@ import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 // import Ionicons from 'react-native-vector-icons/Ionicons';
 import IonIcon from 'react-native-vector-icons/FontAwesome';
-import { Icon } from 'react-native-elements';
+import { Icon, Button } from 'react-native-elements';
 import { NavigationStackOptions } from 'react-navigation-stack';
 
 import { colors } from '../common';
@@ -51,43 +51,34 @@ const NewLinkStack = createStackNavigator(
   }
 );
 
-const ContactsStack = createStackNavigator(
-  {
-    Contacts: ContactsScreen,
-    AddContact: AddContactScreen
-  },
-  {
-    ...defaultNavigationOptions,
-    headerMode: 'none'
-  }
-);
-
 const MainTabNavigator = createBottomTabNavigator(
   {
     Links: LinksScreen,
     Contacts: ContactsScreen
   },
   {
-    defaultNavigationOptions: ({ navigation }) => ({
-      tabBarIcon: ({ focused, horizontal, tintColor }) => {
-        const { routeName } = navigation.state;
-        let iconName = 'link';
-        if (routeName === 'Contacts') {
-          iconName = 'address-book';
-          // } else if (routeName === 'Players') {
-          //   iconName = 'ios-contacts';
-          // } else if (routeName === 'NewRound') {
-          //   iconName = 'ios-add-circle';
-          // } else if (routeName === 'Rounds') {
-          //   iconName = 'ios-list-box';
-          // } else if (routeName === 'Availability') {
-          //   iconName = 'ios-calendar';
-        }
+    defaultNavigationOptions: ({ navigation }) => {
+      return {
+        tabBarIcon: ({ focused, horizontal, tintColor }) => {
+          const { routeName } = navigation.state;
+          let iconName = 'link';
+          if (routeName === 'Contacts') {
+            iconName = 'address-book';
+            // } else if (routeName === 'Players') {
+            //   iconName = 'ios-contacts';
+            // } else if (routeName === 'NewRound') {
+            //   iconName = 'ios-add-circle';
+            // } else if (routeName === 'Rounds') {
+            //   iconName = 'ios-list-box';
+            // } else if (routeName === 'Availability') {
+            //   iconName = 'ios-calendar';
+          }
 
-        // You can return any component that you like here!
-        return <IonIcon name={iconName} size={25} color={tintColor} />;
-      }
-    }),
+          // You can return any component that you like here!
+          return <IonIcon name={iconName} size={25} color={tintColor} />;
+        }
+      };
+    },
     tabBarOptions: {
       activeTintColor: colors.primaryGreen,
       inactiveTintColor: 'gray',
@@ -105,7 +96,33 @@ const RootStackNavigator = createStackNavigator(
     AddContact: AddContactScreen
   },
   {
-    defaultNavigationOptions
+    defaultNavigationOptions: ({ navigation }) => {
+      const route = navigation.state.routes.find(
+        route => route.routeName === 'Contacts'
+      );
+      const contactsParams = (route && route.params) || {};
+      console.log('TCL: contactsParams', contactsParams);
+
+      let headerRight = null;
+      const routeName =
+        navigation.state.routes[navigation.state.index].routeName;
+
+      if (routeName === 'Contacts') {
+        headerRight = () => (
+          <Button
+            title={contactsParams.buttonText}
+            type="clear"
+            onPress={contactsParams.toggleEditMode}
+            titleStyle={{ fontSize: 16, color: 'white' }}
+            containerStyle={{ marginRight: 10 }}
+          />
+        );
+      }
+      return {
+        ...defaultNavigationOptions,
+        headerRight
+      };
+    }
   }
 );
 

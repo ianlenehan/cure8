@@ -1,54 +1,81 @@
-import React from 'react';
-import { Text, View, TouchableWithoutFeedback, StyleSheet } from 'react-native';
+import React, { FunctionComponent } from 'react';
+import { Text, View, StyleSheet } from 'react-native';
 import { Icon } from 'react-native-elements';
 
-const ContactRow = props => {
-  const { contact, onPress, subtitle } = props;
+type Props = {
+  chevronType?: string;
+  contactId: string;
+  editMode: boolean;
+  iconColour?: string;
+  iconType?: string;
+  isGroup?: boolean;
+  isMember?: boolean;
+  onDeletePress?: () => void;
+  onEditPress?: () => void;
+  rightTitle: string;
+  subtitle?: string;
+  title: string;
+};
+
+const ContactRow: FunctionComponent<Props> = props => {
+  const {
+    chevronType,
+    editMode,
+    iconColour,
+    iconType,
+    isGroup,
+    isMember,
+    onDeletePress,
+    onEditPress,
+    rightTitle,
+    subtitle,
+    title
+  } = props;
 
   const getRightTitle = () => {
-    if (props.editMode && props.group) {
+    if (editMode && isGroup) {
       return (
         <View style={{ flexDirection: 'row' }}>
           <Icon
             name="mode-edit"
             color="#ddd"
-            onPress={props.onEditPress}
+            onPress={onEditPress}
             containerStyle={{ paddingRight: 15 }}
           />
           <Icon
             name="trash-o"
             type="font-awesome"
             color="#ddd"
-            onPress={props.onDeletePress}
+            onPress={onDeletePress}
           />
         </View>
       );
-    } else if (props.editMode) {
+    } else if (editMode) {
       return (
         <Icon
           name="trash-o"
           type="font-awesome"
           color="#ddd"
-          onPress={props.onDeletePress}
+          onPress={onDeletePress}
         />
       );
-    } else if (props.rightTitle) {
-      return <Text style={styles.rightTitle}>{props.rightTitle}</Text>;
+    } else if (rightTitle) {
+      return <Text style={styles.rightTitle}>{rightTitle}</Text>;
     }
     return (
       <Icon
-        name={props.chevronType || 'chevron-right'}
-        type={props.iconType}
-        color={props.iconColour || '#f3f3f3'}
+        name={chevronType || 'chevron-right'}
+        type={iconType}
+        color={iconColour || '#f3f3f3'}
       />
     );
   };
 
   const formatName = () => {
-    if (props.title && props.isMember) {
+    if (title && isMember) {
       return (
         <View style={{ flexDirection: 'row' }}>
-          <Text style={styles.title}>{props.title || ''}</Text>
+          <Text style={styles.title}>{title || ''}</Text>
           <Icon
             name="check-circle"
             size={14}
@@ -58,19 +85,17 @@ const ContactRow = props => {
         </View>
       );
     }
-    return <Text style={styles.title}>{props.title || ''}</Text>;
+    return <Text style={styles.title}>{title || ''}</Text>;
   };
 
   return (
-    <TouchableWithoutFeedback onPress={() => onPress(contact)}>
-      <View style={styles.card}>
-        <View style={styles.details}>
-          {formatName()}
-          <Text style={styles.subtitle}>{subtitle}</Text>
-          {getRightTitle()}
-        </View>
+    <View style={styles.card}>
+      <View style={styles.details}>
+        {formatName()}
+        <Text style={styles.subtitle}>{subtitle}</Text>
+        {getRightTitle()}
       </View>
-    </TouchableWithoutFeedback>
+    </View>
   );
 };
 

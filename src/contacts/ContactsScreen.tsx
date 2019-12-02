@@ -1,9 +1,13 @@
-import React, { Component } from 'react';
-import { AsyncStorage, FlatList, View, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { FlatList, View, StyleSheet } from 'react-native';
+import {
+  NavigationBottomTabScreenComponent,
+  NavigationTabScreenProps
+} from 'react-navigation-tabs';
 import { useQuery } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import { Container, AppText } from '../common';
+import { Container, AppText, Spinner } from '../common';
 import ContactRow from './ContactRow';
 import NewContact from './NewContact';
 
@@ -19,22 +23,35 @@ const FETCH_CONTACTS = gql`
       linkedUser {
         id
         name
+        phone
       }
     }
   }
 `;
 
-const ContactsScreen = ({ navigation }) => {
-  const { data, error, loading } = useQuery(FETCH_CONTACTS);
+type ContactType = {
+  id: string;
+  name: string;
+  linkedUser: {
+    id: string;
+    name: string;
+    phone: string;
+  };
+};
 
-  console.log({ data, error });
-  // async componentDidMount() {
-  //   this.props.navigation.setParams({
-  //     setEditMode: this.setEditMode.bind(this),
-  //     editMode: false,
-  //   })
-  //   this._setToken()
-  // }
+const ContactsScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> = ({
+  navigation
+}) => {
+  const [editMode, setEditMode] = useState(false);
+  const toggleEditMode = () => setEditMode(prevState => !prevState);
+  const buttonText: string = editMode ? 'Done' : 'Edit';
+  console.log('TCL: editMode', editMode);
+
+  useEffect(() => {
+    navigation.setParams({ buttonText, toggleEditMode });
+  }, [editMode]);
+
+  const { data, error, loading } = useQuery(FETCH_CONTACTS);
 
   // const onDeletePress = (contact) => {
   //   this.props.deleteContact(contact, this.state.token)
@@ -47,41 +64,42 @@ const ContactsScreen = ({ navigation }) => {
   //   })
   // }
 
-  // const renderItem = ({ item }) => {
-  //   return (
-  //     <ContactRow
-  //       contact={item}
-  //       title={item.name}
-  //       isMember={item.member}
-  //       rightTitle={item.phone}
-  //       onPress={() => {}}
-  //       // editMode={this.props.editMode}
-  //       // onDeletePress={() => this.onDeletePress(item)}
-  //     />
-  //   )
-  // }
+  const renderItem = ({ item }: { item: ContactType }) => {
+    return (
+      <ContactRow
+        contactId={item.id}
+        title={item.name}
+        isMember={false}
+        rightTitle={item.linkedUser.phone}
+        editMode={editMode}
+        // onDeletePress={() => this.onDeletePress(item)}
+      />
+    );
+  };
 
-  // const renderContent = () => {
-  //   if (loading) {
-  //     return <Spinner size="large" text="Loading contacts..." />
-  //   }
-  //   return (
-  //     <FlatList
-  //       data={this.props.contacts}
-  //       renderItem={this.renderItem}
-  //       editMode={this.props.editMode}
-  //       keyExtractor={item => item.id.toString()}
-  //       removeClippedSubviews={false}
-  //     />
-  //   )
-  // }
+  if (loading) {
+    return <Spinner size="large" text="Loading contacts..." />;
+  }
+
+  const renderContent = () => {
+    if (!loading && !data) {
+      return <AppText>No Contacts Yet</AppText>;
+    } else {
+      return (
+        <FlatList
+          data={data.contacts}
+          renderItem={renderItem}
+          keyExtractor={item => item.id.toString()}
+          removeClippedSubviews={false}
+        />
+      );
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <Container style={styles.pageContainer}>
-        <AppText>No Contacts Yet</AppText>
-      </Container>
-      <NewContact {...{ navigation }} />
+      <Container style={styles.pageContainer}>{renderContent()}</Container>
+      <NewContact navigate={navigation.navigate} />
     </View>
   );
 };
@@ -98,29 +116,3 @@ const styles = StyleSheet.create({
     backgroundColor: 'white'
   }
 });
-
-// ContactsScreen.navigationOptions = ({ navigation }) => {
-//   const { navigate } = navigation
-//   const { params = {} } = navigation.state
-
-//   return {
-//     title: 'My Contacts',
-//     headerRight: (
-//       <Button
-//         fontSize={14}
-//         title={params.editMode ? 'Done' : 'Edit'}
-//         backgroundColor="rgba(0,0,0,0)"
-//         onPress={() => params.setEditMode()}
-//       />
-//     ),
-//     headerLeft: (
-//       <Button
-//         fontSize={14}
-//         icon={{ name: 'users', type: 'font-awesome' }}
-//         iconLeft
-//         backgroundColor="rgba(0,0,0,0)"
-//         onPress={() => navigate('myGroups')}
-//       />
-//     ),
-//   }
-// }

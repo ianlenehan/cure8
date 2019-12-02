@@ -1,4 +1,4 @@
-import React, { useState, FunctionComponent, useEffect } from 'react';
+import React, { useState, FunctionComponent } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -6,34 +6,17 @@ import {
   LayoutAnimation,
   ScrollView,
   Alert,
-  PermissionsAndroid,
-  Platform,
   StyleSheet
 } from 'react-native';
 import Contacts, { Contact } from 'react-native-contacts';
 import { Button, Input } from '../common';
 import useAppContext from '../hooks/useAppContext';
 
-const styles = StyleSheet.create({
-  searchContainer: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderBottomWidth: 0,
-    paddingTop: 5
-  },
-  button: {
-    margin: 10
-  },
-  name: {
-    fontSize: 18,
-    padding: 10,
-    fontWeight: 'bold'
-  }
-});
+type Props = {
+  navigate: any;
+};
 
-// AIzaSyDl0Q0qE1SzGT04ehppIL77qRVzNTDo7oE
-
-const NewContact: FunctionComponent = ({ navigation }) => {
+const NewContact: FunctionComponent<Props> = ({ navigate }) => {
   const [isShowing, setShowing] = useState(false);
   const [name, setName] = useState('');
   const [contacts, setContacts] = useState();
@@ -100,8 +83,9 @@ const NewContact: FunctionComponent = ({ navigation }) => {
 
   const onContactPress = (contact: any) => {
     console.log('TCL: onContactPress -> contact', contact);
+    const contactName = `${contact.givenName} ${contact.familyName}`;
     setNewContact(contact);
-    navigation.navigate('AddContact');
+    navigate('AddContact', { contactName });
     // const { navigate, key } = this.props
     // navigate('addContact', { contact, key })
   };
@@ -124,9 +108,9 @@ const NewContact: FunctionComponent = ({ navigation }) => {
   return (
     <View>
       {isShowing ? (
-        <View style={{ height: '95%' }}>
+        <View style={{ height: '75%' }}>
           <Button size="small" type="warning" onPress={handleCancel}>
-            Cancel
+            Close
           </Button>
           <Input
             placeholder="Type a name"
@@ -146,5 +130,22 @@ const NewContact: FunctionComponent = ({ navigation }) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  searchContainer: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderBottomWidth: 0,
+    paddingTop: 5
+  },
+  button: {
+    margin: 10
+  },
+  name: {
+    fontSize: 18,
+    padding: 10,
+    fontWeight: 'bold'
+  }
+});
 
 export default NewContact;
