@@ -2,12 +2,9 @@ import React, { FunctionComponent } from 'react';
 import {
   Image,
   View,
-  SafeAreaView,
-  Text,
   TextInput,
   TouchableOpacity,
-  ActivityIndicator,
-  Platform
+  ActivityIndicator
 } from 'react-native';
 
 import colors from './colors';
@@ -69,13 +66,18 @@ export const Spacer: FunctionComponent<SpacerProps> = ({ size = 1 }) => {
 
 type InputLabelProps = {
   label: string;
+  white?: boolean;
 };
 
-export const InputLabel: FunctionComponent<InputLabelProps> = ({ label }) => {
+export const InputLabel: FunctionComponent<InputLabelProps> = ({
+  label,
+  white
+}) => {
+  const color = white ? 'white' : colors.textGrey;
   return (
     <AppText
       style={{
-        color: 'white',
+        color,
         opacity: 0.8,
         fontSize: 18
       }}>
@@ -85,23 +87,39 @@ export const InputLabel: FunctionComponent<InputLabelProps> = ({ label }) => {
 };
 
 type InputProps = {
-  label?: string;
-  placeholder?: string;
-  buttonText?: string;
-  onButtonPress?: () => void;
-  error?: boolean;
-  white?: boolean;
-  onChangeText?: (value: string) => void;
-  onChange?: ({}: any) => void;
-  value?: string | undefined;
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters' | undefined;
+  bordered?: boolean;
+  buttonText?: string;
+  error?: boolean;
+  label?: string;
+  onButtonPress?: () => void;
+  onChange?: ({}: any) => void;
+  onChangeText?: (value: string) => void;
+  placeholder?: string;
+  value?: string | undefined;
+  color?: 'green' | 'grey' | 'white';
 };
 
 export const Input: FunctionComponent<InputProps> = props => {
-  let backgroundColor = props.white
-    ? colors.backgroundGrey
-    : colors.darkerGreen;
+  let backgroundColor = colors.darkerGreen;
+  let textColor = 'white';
+
+  if (props.color === 'white') {
+    backgroundColor = 'white';
+    textColor = colors.textGrey;
+  }
+  if (props.color === 'grey') {
+    backgroundColor = colors.backgroundGrey;
+    textColor = colors.textGrey;
+  }
+
+  const whiteLabel = props.color === 'white' || props.color == 'grey';
+
   // if (Platform.OS === 'android') backgroundColor = 'rgba(0,0,0,0)';
+
+  const borderedStyle = props.bordered
+    ? { borderWidth: 1, borderColor: '#bdc3c7' }
+    : {};
 
   const textInputStyle = {
     height: 50,
@@ -111,12 +129,13 @@ export const Input: FunctionComponent<InputProps> = props => {
     borderRadius: 5,
     fontSize: 24,
     backgroundColor,
-    color: props.white ? colors.textGrey : 'white'
+    color: textColor,
+    ...borderedStyle
   };
 
   return (
     <View style={{ margin: 5 }}>
-      {props.label && <InputLabel label={props.label} />}
+      {props.label && <InputLabel label={props.label} white={!whiteLabel} />}
       <View style={{ display: 'flex', flexDirection: 'row' }}>
         <TextInput {...props} style={textInputStyle} />
         {props.buttonText && (

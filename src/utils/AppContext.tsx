@@ -11,7 +11,7 @@ const AppContext = React.createContext({
     givenName: '',
     phoneNumbers: []
   },
-  setNewContact: () => {}
+  setNewContact: (contact: any) => {}
 });
 
 export default AppContext;

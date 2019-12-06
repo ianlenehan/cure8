@@ -22,6 +22,16 @@ const CREATE_CONTACT_MUTATION = gql`
     createContact(name: $name, phone: $phone) {
       contacts {
         id
+        name
+        user {
+          id
+          name
+        }
+        linkedUser {
+          id
+          name
+          phone
+        }
       }
     }
   }
@@ -31,8 +41,6 @@ type PhoneNumbers = {
   number: string;
   label: string;
 };
-
-const WhiteInput = (props: any) => <Input {...props} white />;
 
 const AddContactScreen: NavigationStackScreenComponent<NavigationStackScreenProps> = ({
   navigation
@@ -49,11 +57,11 @@ const AddContactScreen: NavigationStackScreenComponent<NavigationStackScreenProp
     getUserLocation();
   }, []);
 
-  const [createContact, { loading, error }] = useMutation(
+  const [createContact, { loading, error, data }] = useMutation(
     CREATE_CONTACT_MUTATION
   );
 
-  console.log({ loading, error });
+  console.log('TCL: CreateContact data', data);
 
   const getUserLocation = () => {
     Geolocation.getCurrentPosition(info => {

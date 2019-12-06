@@ -11,7 +11,7 @@ type ContainerProps = {
 const Container: FunctionComponent<ContainerProps> = ({ children, style }) => {
   const defaultStyle = { flex: 1, backgroundColor: colors.primaryGreen };
   return (
-    <SafeAreaView style={defaultStyle}>
+    <SafeAreaView style={[defaultStyle, style]}>
       <View style={[defaultStyle, style]}>{children}</View>
     </SafeAreaView>
   );

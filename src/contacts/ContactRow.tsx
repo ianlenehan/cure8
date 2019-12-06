@@ -2,6 +2,8 @@ import React, { FunctionComponent } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import { Icon } from 'react-native-elements';
 
+import { AppText, colors } from '../common';
+
 type Props = {
   chevronType?: string;
   contactId: string;
@@ -35,7 +37,7 @@ const ContactRow: FunctionComponent<Props> = props => {
   const getRightTitle = () => {
     if (editMode && isGroup) {
       return (
-        <View style={{ flexDirection: 'row' }}>
+        <View style={styles.row}>
           <Icon
             name="mode-edit"
             color="#ddd"
@@ -45,7 +47,7 @@ const ContactRow: FunctionComponent<Props> = props => {
           <Icon
             name="trash-o"
             type="font-awesome"
-            color="#ddd"
+            color={colors.warningRed}
             onPress={onDeletePress}
           />
         </View>
@@ -55,7 +57,7 @@ const ContactRow: FunctionComponent<Props> = props => {
         <Icon
           name="trash-o"
           type="font-awesome"
-          color="#ddd"
+          color={colors.warningRed}
           onPress={onDeletePress}
         />
       );
@@ -72,20 +74,20 @@ const ContactRow: FunctionComponent<Props> = props => {
   };
 
   const formatName = () => {
-    if (title && isMember) {
+    if (title && !isMember) {
       return (
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={styles.title}>{title || ''}</Text>
+        <View style={styles.row}>
+          <AppText size="large">{title || ''}</AppText>
           <Icon
             name="check-circle"
             size={14}
-            color="#27ae60"
-            containerStyle={{ marginTop: 4 }}
+            color={colors.primaryGreen}
+            containerStyle={{ marginLeft: 4 }}
           />
         </View>
       );
     }
-    return <Text style={styles.title}>{title || ''}</Text>;
+    return <AppText size="large">{title || ''}</AppText>;
   };
 
   return (
@@ -106,12 +108,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 12,
     borderColor: '#ddd',
-    borderBottomWidth: 1
-  },
-  title: {
-    fontSize: 16,
-    paddingTop: 3,
-    paddingRight: 5
+    borderBottomWidth: 1,
+    justifyContent: 'center'
   },
   subtitle: {
     fontSize: 12,
@@ -125,8 +123,12 @@ const styles = StyleSheet.create({
   },
   rightTitle: {
     fontSize: 12,
-    color: '#ddd',
+    color: colors.textGrey,
     marginTop: 5,
     alignItems: 'flex-end'
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center'
   }
 });

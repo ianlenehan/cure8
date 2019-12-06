@@ -7,14 +7,14 @@ import IonIcon from 'react-native-vector-icons/FontAwesome';
 import { Icon, Button } from 'react-native-elements';
 import { NavigationStackOptions } from 'react-navigation-stack';
 
-import { colors } from '../common';
+import { AppText, colors } from '../common';
 
 // type Props = {
 //   navigation: NavigationStackProp<{ userId: string }>;
 // };
 
 import LinksScreen from '../links/LinksScreen';
-import NewLinkModal from '../links/NewLinkModal';
+import NewLinkScreen from '../links/NewLinkScreen';
 import ContactsScreen from '../contacts/ContactsScreen';
 import AddContactScreen from '../contacts/AddContactScreen';
 
@@ -43,7 +43,7 @@ const defaultNavigationOptions: NavigationStackOptions = {
 
 const NewLinkStack = createStackNavigator(
   {
-    NewLink: NewLinkModal
+    NewLink: NewLinkScreen
   },
   {
     mode: 'modal',
@@ -97,20 +97,25 @@ const RootStackNavigator = createStackNavigator(
   },
   {
     defaultNavigationOptions: ({ navigation }) => {
-      const route = navigation.state.routes.find(
-        route => route.routeName === 'Contacts'
-      );
-      const contactsParams = (route && route.params) || {};
-      console.log('TCL: contactsParams', contactsParams);
+      let contactsParams: any = null;
+      let routeName = navigation.state.routeName;
+
+      if (navigation.state.routes) {
+        const contactsRoute = navigation.state.routes.find(
+          route => route.routeName === 'Contacts'
+        );
+        contactsParams = (contactsRoute && contactsRoute.params) || {};
+
+        routeName = navigation.state.routes[navigation.state.index].routeName;
+      }
 
       let headerRight = null;
-      const routeName =
-        navigation.state.routes[navigation.state.index].routeName;
+      let headerTitle = defaultNavigationOptions.headerTitle;
 
-      if (routeName === 'Contacts') {
+      if (routeName === 'Contacts' && contactsParams) {
         headerRight = () => (
           <Button
-            title={contactsParams.buttonText}
+            title={contactsParams.buttonText || ''}
             type="clear"
             onPress={contactsParams.toggleEditMode}
             titleStyle={{ fontSize: 16, color: 'white' }}
@@ -118,8 +123,17 @@ const RootStackNavigator = createStackNavigator(
           />
         );
       }
+
+      if (routeName === 'NewLink') {
+        headerTitle = (
+          <AppText color="white" size="large">
+            Curate New Link
+          </AppText>
+        );
+      }
       return {
         ...defaultNavigationOptions,
+        headerTitle,
         headerRight
       };
     }

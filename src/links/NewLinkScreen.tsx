@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { CheckBox } from 'react-native-elements';
-import { useMutation } from 'react-apollo';
+import { useMutation, useQuery } from 'react-apollo';
 import gql from 'graphql-tag';
 import useForm from '../hooks/useForm';
 import {
@@ -15,6 +15,24 @@ import {
   colors
 } from '../common';
 import validate from './validate';
+
+const FETCH_CONTACTS = gql`
+  query contacts {
+    contacts {
+      id
+      name
+      user {
+        id
+        name
+      }
+      linkedUser {
+        id
+        name
+        phone
+      }
+    }
+  }
+`;
 
 const CREATE_CURATION = gql`
   mutation($url: String!, $comment: String, $saveToMyLinks: Boolean) {
@@ -36,9 +54,15 @@ const CREATE_CURATION = gql`
   }
 `;
 
-const NewLinkModal = () => {
+const NewLinkScreen = () => {
   const [saveToMyLinks, setSaveToMyLinks] = useState(false);
-  const [createCuration, { data, loading, error }] = useMutation(
+
+  const { data: contactsData, loading: loadingContacts } = useQuery(
+    FETCH_CONTACTS
+  );
+  console.log('TCL: NewLinkScreen -> contactsData', contactsData);
+
+  const [createCuration, { loading: processing, error }] = useMutation(
     CREATE_CURATION
   );
 
@@ -67,12 +91,8 @@ const NewLinkModal = () => {
   };
 
   return (
-    <Container>
+    <Container style={styles.container}>
       <PageWrapper>
-        <Spacer size={2} />
-        <Header color="white" headerNumber={2}>
-          Curate New Link
-        </Header>
         <Spacer size={2} />
         <Input
           label="Link URL"
@@ -80,27 +100,33 @@ const NewLinkModal = () => {
           autoCapitalize="none"
           onChangeText={handleUrlChange}
           value={url}
+          color="grey"
         />
         <Spacer size={2} />
         <Input
           label="Comment"
           onChangeText={handleCommentChange}
           value={comment}
+          color="grey"
         />
         <CheckBox
           title="Save to my links"
           center
           checked={saveToMyLinks}
-          checkedColor="rgba(255, 255, 255, 0.8)"
-          uncheckedColor="rgba(255, 255, 255, 0.8)"
-          textStyle={{ color: 'rgba(255, 255, 255, 0.8)' }}
+          checkedColor={colors.darkerGreen}
+          // uncheckedColor="rgba(255, 255, 255, 0.8)"
+          textStyle={{
+            color: colors.textGrey,
+            fontFamily: 'KohinoorBangla-Semibold',
+            fontSize: 18
+          }}
           onPress={handleCheckboxChange}
           containerStyle={{
             backgroundColor: 'rgba(0,0,0,0)',
             borderColor: 'rgba(0,0,0,0)'
           }}
         />
-        <Button onPress={handleSubmit} loading={loading}>
+        <Button onPress={handleSubmit} loading={processing}>
           Save
         </Button>
         {/* <Button onPress={handleCancel} loading={loading}>
@@ -111,4 +137,10 @@ const NewLinkModal = () => {
   );
 };
 
-export default NewLinkModal;
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: 'white'
+  }
+});
+
+export default NewLinkScreen;

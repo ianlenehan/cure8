@@ -8,8 +8,9 @@ import {
   Alert,
   StyleSheet
 } from 'react-native';
+import { Icon } from 'react-native-elements';
 import Contacts, { Contact } from 'react-native-contacts';
-import { Button, Input } from '../common';
+import { Button, Input, colors, AppText } from '../common';
 import useAppContext from '../hooks/useAppContext';
 
 type Props = {
@@ -86,46 +87,60 @@ const NewContact: FunctionComponent<Props> = ({ navigate }) => {
     const contactName = `${contact.givenName} ${contact.familyName}`;
     setNewContact(contact);
     navigate('AddContact', { contactName });
-    // const { navigate, key } = this.props
-    // navigate('addContact', { contact, key })
   };
 
   const renderNames = () => {
     if (!contacts) return null;
 
-    return contacts.map(contact => {
+    return contacts.map((contact: any) => {
       const name = `${contact.givenName || ''} ${contact.familyName || ''}`;
       return (
         <TouchableOpacity
           key={contact.recordID}
           onPress={() => onContactPress(contact)}>
-          <Text style={styles.name}>{name}</Text>
+          <View style={styles.nameView}>
+            <AppText size="large">{name}</AppText>
+            <Icon
+              name="arrow-right"
+              type="font-awesome"
+              color={colors.textGrey}
+            />
+          </View>
         </TouchableOpacity>
       );
     });
   };
 
   return (
-    <View>
+    <View
+      style={
+        isShowing && {
+          backgroundColor: colors.primaryGreen,
+          padding: 10,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20
+        }
+      }>
       {isShowing ? (
-        <View style={{ height: '75%' }}>
+        <View
+          style={{
+            height: '75%'
+          }}>
           <Button size="small" type="warning" onPress={handleCancel}>
             Close
           </Button>
           <Input
-            placeholder="Type a name"
+            placeholder="Start typing a name..."
             onChangeText={handleChangeText}
             value={name}
-            white
+            color="white"
           />
-          <ScrollView>{renderNames()}</ScrollView>
+          <ScrollView style={styles.scrollView}>{renderNames()}</ScrollView>
         </View>
       ) : (
-        <View>
-          <Button size="medium" onPress={handleNewContactPress}>
-            New Contact
-          </Button>
-        </View>
+        <Button size="medium" onPress={handleNewContactPress}>
+          New Contact
+        </Button>
       )}
     </View>
   );
@@ -141,10 +156,16 @@ const styles = StyleSheet.create({
   button: {
     margin: 10
   },
-  name: {
-    fontSize: 18,
-    padding: 10,
-    fontWeight: 'bold'
+  nameView: {
+    backgroundColor: colors.backgroundGrey,
+    borderRadius: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    margin: 5,
+    padding: 10
+  },
+  scrollView: {
+    marginTop: 20
   }
 });
 

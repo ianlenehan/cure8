@@ -45,13 +45,14 @@ const ContactsScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProp
   const [editMode, setEditMode] = useState(false);
   const toggleEditMode = () => setEditMode(prevState => !prevState);
   const buttonText: string = editMode ? 'Done' : 'Edit';
-  console.log('TCL: editMode', editMode);
 
   useEffect(() => {
     navigation.setParams({ buttonText, toggleEditMode });
   }, [editMode]);
 
-  const { data, error, loading } = useQuery(FETCH_CONTACTS);
+  const { data, error, loading } = useQuery(FETCH_CONTACTS, {
+    fetchPolicy: 'network-only'
+  });
 
   // const onDeletePress = (contact) => {
   //   this.props.deleteContact(contact, this.state.token)
@@ -108,7 +109,6 @@ export default ContactsScreen;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
     flex: 1,
     justifyContent: 'space-between'
   },

@@ -13,18 +13,23 @@ type AppTextProps = {
 const AppText: FunctionComponent<AppTextProps> = ({
   children,
   style,
-  size
+  size,
+  color
 }) => {
   let fontSize = 12;
   if (size === 'medium') fontSize = 16;
   if (size === 'large') fontSize = 20;
   if (size === 'xlarge') fontSize = 24;
+
+  let textColor = colors.textGrey;
+  if (color === 'white') textColor = 'white';
+
   return (
     <Text
       style={[
         {
           fontFamily: 'KohinoorBangla-Semibold',
-          color: colors.textGrey,
+          color: textColor,
           fontSize
         },
         style

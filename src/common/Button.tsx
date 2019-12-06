@@ -30,7 +30,7 @@ const getColor = (type: ButtonProps['type']) => {
 };
 
 const getSize = (size: ButtonProps['size']) => {
-  let height = 65;
+  let height = 55;
   let fontSize = 22;
 
   if (size === 'medium') {
