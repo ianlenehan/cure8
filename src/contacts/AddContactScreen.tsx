@@ -37,6 +37,15 @@ const CREATE_CONTACT_MUTATION = gql`
   }
 `;
 
+// TODO export this as it's here twice now
+const FETCH_CONTACTS = gql`
+  query contacts {
+    contacts {
+      id
+    }
+  }
+`;
+
 type PhoneNumbers = {
   number: string;
   label: string;
@@ -57,11 +66,20 @@ const AddContactScreen: NavigationStackScreenComponent<NavigationStackScreenProp
     getUserLocation();
   }, []);
 
-  const [createContact, { loading, error, data }] = useMutation(
-    CREATE_CONTACT_MUTATION
+  const [createContact, { data, loading, error }] = useMutation(
+    CREATE_CONTACT_MUTATION,
+    {
+      refetchQueries: [{ query: FETCH_CONTACTS }]
+    }
   );
 
-  console.log('TCL: CreateContact data', data);
+  console.log('TCL: loading, error, data ', loading, error, data);
+  useEffect(() => {
+    if (data) {
+      navigation.state.params.onContactSave();
+      navigation.goBack();
+    }
+  }, [data]);
 
   const getUserLocation = () => {
     Geolocation.getCurrentPosition(info => {
@@ -91,12 +109,9 @@ const AddContactScreen: NavigationStackScreenComponent<NavigationStackScreenProp
 
   const handleAddPress = async (name: string, number: string) => {
     const phone = formatNumber(number);
-    const { data } = await createContact({
+    createContact({
       variables: { name, phone }
     });
-    if (data) {
-      navigation.goBack();
-    }
   };
 
   const handleCountryChange = (data: any) => {

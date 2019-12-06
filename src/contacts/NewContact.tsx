@@ -33,6 +33,12 @@ const NewContact: FunctionComponent<Props> = ({ navigate }) => {
     setShowing(false);
   };
 
+  const handleContactSave = () => {
+    setName('');
+    setContacts([]);
+    setShowing(false);
+  };
+
   const getPhoneContact = (name: string) => {
     Contacts.getContactsMatchingString(name, (err, phoneContacts) => {
       if (err === 'denied') {
@@ -83,10 +89,9 @@ const NewContact: FunctionComponent<Props> = ({ navigate }) => {
   };
 
   const onContactPress = (contact: any) => {
-    console.log('TCL: onContactPress -> contact', contact);
     const contactName = `${contact.givenName} ${contact.familyName}`;
     setNewContact(contact);
-    navigate('AddContact', { contactName });
+    navigate('AddContact', { contactName, onContactSave: handleContactSave });
   };
 
   const renderNames = () => {

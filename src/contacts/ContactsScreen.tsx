@@ -50,9 +50,7 @@ const ContactsScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProp
     navigation.setParams({ buttonText, toggleEditMode });
   }, [editMode]);
 
-  const { data, error, loading } = useQuery(FETCH_CONTACTS, {
-    fetchPolicy: 'network-only'
-  });
+  const { data, loading } = useQuery(FETCH_CONTACTS);
 
   // const onDeletePress = (contact) => {
   //   this.props.deleteContact(contact, this.state.token)
