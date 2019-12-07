@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Animated } from 'react-native';
-import { useQuery } from 'react-apollo';
+import { useQuery, useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
 import {
   NavigationBottomTabScreenComponent,
@@ -28,6 +28,16 @@ const FETCH_LINKS = gql`
   }
 `;
 
+const DELETE_CURATION = gql`
+  mutation DeleteCuration($id: String!) {
+    deleteCuration(id: $id) {
+      curations {
+        id
+      }
+    }
+  }
+`;
+
 type Curation = {
   id: string;
   link: { title: string; image: string };
@@ -40,7 +50,7 @@ const LinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> 
 }) => {
   const [openRows, setOpenRows] = useState<string[]>([]);
   const [opacity, setOpacity] = useState(new Animated.Value(1));
-  const { data, loading, error } = useQuery(FETCH_LINKS);
+  const { data, loading, error, refetch } = useQuery(FETCH_LINKS);
 
   const togglePlusIcon = (direction: 'show' | 'hide') => {
     const toValue = direction === 'show' ? 1 : 0;
@@ -69,6 +79,14 @@ const LinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> 
     }
   };
 
+  const [deleteCuration] = useMutation(DELETE_CURATION);
+
+  const handleDeletePress = async (curationId: string) => {
+    await deleteCuration({ variables: { id: curationId } });
+    setOpenRows([]);
+    refetch();
+  };
+
   const PlusIcon = () => {
     return (
       <Animated.View style={[styles.plusIconContainer, { opacity }]}>
@@ -93,7 +111,7 @@ const LinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> 
             color={colors.secondaryPink}
             name="trash"
             type="font-awesome"
-            onPress={handleNewLinkPress}
+            onPress={() => handleDeletePress(item.id)}
           />
           <Icon
             color={colors.secondaryPink}

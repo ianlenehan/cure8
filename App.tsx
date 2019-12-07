@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
 import firebase, { RNFirebase } from 'react-native-firebase';
 import('react-native-firebase');
+import { Root } from 'native-base';
 import ApolloClient from 'apollo-boost/lib/index';
 import { ApolloProvider } from 'react-apollo';
 import { createAppContainer } from 'react-navigation';
@@ -67,10 +68,12 @@ const App = () => {
 
   return (
     <ApolloProvider client={apolloClient}>
-      <AppContext.Provider value={{ authUser, newContact, setNewContact }}>
-        <StatusBar barStyle="light-content" />
-        <View style={styles.container}>{renderApp()}</View>
-      </AppContext.Provider>
+      <Root>
+        <AppContext.Provider value={{ authUser, newContact, setNewContact }}>
+          <StatusBar barStyle="light-content" />
+          <View style={styles.container}>{renderApp()}</View>
+        </AppContext.Provider>
+      </Root>
     </ApolloProvider>
   );
 };

@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import { Icon } from 'react-native-elements';
 
 import { AppText, colors } from '../common';
@@ -14,6 +14,7 @@ type Props = {
   isMember?: boolean;
   onDeletePress?: () => void;
   onEditPress?: () => void;
+  onPress?: () => void;
   rightIcon?: any;
   rightTitle?: string;
   subtitle?: string;
@@ -31,6 +32,7 @@ const ContactRow: FunctionComponent<Props> = props => {
     isMember,
     onDeletePress,
     onEditPress,
+    onPress,
     rightTitle,
     rightIcon,
     subtitle,
@@ -83,7 +85,7 @@ const ContactRow: FunctionComponent<Props> = props => {
   };
 
   const formatName = () => {
-    if (title && !isMember) {
+    if (title && isMember) {
       return (
         <View style={styles.row}>
           <AppText size="large">{title || ''}</AppText>
@@ -101,13 +103,15 @@ const ContactRow: FunctionComponent<Props> = props => {
 
   return (
     <View style={styles.card}>
-      <View style={styles.details}>
-        <View>
-          {formatName()}
-          {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+      <TouchableWithoutFeedback onPress={onPress}>
+        <View style={styles.details}>
+          <View>
+            {formatName()}
+            {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+          </View>
+          {getRightTitle()}
         </View>
-        {getRightTitle()}
-      </View>
+      </TouchableWithoutFeedback>
     </View>
   );
 };

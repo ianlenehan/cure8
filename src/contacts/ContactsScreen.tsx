@@ -7,8 +7,7 @@ import {
 import { useQuery, useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import { Container, AppText, Spinner } from '../common';
-import ContactRow from './ContactRow';
+import { Container, AppText, Spinner, ContactRow } from '../common';
 import NewContact from './NewContact';
 
 const FETCH_CONTACTS = gql`

@@ -19,6 +19,7 @@ export { default as Container } from './Container';
 export { default as Spinner } from './Spinner';
 export { default as AppText } from './AppText';
 export { default as Header } from './Header';
+export { default as ContactRow } from './ContactRow';
 
 type LogoProps = {
   size?: 'small' | 'medium' | 'large';

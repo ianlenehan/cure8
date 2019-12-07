@@ -13,8 +13,7 @@ import {
 import { useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import { AppText, colors } from '../common';
-import ContactRow from './ContactRow';
+import { AppText, colors, ContactRow } from '../common';
 
 import useAppContext from '../hooks/useAppContext';
 
