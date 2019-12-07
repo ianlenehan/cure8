@@ -4,7 +4,7 @@ import {
   NavigationBottomTabScreenComponent,
   NavigationTabScreenProps
 } from 'react-navigation-tabs';
-import { useQuery } from 'react-apollo';
+import { useQuery, useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import { Container, AppText, Spinner } from '../common';
@@ -24,6 +24,16 @@ const FETCH_CONTACTS = gql`
         id
         name
         phone
+      }
+    }
+  }
+`;
+
+const DELETE_CONTACT = gql`
+  mutation DeleteContact($id: String!) {
+    deleteContact(id: $id) {
+      contacts {
+        id
       }
     }
   }
@@ -50,11 +60,17 @@ const ContactsScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProp
     navigation.setParams({ buttonText, toggleEditMode });
   }, [editMode]);
 
-  const { data, loading } = useQuery(FETCH_CONTACTS);
+  const { data, loading, refetch } = useQuery(FETCH_CONTACTS);
 
-  // const onDeletePress = (contact) => {
-  //   this.props.deleteContact(contact, this.state.token)
-  // }
+  const [deleteContact, { error, loading: deleteLoading }] = useMutation(
+    DELETE_CONTACT
+  );
+
+  const handleDelete = async (id: string) => {
+    await deleteContact({ variables: { id } });
+    await refetch();
+    toggleEditMode();
+  };
 
   // setEditMode = async () => {
   //   await this.props.setEditMode(this.props.editMode)
@@ -64,14 +80,15 @@ const ContactsScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProp
   // }
 
   const renderItem = ({ item }: { item: ContactType }) => {
+    const onDeletePress = () => handleDelete(item.id);
+
     return (
       <ContactRow
-        contactId={item.id}
         title={item.name}
         isMember={false}
         rightTitle={item.linkedUser.phone}
-        editMode={editMode}
-        // onDeletePress={() => this.onDeletePress(item)}
+        disabled={loading || deleteLoading}
+        {...{ editMode, onDeletePress }}
       />
     );
   };

@@ -6,15 +6,16 @@ import { AppText, colors } from '../common';
 
 type Props = {
   chevronType?: string;
-  contactId: string;
-  editMode: boolean;
+  disabled?: boolean;
+  editMode?: boolean;
   iconColour?: string;
   iconType?: string;
   isGroup?: boolean;
   isMember?: boolean;
   onDeletePress?: () => void;
   onEditPress?: () => void;
-  rightTitle: string;
+  rightIcon?: any;
+  rightTitle?: string;
   subtitle?: string;
   title: string;
 };
@@ -22,6 +23,7 @@ type Props = {
 const ContactRow: FunctionComponent<Props> = props => {
   const {
     chevronType,
+    disabled,
     editMode,
     iconColour,
     iconType,
@@ -30,6 +32,7 @@ const ContactRow: FunctionComponent<Props> = props => {
     onDeletePress,
     onEditPress,
     rightTitle,
+    rightIcon,
     subtitle,
     title
   } = props;
@@ -42,6 +45,7 @@ const ContactRow: FunctionComponent<Props> = props => {
             name="mode-edit"
             color="#ddd"
             onPress={onEditPress}
+            disabled={disabled}
             containerStyle={{ paddingRight: 15 }}
           />
           <Icon
@@ -49,6 +53,7 @@ const ContactRow: FunctionComponent<Props> = props => {
             type="font-awesome"
             color={colors.warningRed}
             onPress={onDeletePress}
+            disabled={disabled}
           />
         </View>
       );
@@ -59,16 +64,20 @@ const ContactRow: FunctionComponent<Props> = props => {
           type="font-awesome"
           color={colors.warningRed}
           onPress={onDeletePress}
+          disabled={disabled}
         />
       );
     } else if (rightTitle) {
       return <Text style={styles.rightTitle}>{rightTitle}</Text>;
+    } else if (rightIcon) {
+      return rightIcon;
     }
     return (
       <Icon
         name={chevronType || 'chevron-right'}
         type={iconType}
         color={iconColour || '#f3f3f3'}
+        disabled={disabled}
       />
     );
   };
@@ -93,8 +102,10 @@ const ContactRow: FunctionComponent<Props> = props => {
   return (
     <View style={styles.card}>
       <View style={styles.details}>
-        {formatName()}
-        <Text style={styles.subtitle}>{subtitle}</Text>
+        <View>
+          {formatName()}
+          {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+        </View>
         {getRightTitle()}
       </View>
     </View>
@@ -113,11 +124,12 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 12,
-    color: '#ddd'
+    color: colors.textGrey
   },
   details: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingLeft: 10,
     paddingRight: 10
   },

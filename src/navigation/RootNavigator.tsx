@@ -124,6 +124,14 @@ const RootStackNavigator = createStackNavigator(
         );
       }
 
+      if (routeName === 'AddContact') {
+        headerTitle = (
+          <AppText color="white" size="large">
+            {navigation.state.params.contactName}
+          </AppText>
+        );
+      }
+
       if (routeName === 'NewLink') {
         headerTitle = (
           <AppText color="white" size="large">

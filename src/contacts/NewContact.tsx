@@ -2,7 +2,7 @@ import React, { useState, FunctionComponent } from 'react';
 import {
   View,
   TouchableOpacity,
-  Text,
+  TouchableWithoutFeedback,
   LayoutAnimation,
   ScrollView,
   Alert,
@@ -118,34 +118,34 @@ const NewContact: FunctionComponent<Props> = ({ navigate }) => {
 
   return (
     <View
-      style={
+      style={[
         isShowing && {
-          backgroundColor: colors.primaryGreen,
-          padding: 10,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20
-        }
-      }>
-      {isShowing ? (
-        <View
-          style={{
-            height: '75%'
-          }}>
-          <Button size="small" type="warning" onPress={handleCancel}>
+          height: '75%'
+        },
+        styles.overlay
+      ]}>
+      <TouchableWithoutFeedback onPress={handleNewContactPress}>
+        <View style={styles.newContactButton}>
+          <AppText color="white" size="large">
+            New Contact
+          </AppText>
+        </View>
+      </TouchableWithoutFeedback>
+      {isShowing && (
+        <View style={styles.overlayInner}>
+          <View>
+            <Input
+              placeholder="Start typing a name..."
+              onChangeText={handleChangeText}
+              value={name}
+              color="white"
+            />
+            <ScrollView style={styles.scrollView}>{renderNames()}</ScrollView>
+          </View>
+          <Button size="medium" type="secondary" onPress={handleCancel}>
             Close
           </Button>
-          <Input
-            placeholder="Start typing a name..."
-            onChangeText={handleChangeText}
-            value={name}
-            color="white"
-          />
-          <ScrollView style={styles.scrollView}>{renderNames()}</ScrollView>
         </View>
-      ) : (
-        <Button size="medium" onPress={handleNewContactPress}>
-          New Contact
-        </Button>
       )}
     </View>
   );
@@ -169,8 +169,20 @@ const styles = StyleSheet.create({
     margin: 5,
     padding: 10
   },
+  overlay: {
+    backgroundColor: colors.primaryGreen,
+    padding: 10,
+    paddingBottom: 0,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20
+  },
+  overlayInner: { flex: 1, justifyContent: 'space-between' },
   scrollView: {
     marginTop: 20
+  },
+  newContactButton: {
+    padding: 5,
+    alignItems: 'center'
   }
 });
 

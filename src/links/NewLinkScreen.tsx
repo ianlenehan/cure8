@@ -60,7 +60,6 @@ const NewLinkScreen = () => {
   const { data: contactsData, loading: loadingContacts } = useQuery(
     FETCH_CONTACTS
   );
-  console.log('TCL: NewLinkScreen -> contactsData', contactsData);
 
   const [createCuration, { loading: processing, error }] = useMutation(
     CREATE_CURATION
@@ -114,7 +113,6 @@ const NewLinkScreen = () => {
           center
           checked={saveToMyLinks}
           checkedColor={colors.darkerGreen}
-          // uncheckedColor="rgba(255, 255, 255, 0.8)"
           textStyle={{
             color: colors.textGrey,
             fontFamily: 'KohinoorBangla-Semibold',

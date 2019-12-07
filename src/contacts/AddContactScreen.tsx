@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
-import { ListItem, Divider } from 'react-native-elements';
+import { Divider, Icon } from 'react-native-elements';
 import CountryPicker, {
   CountryCode,
   getCallingCode
@@ -13,7 +13,8 @@ import {
 import { useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import { AppText, Input } from '../common';
+import { AppText, colors } from '../common';
+import ContactRow from './ContactRow';
 
 import useAppContext from '../hooks/useAppContext';
 
@@ -73,7 +74,6 @@ const AddContactScreen: NavigationStackScreenComponent<NavigationStackScreenProp
     }
   );
 
-  console.log('TCL: loading, error, data ', loading, error, data);
   useEffect(() => {
     if (data) {
       navigation.state.params.onContactSave();
@@ -141,10 +141,6 @@ const AddContactScreen: NavigationStackScreenComponent<NavigationStackScreenProp
   const renderCountryPicker = () => {
     if (!countryCode) return null;
 
-    const note =
-      'Country code selected below only applies if ' +
-      'the phone number chosen does not begin with +';
-
     return (
       <View style={styles.pickerView}>
         <AppText size="medium">Choose Country Code:</AppText>
@@ -160,6 +156,22 @@ const AddContactScreen: NavigationStackScreenComponent<NavigationStackScreenProp
     );
   };
 
+  const AddIcon = ({ name, number }: { name: string; number: string }) => {
+    const onPress = () => handleAddPress(name, number);
+
+    return (
+      <Icon
+        name="plus"
+        type="font-awesome"
+        color={colors.primaryGreen}
+        onPress={onPress}
+        reverse
+        disabled={!countryCode}
+        size={18}
+      />
+    );
+  };
+
   return (
     <View>
       {renderCountryPicker()}
@@ -167,12 +179,11 @@ const AddContactScreen: NavigationStackScreenComponent<NavigationStackScreenProp
       <ScrollView>
         <View style={{ marginBottom: 20 }}>
           {phoneNumbers.map((number: PhoneNumbers) => (
-            <ListItem
+            <ContactRow
               key={number.number}
               title={number.number}
               subtitle={numberLabel(number.label)}
-              rightIcon={{ name: 'plus', type: 'font-awesome' }}
-              onPress={() => handleAddPress(name, number.number)}
+              rightIcon={<AddIcon name={name} number={number.number} />}
             />
           ))}
         </View>
