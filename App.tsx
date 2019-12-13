@@ -16,10 +16,15 @@ const rootURL = 'http://localhost:3000/';
 
 const MainApp = createAppContainer(RootNavigator);
 
+const initialApolloClient = new ApolloClient({
+  uri: `${rootURL}graphql`
+});
+
 const App = () => {
   const [authUser, setAuthUser] = useState<RNFirebase.User>();
   const [newContact, setNewContact] = useState({});
-  const [apolloClient, setApolloClient] = useState();
+  const [apolloClient, setApolloClient] = useState(initialApolloClient);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscriber = firebase
@@ -27,19 +32,15 @@ const App = () => {
       .onAuthStateChanged(async userFromAuth => {
         if (userFromAuth) {
           setAuthUser(userFromAuth);
+          getIdToken(userFromAuth);
         } else {
           console.log('no user');
+          setLoading(false);
         }
       });
 
     return () => unsubscriber();
   }, []);
-
-  useEffect(() => {
-    if (authUser) {
-      getIdToken(authUser);
-    }
-  }, [authUser]);
 
   const getIdToken = async (authUser: RNFirebase.User) => {
     try {
@@ -49,6 +50,7 @@ const App = () => {
         headers: { token }
       });
       setApolloClient(client);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching token', error);
     }
@@ -64,7 +66,7 @@ const App = () => {
     return <MainApp />;
   };
 
-  if (!apolloClient) return <Spinner />;
+  if (loading) return <Spinner />;
 
   return (
     <ApolloProvider client={apolloClient}>

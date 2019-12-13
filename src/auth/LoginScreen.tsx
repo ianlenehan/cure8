@@ -16,6 +16,7 @@ import {
 import PhoneInput from 'react-native-phone-input';
 
 const testPhoneNumber = '+61112223333';
+// pin code is 123456
 
 type Props = {};
 
@@ -115,7 +116,7 @@ class LoginScreen extends Component<Props, State> {
             <Spacer size={2} />
             <Header color="white">Login</Header>
             <Spacer size={4} />
-            <InputLabel label={label} />
+            <InputLabel label={label} color="white" />
             <PhoneInput
               initialCountry="au"
               flagStyle={styles.flagStyle}
@@ -133,7 +134,7 @@ class LoginScreen extends Component<Props, State> {
                   style={styles.codeInput}
                   onChangeText={this.handleCodeChange}
                 />
-                <AppText style={{ color: 'white', textAlign: 'center' }}>
+                <AppText color="white" style={{ textAlign: 'center' }}>
                   Enter One Time Password that was sent to your mobile via SMS.
                 </AppText>
               </View>
@@ -143,14 +144,18 @@ class LoginScreen extends Component<Props, State> {
             )}
             <Spacer size={6} />
             {showCodeField ? (
-              <Button loading={loading} onPress={this.handleVerifyCode}>
+              <Button
+                loading={loading}
+                onPress={this.handleVerifyCode}
+                bordered>
                 Verify Code
               </Button>
             ) : (
               <Button
                 loading={loading}
                 disabled={!isValid}
-                onPress={this.handleGetCode}>
+                onPress={this.handleGetCode}
+                bordered>
                 Get Code
               </Button>
             )}
