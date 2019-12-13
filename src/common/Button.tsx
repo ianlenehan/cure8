@@ -13,6 +13,7 @@ type ButtonProps = {
   disabled?: boolean;
   size?: 'small' | 'medium' | 'large';
   raised?: boolean;
+  bordered?: boolean;
 };
 
 const getColor = (type: ButtonProps['type']) => {
@@ -62,6 +63,14 @@ const Button: FunctionComponent<ButtonProps> = props => {
       }
     : {};
 
+  const borderedStyle = props.bordered
+    ? {
+        borderColor: 'white',
+        borderWidth: 1.5,
+        opacity: 0.8
+      }
+    : {};
+
   return (
     <TouchableOpacity
       style={{
@@ -71,7 +80,8 @@ const Button: FunctionComponent<ButtonProps> = props => {
         justifyContent: 'center',
         margin: 5,
         ...raisedStyle,
-        ...props.style
+        ...props.style,
+        ...borderedStyle
       }}
       onPress={onPress}
       {...props}>

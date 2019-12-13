@@ -19,6 +19,7 @@ export { default as Container } from './Container';
 export { default as Spinner } from './Spinner';
 export { default as AppText } from './AppText';
 export { default as Header } from './Header';
+export { default as Tag } from './Tag';
 export { default as ContactRow } from './ContactRow';
 
 type LogoProps = {
@@ -50,8 +51,8 @@ export const PageWrapper: FunctionComponent<PageWrapperProps> = ({
   style
 }) => {
   const baseStyle = {
-    marginLeft: '7.5%',
-    marginRight: '7.5%'
+    marginLeft: '3%',
+    marginRight: '3%'
   };
   return <View style={[baseStyle, style]}>{children}</View>;
 };
@@ -67,18 +68,17 @@ export const Spacer: FunctionComponent<SpacerProps> = ({ size = 1 }) => {
 
 type InputLabelProps = {
   label: string;
-  white?: boolean;
+  color?: 'white' | 'grey';
 };
 
 export const InputLabel: FunctionComponent<InputLabelProps> = ({
   label,
-  white
+  color
 }) => {
-  const color = white ? 'white' : colors.textGrey;
   return (
     <AppText
       style={{
-        color,
+        color: color || colors.textGrey,
         opacity: 0.8,
         fontSize: 18
       }}>
@@ -99,6 +99,7 @@ type InputProps = {
   placeholder?: string;
   value?: string | undefined;
   color?: 'green' | 'grey' | 'white';
+  small?: boolean;
 };
 
 export const Input: FunctionComponent<InputProps> = props => {
@@ -114,7 +115,7 @@ export const Input: FunctionComponent<InputProps> = props => {
     textColor = colors.textGrey;
   }
 
-  const whiteLabel = props.color === 'white' || props.color == 'grey';
+  const labelColor = props.color === 'white' ? 'white' : 'grey';
 
   // if (Platform.OS === 'android') backgroundColor = 'rgba(0,0,0,0)';
 
@@ -123,12 +124,12 @@ export const Input: FunctionComponent<InputProps> = props => {
     : {};
 
   const textInputStyle = {
-    height: 50,
+    height: props.small ? 35 : 50,
     flex: 1,
     flexShrink: 0,
     padding: 10,
     borderRadius: 5,
-    fontSize: 24,
+    fontSize: props.small ? 16 : 24,
     backgroundColor,
     color: textColor,
     ...borderedStyle
@@ -136,7 +137,7 @@ export const Input: FunctionComponent<InputProps> = props => {
 
   return (
     <View style={{ margin: 5 }}>
-      {props.label && <InputLabel label={props.label} white={!whiteLabel} />}
+      {props.label && <InputLabel label={props.label} color={labelColor} />}
       <View style={{ display: 'flex', flexDirection: 'row' }}>
         <TextInput {...props} style={textInputStyle} />
         {props.buttonText && (
