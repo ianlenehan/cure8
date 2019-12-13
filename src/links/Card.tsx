@@ -8,25 +8,38 @@ type Props = {
   title: string;
   comment?: string;
   date: any;
+  curatedBy: string;
 };
 
-const Card: FunctionComponent<Props> = ({ image, title, comment, date }) => {
-  const formatDate = date => {
-    const currentDate = moment();
-    const dateString = moment(date)
+const Card: FunctionComponent<Props> = ({
+  image,
+  title,
+  comment,
+  date,
+  curatedBy
+}) => {
+  const formatDate = (date: string) => {
+    const currentDate = new Date();
+    return moment(date)
       .local()
       .from(currentDate);
-    return dateString[0].toUpperCase() + dateString.slice(1);
   };
 
   return (
     <View style={styles.container}>
       <Image source={{ uri: image }} style={styles.image} />
       <View style={styles.textArea}>
-        <AppText size="medium" style={styles.titleStyle}>
+        <AppText size="medium" style={styles.centredText}>
           {title}
         </AppText>
-        <Text style={styles.date}>{formatDate(date)}</Text>
+        {comment ? (
+          <AppText size="small" style={styles.subtitle}>
+            "{comment}"
+          </AppText>
+        ) : null}
+        <Text style={styles.date}>{`${formatDate(
+          date
+        )} from ${curatedBy}`}</Text>
       </View>
     </View>
   );
@@ -55,11 +68,16 @@ const styles = StyleSheet.create({
     height: 220,
     paddingBottom: 5
   },
-  titleStyle: {
+  centredText: {
     textAlign: 'center'
   },
+  subtitle: {
+    fontWeight: '200',
+    textAlign: 'center',
+    marginTop: 8
+  },
   date: {
-    fontSize: 8,
+    fontSize: 11,
     color: 'grey',
     flex: 1,
     marginTop: 10
