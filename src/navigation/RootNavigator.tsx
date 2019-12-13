@@ -64,14 +64,8 @@ const MainTabNavigator = createBottomTabNavigator(
           let iconName = 'link';
           if (routeName === 'Contacts') {
             iconName = 'address-book';
-            // } else if (routeName === 'Players') {
-            //   iconName = 'ios-contacts';
-            // } else if (routeName === 'NewRound') {
-            //   iconName = 'ios-add-circle';
-            // } else if (routeName === 'Rounds') {
-            //   iconName = 'ios-list-box';
-            // } else if (routeName === 'Availability') {
-            //   iconName = 'ios-calendar';
+            // } else if (routeName === 'NewLink') {
+            //   iconName = 'plus';
           }
 
           // You can return any component that you like here!
@@ -98,6 +92,7 @@ const RootStackNavigator = createStackNavigator(
   {
     defaultNavigationOptions: ({ navigation }) => {
       let contactsParams: any = null;
+      let linksParams: any = null;
       let routeName = navigation.state.routeName;
 
       if (navigation.state.routes) {
@@ -108,9 +103,23 @@ const RootStackNavigator = createStackNavigator(
 
         routeName = navigation.state.routes[navigation.state.index].routeName;
       }
+      console.log('TCL: routeName', routeName);
 
       let headerRight = null;
       let headerTitle = defaultNavigationOptions.headerTitle;
+
+      if (routeName === 'Links') {
+        const handleNewLinkPress = () => navigation.navigate('NewLink');
+        headerRight = () => (
+          <Icon
+            name="plus"
+            type="font-awesome"
+            color="white"
+            onPress={handleNewLinkPress}
+            containerStyle={{ marginRight: 25 }}
+          />
+        );
+      }
 
       if (routeName === 'Contacts' && contactsParams) {
         headerRight = () => (

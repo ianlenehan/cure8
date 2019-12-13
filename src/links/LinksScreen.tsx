@@ -1,16 +1,27 @@
 import React, { FunctionComponent, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Animated } from 'react-native';
+import { View, StyleSheet, Animated, Modal } from 'react-native';
 import { useQuery, useMutation } from 'react-apollo';
+import { Toast } from 'native-base';
 import gql from 'graphql-tag';
 import {
   NavigationBottomTabScreenComponent,
   NavigationTabScreenProps
 } from 'react-navigation-tabs';
-import { AppText, Button, Spacer, colors, Spinner } from '../common';
 import IonIcon from 'react-native-vector-icons/FontAwesome';
 import { Icon } from 'react-native-elements';
+
+import {
+  AppText,
+  Button,
+  Input,
+  Spacer,
+  colors,
+  Spinner,
+  Tag
+} from '../common';
+import useToast from '../hooks/useToast';
 import Card from './Card';
-import AppContext from '../utils/AppContext';
+import ArchiveModal from './ArchiveModal';
 
 import { SwipeListView } from 'react-native-swipe-list-view';
 
@@ -18,6 +29,9 @@ const FETCH_LINKS = gql`
   query curations {
     curations {
       id
+      createdAt
+      curatorName
+      comment
       link {
         id
         image
@@ -38,27 +52,38 @@ const DELETE_CURATION = gql`
   }
 `;
 
+const ARCHIVE_CURATION = gql`
+  mutation ArchiveCuration($id: String!) {
+    archiveCuration(id: $id) {
+      curations {
+        id
+      }
+    }
+  }
+`;
+
 type Curation = {
   id: string;
   link: { title: string; image: string };
   comment?: string;
-  date: any;
+  createdAt: string;
+  curatorName: string;
 };
 
 const LinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> = ({
   navigation
 }) => {
   const [openRows, setOpenRows] = useState<string[]>([]);
-  const [opacity, setOpacity] = useState(new Animated.Value(1));
-  const { data, loading, error, refetch } = useQuery(FETCH_LINKS);
+  const [archiveModalVisible, setArchiveModalVisible] = useState<boolean>(
+    false
+  );
+  const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
+  const [tags, setTags] = useState<string[]>([]);
+  const [tag, setTag] = useState<string>('');
+  const [selectedCurationId, setSelectedCurationId] = useState();
 
-  const togglePlusIcon = (direction: 'show' | 'hide') => {
-    const toValue = direction === 'show' ? 1 : 0;
-    Animated.timing(opacity, {
-      toValue,
-      duration: 200
-    }).start();
-  };
+  const [existingTags, setExistingTags] = useState(['one', 'two', 'three']);
+  const { data, loading, error, refetch } = useQuery(FETCH_LINKS);
 
   const handleNewLinkPress = () => {
     navigation.navigate('NewLink');
@@ -66,40 +91,49 @@ const LinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> 
 
   const handleScrollEnabled = (rowKey: string) => {
     setOpenRows(openRows => [...openRows, rowKey]);
-
-    togglePlusIcon('hide');
   };
 
   const handleRowDidClose = (rowKey: string) => {
     const newOpenRows = openRows.filter(row => row !== rowKey);
     setOpenRows(newOpenRows);
-
-    if (!newOpenRows.length) {
-      togglePlusIcon('show');
-    }
   };
 
   const [deleteCuration] = useMutation(DELETE_CURATION);
 
   const handleDeletePress = async (curationId: string) => {
-    await deleteCuration({ variables: { id: curationId } });
+    setSelectedCurationId(curationId);
+    setDeleteModalVisible(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    await deleteCuration({ variables: { id: selectedCurationId } });
+    setDeleteModalVisible(false);
+    useToast('Curation successfully deleted');
     setOpenRows([]);
     refetch();
   };
 
-  const PlusIcon = () => {
-    return (
-      <Animated.View style={[styles.plusIconContainer, { opacity }]}>
-        <Icon
-          color={colors.secondaryPink}
-          reverse
-          containerStyle={styles.plusIcon}
-          name="plus"
-          type="font-awesome"
-          onPress={handleNewLinkPress}
-        />
-      </Animated.View>
-    );
+  const handleArchivePress = () => {
+    setArchiveModalVisible(true);
+  };
+
+  const handleTagChange = (value: string) => {
+    setTag(value);
+    const filteredTags = existingTags.filter(t => t.includes(value));
+    setExistingTags(filteredTags);
+  };
+
+  const handleSaveNewTag = () => {
+    console.log('save tag', tag);
+  };
+
+  const handleTagPress = (tag: string) => {
+    if (tags.includes(tag)) {
+      const otherTags = tags.filter(t => t !== tag);
+      setTags(otherTags);
+    } else {
+      setTags(prevTags => [...prevTags, tag]);
+    }
   };
 
   const renderHiddenItem = ({ item }: { item: Curation }) => {
@@ -108,19 +142,19 @@ const LinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> 
         <View></View>
         <View style={styles.rightBack}>
           <Icon
-            color={colors.secondaryPink}
+            color={colors.tertiaryBlue}
             name="trash"
             type="font-awesome"
             onPress={() => handleDeletePress(item.id)}
           />
           <Icon
-            color={colors.secondaryPink}
+            color={colors.tertiaryBlue}
             name="archive"
             type="font-awesome"
-            onPress={handleNewLinkPress}
+            onPress={handleArchivePress}
           />
           <Icon
-            color={colors.secondaryPink}
+            color={colors.tertiaryBlue}
             name="share"
             type="font-awesome"
             onPress={handleNewLinkPress}
@@ -130,14 +164,15 @@ const LinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> 
     );
   };
 
-  const renderCurations = ({ item }: { item: Curation }) => {
+  const renderCuration = ({ item }: { item: Curation }) => {
     return (
       <Card
         key={item.id}
         image={item.link.image}
         title={item.link.title}
         comment={item.comment}
-        date={item.date}
+        date={item.createdAt}
+        curatedBy={item.curatorName}
       />
     );
   };
@@ -163,7 +198,7 @@ const LinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> 
     <View style={styles.container}>
       <SwipeListView
         data={data.curations}
-        renderItem={renderCurations}
+        renderItem={renderCuration}
         keyExtractor={item => item.id.toString()}
         removeClippedSubviews={false}
         renderHiddenItem={renderHiddenItem}
@@ -173,7 +208,32 @@ const LinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> 
         onRowDidClose={handleRowDidClose}
       />
 
-      <PlusIcon />
+      <ArchiveModal
+        isVisible={archiveModalVisible}
+        onTagChange={handleTagChange}
+        onTagPress={handleTagPress}
+        onSaveNewTag={handleSaveNewTag}
+        onHideModal={() => setArchiveModalVisible(false)}
+        {...{ tags, tag, existingTags }}
+      />
+
+      <Modal animationType="fade" visible={deleteModalVisible} transparent>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalInner}>
+            <AppText size="large" style={{ textAlign: 'center' }}>
+              Are you sure you want to delete this curation?
+            </AppText>
+            <View>
+              <Button size="small" type="warning" onPress={handleDeleteConfirm}>
+                Yes
+              </Button>
+              <Button size="small" onPress={() => setDeleteModalVisible(false)}>
+                No
+              </Button>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -212,5 +272,27 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     flex: 1,
     alignItems: 'flex-end'
+  },
+  modalInner: {
+    backgroundColor: 'white',
+    height: '25%',
+    padding: 10,
+    paddingBottom: 15,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    justifyContent: 'space-around'
+  },
+  modalContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    flex: 1,
+    justifyContent: 'flex-end'
+  },
+  tagContainer: {
+    borderTopWidth: 1,
+    borderColor: '#dcdcdc',
+    marginTop: 5,
+    paddingTop: 5,
+    flexDirection: 'row',
+    flexWrap: 'wrap'
   }
 });

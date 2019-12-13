@@ -18,6 +18,7 @@ export const useForm = (
     const noErrors = !hasErrors;
     if (noErrors && isSubmitting) {
       onSubmitCallback(values);
+      setValues({});
     }
   }, [errors, isSubmitting]);
 

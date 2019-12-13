@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 import { useMutation, useQuery } from 'react-apollo';
-import { Toast } from 'native-base';
 import gql from 'graphql-tag';
 import useForm from '../hooks/useForm';
+import useToast from '../hooks/useToast';
 import {
   Container,
   PageWrapper,
@@ -17,6 +17,22 @@ import {
 } from '../common';
 import validate from './validate';
 import ContactsPickList from './ContactsPickList';
+
+const FETCH_LINKS = gql`
+  query curations {
+    curations {
+      id
+      createdAt
+      curatorName
+      link {
+        id
+        image
+        title
+        url
+      }
+    }
+  }
+`;
 
 const FETCH_CONTACTS = gql`
   query contacts {
@@ -51,12 +67,6 @@ const CREATE_CURATION = gql`
     ) {
       curations {
         id
-        link {
-          id
-          image
-          title
-          url
-        }
       }
     }
   }
@@ -71,7 +81,10 @@ const NewLinkScreen = ({ navigation }) => {
   );
 
   const [createCuration, { loading: processing, error }] = useMutation(
-    CREATE_CURATION
+    CREATE_CURATION,
+    {
+      refetchQueries: [{ query: FETCH_LINKS }]
+    }
   );
 
   const saveCuration = async (values: any) => {
@@ -88,14 +101,9 @@ const NewLinkScreen = ({ navigation }) => {
 
     setSaveToMyLinks(false);
     setSelectedContactIds([]);
-    navigation.pop();
+    navigation.goBack();
 
-    Toast.show({
-      text: 'Curation successfully created',
-      position: 'top',
-      buttonText: 'OK',
-      duration: 3000
-    });
+    useToast('Curation successfully created');
   };
 
   const { handleChange, handleSubmit, values } = useForm(
@@ -129,33 +137,34 @@ const NewLinkScreen = ({ navigation }) => {
   return (
     <Container style={styles.container}>
       <Spacer size={2} />
-      <Input
-        label="Link URL"
-        placeholder="www.cure8.io"
-        autoCapitalize="none"
-        onChangeText={handleUrlChange}
-        value={url}
-        color="grey"
-      />
-      <Spacer size={2} />
-      <Input
-        label="Comment"
-        onChangeText={handleCommentChange}
-        value={comment || ''}
-        color="grey"
-      />
-      <CheckBox
-        title="Save to my links"
-        center
-        checked={saveToMyLinks}
-        checkedColor={colors.darkerGreen}
-        textStyle={styles.checkbox}
-        onPress={handleCheckboxChange}
-        containerStyle={{
-          backgroundColor: 'rgba(0,0,0,0)',
-          borderColor: 'rgba(0,0,0,0)'
-        }}
-      />
+      <PageWrapper>
+        <Input
+          placeholder="Link URL"
+          autoCapitalize="none"
+          onChangeText={handleUrlChange}
+          value={url}
+          color="grey"
+        />
+        <Spacer size={2} />
+        <Input
+          onChangeText={handleCommentChange}
+          value={comment || ''}
+          color="grey"
+          placeholder="Comment"
+        />
+        <CheckBox
+          title="Save to my links"
+          center
+          checked={saveToMyLinks}
+          checkedColor={colors.darkerGreen}
+          textStyle={styles.checkbox}
+          onPress={handleCheckboxChange}
+          containerStyle={{
+            backgroundColor: 'rgba(0,0,0,0)',
+            borderColor: 'rgba(0,0,0,0)'
+          }}
+        />
+      </PageWrapper>
       <ContactsPickList
         onPress={handleContactPress}
         selectedContactIds={selectedContactIds}
