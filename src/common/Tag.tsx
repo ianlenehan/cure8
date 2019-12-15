@@ -19,15 +19,18 @@ const styles = {
 
 type Props = {
   tag: string;
-  onPress: (tag: string) => void;
+  onPress?: (tag: string) => void;
   style?: any;
   selected: boolean;
 };
 
 const Tag: FunctionComponent<Props> = ({ tag, style, selected, onPress }) => {
   const handlePress = () => {
+    if (!onPress) return null;
+
     onPress(tag);
   };
+
   return (
     <TouchableOpacity
       style={[

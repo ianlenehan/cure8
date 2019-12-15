@@ -14,6 +14,7 @@ import { AppText, colors } from '../common';
 // };
 
 import LinksScreen from '../links/LinksScreen';
+import ArchivedLinksScreen from '../links/ArchivedLinksScreen';
 import NewLinkScreen from '../links/NewLinkScreen';
 import ContactsScreen from '../contacts/ContactsScreen';
 import AddContactScreen from '../contacts/AddContactScreen';
@@ -54,6 +55,7 @@ const NewLinkStack = createStackNavigator(
 const MainTabNavigator = createBottomTabNavigator(
   {
     Links: LinksScreen,
+    ArchivedLinks: ArchivedLinksScreen,
     Contacts: ContactsScreen
   },
   {
@@ -64,11 +66,10 @@ const MainTabNavigator = createBottomTabNavigator(
           let iconName = 'link';
           if (routeName === 'Contacts') {
             iconName = 'address-book';
-            // } else if (routeName === 'NewLink') {
-            //   iconName = 'plus';
+          } else if (routeName === 'ArchivedLinks') {
+            iconName = 'archive';
           }
 
-          // You can return any component that you like here!
           return <IonIcon name={iconName} size={25} color={tintColor} />;
         }
       };
@@ -92,7 +93,6 @@ const RootStackNavigator = createStackNavigator(
   {
     defaultNavigationOptions: ({ navigation }) => {
       let contactsParams: any = null;
-      let linksParams: any = null;
       let routeName = navigation.state.routeName;
 
       if (navigation.state.routes) {
@@ -103,7 +103,6 @@ const RootStackNavigator = createStackNavigator(
 
         routeName = navigation.state.routes[navigation.state.index].routeName;
       }
-      console.log('TCL: routeName', routeName);
 
       let headerRight = null;
       let headerTitle = defaultNavigationOptions.headerTitle;
@@ -148,6 +147,15 @@ const RootStackNavigator = createStackNavigator(
           </AppText>
         );
       }
+
+      if (routeName === 'ArchivedLinks') {
+        headerTitle = (
+          <AppText color="white" size="large">
+            Archived Links
+          </AppText>
+        );
+      }
+
       return {
         ...defaultNavigationOptions,
         headerTitle,

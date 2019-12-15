@@ -8,12 +8,12 @@ import {
 import { Spinner } from '../common';
 
 import Links from './Links';
-import { FETCH_NEW_LINKS } from './graphql';
+import { FETCH_ARCHIVED_LINKS } from './graphql';
 
-const LinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> = ({
+const ArchivedLinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> = ({
   navigation
 }) => {
-  const { data, loading, error, refetch } = useQuery(FETCH_NEW_LINKS);
+  const { data, loading, error, refetch } = useQuery(FETCH_ARCHIVED_LINKS);
 
   const handleNewLinkPress = () => {
     navigation.navigate('NewLink');
@@ -23,11 +23,12 @@ const LinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> 
 
   return (
     <Links
-      curations={data && data.curations}
+      curations={data && data.archivedCurations}
       onNewLinkPress={handleNewLinkPress}
       refetch={refetch}
+      archivedLinks
     />
   );
 };
 
-export default LinksScreen;
+export default ArchivedLinksScreen;

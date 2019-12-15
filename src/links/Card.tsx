@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import moment from 'moment';
-import { AppText } from '../common';
+import { AppText, Tag } from '../common';
 
 type Props = {
   image: string;
@@ -9,6 +9,8 @@ type Props = {
   comment?: string;
   date: any;
   curatedBy: string;
+  rating?: string;
+  tags?: any;
 };
 
 const Card: FunctionComponent<Props> = ({
@@ -16,7 +18,9 @@ const Card: FunctionComponent<Props> = ({
   title,
   comment,
   date,
-  curatedBy
+  curatedBy,
+  rating,
+  tags
 }) => {
   const formatDate = (date: string) => {
     const currentDate = new Date();
@@ -37,9 +41,18 @@ const Card: FunctionComponent<Props> = ({
             "{comment}"
           </AppText>
         ) : null}
-        <Text style={styles.date}>{`${formatDate(
-          date
-        )} from ${curatedBy}`}</Text>
+        {tags &&
+          tags.map((tag: any) => (
+            <View style={styles.tagContainer} key={tag.id}>
+              <Tag tag={tag.name} selected />
+            </View>
+          ))}
+        <View style={styles.dateView}>
+          <Text style={styles.date}>{`${formatDate(
+            date
+          )} from ${curatedBy}`}</Text>
+          {rating && <Text>{rating}</Text>}
+        </View>
       </View>
     </View>
   );
@@ -84,5 +97,15 @@ const styles = StyleSheet.create({
   },
   textArea: {
     padding: 10
+  },
+  dateView: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end'
+  },
+  tagContainer: {
+    paddingTop: 5,
+    flexDirection: 'row',
+    flexWrap: 'wrap'
   }
 });
