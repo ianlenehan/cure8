@@ -20,6 +20,7 @@ export { default as Spinner } from './Spinner';
 export { default as AppText } from './AppText';
 export { default as Header } from './Header';
 export { default as Tag } from './Tag';
+export { default as TagContainer } from './TagContainer';
 export { default as ContactRow } from './ContactRow';
 
 type LogoProps = {

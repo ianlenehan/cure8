@@ -1,17 +1,28 @@
 import React, { FunctionComponent, useState } from 'react';
-import { View, StyleSheet, Modal } from 'react-native';
-import { useMutation } from 'react-apollo';
+import {
+  View,
+  StyleSheet,
+  Modal,
+  LayoutAnimation,
+  TouchableWithoutFeedback
+} from 'react-native';
+import { useQuery, useMutation } from 'react-apollo';
 
 import IonIcon from 'react-native-vector-icons/FontAwesome';
 import { Icon } from 'react-native-elements';
 
-import { AppText, Button, Spacer, colors } from '../common';
+import { AppText, Button, Spacer, Tag, TagContainer, colors } from '../common';
 import useToast from '../hooks/useToast';
 import Card from './Card';
 import ArchiveModal from './ArchiveModal';
-import { ARCHIVE_CURATION, DELETE_CURATION } from './graphql';
+import { ARCHIVE_CURATION, DELETE_CURATION, FETCH_TAGS } from './graphql';
 
 import { SwipeListView } from 'react-native-swipe-list-view';
+
+type Tag = {
+  id: string;
+  name: string;
+};
 
 type Curation = {
   id: string;
@@ -43,9 +54,16 @@ const Links: FunctionComponent<Props> = ({
   const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
   const [tags, setTags] = useState<string[]>([]);
   const [tag, setTag] = useState<string>('');
+  const [filteredTags, setFilteredTags] = useState<[Tag] | []>([]);
   const [selectedCurationId, setSelectedCurationId] = useState();
-  const [existingTags, setExistingTags] = useState(['one', 'two', 'three']);
   const [selectedRating, setRating] = useState('');
+  const [tagSelectorOpen, setTagSelectorOpen] = useState(false);
+
+  const { data: tagsData, refetch: refetchTags } = useQuery(FETCH_TAGS);
+
+  if (tagsData && !filteredTags) {
+    setFilteredTags(tagsData.tags);
+  }
 
   const handleRatingPress = (rating: string) => {
     if (rating === selectedRating) {
@@ -97,8 +115,10 @@ const Links: FunctionComponent<Props> = ({
 
   const handleTagChange = (value: string) => {
     setTag(value);
-    const filteredTags = existingTags.filter(t => t.includes(value));
-    setExistingTags(filteredTags);
+    const filteredTags = tagsData.tags.filter((tag: Tag) =>
+      tag.name.includes(value)
+    );
+    setFilteredTags(filteredTags);
   };
 
   const handleSaveNewTag = () => {
@@ -159,9 +179,50 @@ const Links: FunctionComponent<Props> = ({
     );
   };
 
+  const renderTagSelector = () => {
+    if (!archivedLinks) return null;
+
+    const tags = tagsData ? tagsData.tags : [];
+    const icon = tagSelectorOpen ? 'expand-less' : 'expand-more';
+
+    const handleTagPress = () => {};
+
+    const toggleTagSelector = () => {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+      if (tagSelectorOpen) {
+        setTagSelectorOpen(false);
+      } else {
+        setTagSelectorOpen(true);
+      }
+    };
+
+    return (
+      <View style={styles.tagSelector}>
+        <TouchableWithoutFeedback onPress={toggleTagSelector}>
+          <View style={styles.tagSelectorTop}>
+            <AppText size="medium">Filter by tag</AppText>
+            <Icon name={icon} color={colors.primaryGreen} size={32} />
+          </View>
+        </TouchableWithoutFeedback>
+        {tagSelectorOpen && (
+          <TagContainer>
+            {tags.map((tag: any) => (
+              <Tag
+                tag={tag.name}
+                key={tag.id}
+                onPress={handleTagPress}
+                selected={tags ? tags.includes(tag.name) : false}
+              />
+            ))}
+          </TagContainer>
+        )}
+      </View>
+    );
+  };
+
   if (!curations) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, styles.noLinks]}>
         <AppText size="large">You have no links here!</AppText>
         <Spacer size={2} />
         <IonIcon.Button
@@ -176,6 +237,7 @@ const Links: FunctionComponent<Props> = ({
 
   return (
     <View style={styles.container}>
+      {renderTagSelector()}
       <SwipeListView
         data={curations}
         renderItem={renderCuration}
@@ -196,7 +258,8 @@ const Links: FunctionComponent<Props> = ({
         onHideModal={() => setArchiveModalVisible(false)}
         onRatingPress={handleRatingPress}
         onArchiveConfirm={handleArchiveConfirm}
-        {...{ tags, tag, existingTags, selectedRating }}
+        existingTags={filteredTags || []}
+        {...{ tags, tag, selectedRating }}
       />
 
       <Modal animationType="fade" visible={deleteModalVisible} transparent>
@@ -224,26 +287,12 @@ export default Links;
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#ecf0f1',
     flex: 1
   },
-  plusIconContainer: {
-    position: 'absolute',
-    bottom: 0,
-    alignSelf: 'flex-end'
-  },
-  plusIcon: {
-    opacity: 0.8,
-    shadowColor: '#000',
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
-    elevation: 2
-  },
-  scrollContainer: {
-    flex: 1
+  noLinks: {
+    alignItems: 'center'
   },
   rowBack: {
     flex: 1,
@@ -276,5 +325,14 @@ const styles = StyleSheet.create({
     paddingTop: 5,
     flexDirection: 'row',
     flexWrap: 'wrap'
+  },
+  tagSelector: {
+    backgroundColor: 'white',
+    padding: 5
+  },
+  tagSelectorTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   }
 });

@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 export const FETCH_NEW_LINKS = gql`
   query curations {
-    curations {
+    curations(status: "new") {
       id
       createdAt
       curatorName
@@ -19,7 +19,7 @@ export const FETCH_NEW_LINKS = gql`
 
 export const FETCH_ARCHIVED_LINKS = gql`
   query archivedCurations {
-    archivedCurations {
+    curations(status: "archived") {
       id
       createdAt
       curatorName
@@ -55,6 +55,15 @@ export const ARCHIVE_CURATION = gql`
       curations {
         id
       }
+    }
+  }
+`;
+
+export const FETCH_TAGS = gql`
+  query Tags {
+    tags {
+      id
+      name
     }
   }
 `;

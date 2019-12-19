@@ -7,12 +7,17 @@ import {
   TouchableWithoutFeedback
 } from 'react-native';
 
-import { Button, Input, Tag, colors } from '../common';
+import { Button, Input, Tag, TagContainer, colors } from '../common';
 
 const RATINGS = ['👍', '😂', '😢', '😲', '😡'];
 
+type Tag = {
+  id: string;
+  name: string;
+};
+
 type Props = {
-  existingTags: string[];
+  existingTags: [Tag] | [];
   isVisible: boolean;
   onArchiveConfirm: () => void;
   onRatingPress: (rating: string) => void;
@@ -58,16 +63,16 @@ const ArchiveModal: FunctionComponent<Props> = props => {
               </Button>
             )}
 
-            <View style={styles.tagContainer}>
-              {existingTags.map(tag => (
+            <TagContainer>
+              {existingTags.map((tag: Tag) => (
                 <Tag
-                  tag={tag}
-                  key={tag}
+                  tag={tag.name}
+                  key={tag.id}
                   onPress={onTagPress}
-                  selected={tags ? tags.includes(tag) : false}
+                  selected={tags ? tags.includes(tag.name) : false}
                 />
               ))}
-            </View>
+            </TagContainer>
           </View>
           <View style={styles.ratings}>
             {RATINGS.map(rating => {
@@ -103,20 +108,11 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingBottom: 15,
     borderRadius: 20
-    // borderTopRightRadius: 20
   },
   modalContainer: {
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
     flex: 1,
     justifyContent: 'center'
-  },
-  tagContainer: {
-    borderTopWidth: 1,
-    borderColor: '#dcdcdc',
-    marginTop: 5,
-    paddingTop: 5,
-    flexDirection: 'row',
-    flexWrap: 'wrap'
   },
   ratings: {
     flexDirection: 'row',

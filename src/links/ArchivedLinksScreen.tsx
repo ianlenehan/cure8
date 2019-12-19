@@ -13,7 +13,9 @@ import { FETCH_ARCHIVED_LINKS } from './graphql';
 const ArchivedLinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> = ({
   navigation
 }) => {
-  const { data, loading, error, refetch } = useQuery(FETCH_ARCHIVED_LINKS);
+  const { data, loading, error, refetch } = useQuery(
+    FETCH_ARCHIVED_LINKS
+  );
 
   const handleNewLinkPress = () => {
     navigation.navigate('NewLink');
@@ -23,7 +25,7 @@ const ArchivedLinksScreen: NavigationBottomTabScreenComponent<NavigationTabScree
 
   return (
     <Links
-      curations={data && data.archivedCurations}
+      curations={data && data.curations}
       onNewLinkPress={handleNewLinkPress}
       refetch={refetch}
       archivedLinks
