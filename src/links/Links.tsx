@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -7,9 +7,9 @@ import {
   TouchableWithoutFeedback
 } from 'react-native';
 import { useQuery, useMutation } from 'react-apollo';
-
 import IonIcon from 'react-native-vector-icons/FontAwesome';
 import { Icon } from 'react-native-elements';
+import { SwipeListView } from 'react-native-swipe-list-view';
 
 import { AppText, Button, Spacer, Tag, TagContainer, colors } from '../common';
 import useToast from '../hooks/useToast';
@@ -17,9 +17,7 @@ import Card from './Card';
 import ArchiveModal from './ArchiveModal';
 import { ARCHIVE_CURATION, DELETE_CURATION, FETCH_TAGS } from './graphql';
 
-import { SwipeListView } from 'react-native-swipe-list-view';
-
-type Tag = {
+type TagType = {
   id: string;
   name: string;
 };
@@ -31,39 +29,42 @@ type Curation = {
   createdAt: string;
   curatorName: string;
   rating: string;
-  tags: any;
+  tags: [TagType];
 };
 
 type Props = {
   curations: [Curation];
   onNewLinkPress: () => void;
   refetch: () => void;
-  archivedLinks?: boolean;
+  isArchivedLinks?: boolean;
+  onTagPress: (tag: TagType) => void;
+  onClearTagFilter: () => void;
+  filteredTagIds: string[];
 };
 
 const Links: FunctionComponent<Props> = ({
   curations,
   onNewLinkPress,
   refetch,
-  archivedLinks
+  isArchivedLinks,
+  onTagPress = () => {},
+  onClearTagFilter = () => {},
+  filteredTagIds = []
 }) => {
   const [openRows, setOpenRows] = useState<string[]>([]);
   const [archiveModalVisible, setArchiveModalVisible] = useState<boolean>(
     false
   );
   const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
-  const [tags, setTags] = useState<string[]>([]);
+  const [tagNames, setTagNames] = useState<string[]>([]);
   const [tag, setTag] = useState<string>('');
-  const [filteredTags, setFilteredTags] = useState<[Tag] | []>([]);
+
   const [selectedCurationId, setSelectedCurationId] = useState();
   const [selectedRating, setRating] = useState('');
   const [tagSelectorOpen, setTagSelectorOpen] = useState(false);
 
   const { data: tagsData, refetch: refetchTags } = useQuery(FETCH_TAGS);
-
-  if (tagsData && !filteredTags) {
-    setFilteredTags(tagsData.tags);
-  }
+  const tags = tagsData ? tagsData.tags : [];
 
   const handleRatingPress = (rating: string) => {
     if (rating === selectedRating) {
@@ -115,22 +116,18 @@ const Links: FunctionComponent<Props> = ({
 
   const handleTagChange = (value: string) => {
     setTag(value);
-    const filteredTags = tagsData.tags.filter((tag: Tag) =>
-      tag.name.includes(value)
-    );
-    setFilteredTags(filteredTags);
   };
 
   const handleSaveNewTag = () => {
-    setTags(prevTags => [...prevTags, tag]);
+    setTagNames(prevState => [...prevState, tag]);
   };
 
-  const handleTagPress = (tag: string) => {
-    if (tags.includes(tag)) {
-      const otherTags = tags.filter(t => t !== tag);
-      setTags(otherTags);
+  const handleTagPress = (tag: TagType) => {
+    if (tagNames.includes(tag.name)) {
+      const otherTags = tagNames.filter(t => t !== tag.name);
+      setTagNames(otherTags);
     } else {
-      setTags(prevTags => [...prevTags, tag]);
+      setTagNames(prevState => [...prevState, tag.name]);
     }
   };
 
@@ -143,13 +140,17 @@ const Links: FunctionComponent<Props> = ({
             color={colors.tertiaryBlue}
             name="trash"
             type="font-awesome"
+            reverse
+            size={18}
             onPress={() => handleDeletePress(item.id)}
           />
-          {!archivedLinks && (
+          {!isArchivedLinks && (
             <Icon
               color={colors.tertiaryBlue}
               name="archive"
               type="font-awesome"
+              reverse
+              size={18}
               onPress={() => handleArchivePress(item.id)}
             />
           )}
@@ -157,6 +158,8 @@ const Links: FunctionComponent<Props> = ({
             color={colors.tertiaryBlue}
             name="share"
             type="font-awesome"
+            reverse
+            size={18}
             onPress={onNewLinkPress}
           />
         </View>
@@ -165,27 +168,23 @@ const Links: FunctionComponent<Props> = ({
   };
 
   const renderCuration = ({ item }: { item: Curation }) => {
+    const { id, link, comment, createdAt, curatorName, rating, tags } = item;
     return (
       <Card
-        key={item.id}
-        image={item.link.image}
-        title={item.link.title}
-        comment={item.comment}
-        date={item.createdAt}
-        curatedBy={item.curatorName}
-        rating={item.rating}
-        tags={item.tags}
+        key={id}
+        image={link.image}
+        title={link.title}
+        date={createdAt}
+        curatedBy={curatorName}
+        {...{ comment, rating, tags, onTagPress, filteredTagIds }}
       />
     );
   };
 
   const renderTagSelector = () => {
-    if (!archivedLinks) return null;
+    if (!isArchivedLinks) return null;
 
-    const tags = tagsData ? tagsData.tags : [];
     const icon = tagSelectorOpen ? 'expand-less' : 'expand-more';
-
-    const handleTagPress = () => {};
 
     const toggleTagSelector = () => {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
@@ -206,14 +205,21 @@ const Links: FunctionComponent<Props> = ({
         </TouchableWithoutFeedback>
         {tagSelectorOpen && (
           <TagContainer>
-            {tags.map((tag: any) => (
+            {tags.map((tag: Tag) => (
               <Tag
-                tag={tag.name}
+                tag={tag}
                 key={tag.id}
-                onPress={handleTagPress}
-                selected={tags ? tags.includes(tag.name) : false}
+                onPress={onTagPress}
+                selected={filteredTagIds.includes(tag.id)}
               />
             ))}
+            <Icon
+              size={24}
+              containerStyle={{ margin: 5 }}
+              name="cancel"
+              color="#ddd"
+              onPress={onClearTagFilter}
+            />
           </TagContainer>
         )}
       </View>
@@ -258,8 +264,8 @@ const Links: FunctionComponent<Props> = ({
         onHideModal={() => setArchiveModalVisible(false)}
         onRatingPress={handleRatingPress}
         onArchiveConfirm={handleArchiveConfirm}
-        existingTags={filteredTags || []}
-        {...{ tags, tag, selectedRating }}
+        existingTags={(tagsData && tagsData.tags) || []}
+        {...{ tagNames, tag, selectedRating }}
       />
 
       <Modal animationType="fade" visible={deleteModalVisible} transparent>
@@ -297,7 +303,7 @@ const styles = StyleSheet.create({
   rowBack: {
     flex: 1,
     flexDirection: 'row',
-    paddingRight: 30
+    paddingRight: 15
   },
   rightBack: {
     justifyContent: 'space-around',

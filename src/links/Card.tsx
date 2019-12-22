@@ -1,7 +1,13 @@
 import React, { FunctionComponent } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
+import { Icon } from 'react-native-elements';
 import moment from 'moment';
 import { AppText, Tag } from '../common';
+
+type TagType = {
+  id: string;
+  name: string;
+};
 
 type Props = {
   image: string;
@@ -11,6 +17,8 @@ type Props = {
   curatedBy: string;
   rating?: string;
   tags?: any;
+  onTagPress: (tag: TagType) => void;
+  filteredTagIds: string[];
 };
 
 const Card: FunctionComponent<Props> = ({
@@ -20,7 +28,9 @@ const Card: FunctionComponent<Props> = ({
   date,
   curatedBy,
   rating,
-  tags
+  tags,
+  onTagPress,
+  filteredTagIds = []
 }) => {
   const formatDate = (date: string) => {
     const currentDate = new Date();
@@ -42,9 +52,13 @@ const Card: FunctionComponent<Props> = ({
           </AppText>
         ) : null}
         {tags &&
-          tags.map((tag: any) => (
+          tags.map((tag: TagType) => (
             <View style={styles.tagContainer} key={tag.id}>
-              <Tag tag={tag.name} selected />
+              <Tag
+                tag={tag}
+                selected={filteredTagIds.includes(tag.id)}
+                onPress={onTagPress}
+              />
             </View>
           ))}
         <View style={styles.dateView}>

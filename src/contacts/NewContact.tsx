@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     padding: 10
   },
   overlay: {
-    backgroundColor: colors.primaryGreen,
+    backgroundColor: colors.tertiaryBlue,
     padding: 10,
     paddingBottom: 0,
     borderTopLeftRadius: 20,

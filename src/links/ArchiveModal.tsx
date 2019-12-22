@@ -11,23 +11,23 @@ import { Button, Input, Tag, TagContainer, colors } from '../common';
 
 const RATINGS = ['👍', '😂', '😢', '😲', '😡'];
 
-type Tag = {
+type TagType = {
   id: string;
   name: string;
 };
 
 type Props = {
-  existingTags: [Tag] | [];
+  existingTags: [TagType];
   isVisible: boolean;
   onArchiveConfirm: () => void;
   onRatingPress: (rating: string) => void;
   onSaveNewTag: () => void;
   onTagChange: (value: string) => void;
-  onTagPress: (tag: string) => void;
+  onTagPress: (tag: TagType) => void;
   onHideModal: () => void;
   selectedRating?: string;
   tag?: string;
-  tags?: string[];
+  tagNames: string[];
 };
 
 const ArchiveModal: FunctionComponent<Props> = props => {
@@ -42,7 +42,7 @@ const ArchiveModal: FunctionComponent<Props> = props => {
     onHideModal,
     selectedRating,
     tag,
-    tags
+    tagNames = []
   } = props;
 
   return (
@@ -66,10 +66,10 @@ const ArchiveModal: FunctionComponent<Props> = props => {
             <TagContainer>
               {existingTags.map((tag: Tag) => (
                 <Tag
-                  tag={tag.name}
+                  tag={tag}
                   key={tag.id}
                   onPress={onTagPress}
-                  selected={tags ? tags.includes(tag.name) : false}
+                  selected={tagNames.includes(tag.name)}
                 />
               ))}
             </TagContainer>

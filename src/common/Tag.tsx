@@ -17,14 +17,18 @@ const styles = {
   }
 };
 
+type Tag = {
+  id: string;
+  name: string;
+};
+
 type Props = {
-  tag: string;
-  onPress?: (tag: string) => void;
-  style?: any;
+  tag: Tag;
+  onPress?: (tag: Tag) => void;
   selected: boolean;
 };
 
-const Tag: FunctionComponent<Props> = ({ tag, style, selected, onPress }) => {
+const Tag: FunctionComponent<Props> = ({ tag, selected, onPress }) => {
   const handlePress = () => {
     if (!onPress) return null;
 
@@ -37,9 +41,9 @@ const Tag: FunctionComponent<Props> = ({ tag, style, selected, onPress }) => {
         styles.tagView,
         selected && { backgroundColor: colors.primaryGreen }
       ]}
-      key={tag}
+      key={tag.id}
       onPress={handlePress}>
-      <Text style={styles.tag}>{tag}</Text>
+      <Text style={styles.tag}>{tag.name}</Text>
     </TouchableOpacity>
   );
 };
