@@ -91,14 +91,14 @@ const ContactRow: FunctionComponent<Props> = props => {
           <AppText size="large">{title || ''}</AppText>
           <Icon
             name="check-circle"
-            size={14}
+            size={12}
             color={colors.primaryGreen}
             containerStyle={{ marginLeft: 4 }}
           />
         </View>
       );
     }
-    return <AppText size="large">{title || ''}</AppText>;
+    return <AppText size="medium">{title || ''}</AppText>;
   };
 
   return (
@@ -121,7 +121,7 @@ export default ContactRow;
 const styles = StyleSheet.create({
   card: {
     backgroundColor: 'white',
-    padding: 12,
+    padding: 10,
     borderColor: '#ddd',
     borderBottomWidth: 1,
     justifyContent: 'center'

@@ -10,27 +10,27 @@ type TagType = {
 };
 
 type Props = {
-  image: string;
-  title: string;
   comment?: string;
-  date: any;
   curatedBy: string;
+  date: any;
+  filteredTagIds: string[];
+  image: string;
+  onTagPress: (tag: TagType) => void;
   rating?: string;
   tags?: any;
-  onTagPress: (tag: TagType) => void;
-  filteredTagIds: string[];
+  title: string;
 };
 
 const Card: FunctionComponent<Props> = ({
-  image,
-  title,
   comment,
-  date,
   curatedBy,
+  date,
+  filteredTagIds = [],
+  image,
+  onTagPress,
   rating,
   tags,
-  onTagPress,
-  filteredTagIds = []
+  title
 }) => {
   const formatDate = (date: string) => {
     const currentDate = new Date();
@@ -77,19 +77,19 @@ export default Card;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
+    borderBottomWidth: 0,
+    borderColor: '#ddd',
+    borderRadius: 2,
     borderWidth: 0,
+    elevation: 1,
+    marginBottom: 5,
     marginLeft: 0,
     marginRight: 0,
-    marginBottom: 5,
     marginTop: 5,
-    borderRadius: 2,
-    borderColor: '#ddd',
-    borderBottomWidth: 0,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1
+    shadowRadius: 2
   },
   image: {
     height: 220,

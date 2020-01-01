@@ -20,11 +20,11 @@ type Props = {
   existingTags: [TagType];
   isVisible: boolean;
   onArchiveConfirm: () => void;
+  onHideModal: () => void;
   onRatingPress: (rating: string) => void;
   onSaveNewTag: () => void;
   onTagChange: (value: string) => void;
   onTagPress: (tag: TagType) => void;
-  onHideModal: () => void;
   selectedRating?: string;
   tag?: string;
   tagNames: string[];
@@ -35,11 +35,11 @@ const ArchiveModal: FunctionComponent<Props> = props => {
     existingTags,
     isVisible,
     onArchiveConfirm,
+    onHideModal,
     onRatingPress,
     onSaveNewTag,
     onTagChange,
     onTagPress,
-    onHideModal,
     selectedRating,
     tag,
     tagNames = []
@@ -51,10 +51,10 @@ const ArchiveModal: FunctionComponent<Props> = props => {
         <View style={styles.modalInner}>
           <View style={{ flex: 1 }}>
             <Input
+              autoCapitalize="none"
+              color="grey"
               label="Add tags"
               onChangeText={onTagChange}
-              color="grey"
-              autoCapitalize="none"
               small
             />
             {!!tag && (
@@ -66,10 +66,10 @@ const ArchiveModal: FunctionComponent<Props> = props => {
             <TagContainer>
               {existingTags.map((tag: Tag) => (
                 <Tag
-                  tag={tag}
                   key={tag.id}
                   onPress={onTagPress}
                   selected={tagNames.includes(tag.name)}
+                  tag={tag}
                 />
               ))}
             </TagContainer>

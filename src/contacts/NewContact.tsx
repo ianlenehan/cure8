@@ -2,7 +2,6 @@ import React, { useState, FunctionComponent } from 'react';
 import {
   View,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   LayoutAnimation,
   ScrollView,
   Alert,
@@ -10,7 +9,9 @@ import {
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 import Contacts, { Contact } from 'react-native-contacts';
-import { Button, Input, colors, AppText } from '../common';
+
+import Overlay from './Overlay';
+import { Input, colors, AppText } from '../common';
 import useAppContext from '../hooks/useAppContext';
 
 type Props = {
@@ -18,25 +19,13 @@ type Props = {
 };
 
 const NewContact: FunctionComponent<Props> = ({ navigate }) => {
-  const [isShowing, setShowing] = useState(false);
   const [name, setName] = useState('');
   const [contacts, setContacts] = useState();
   const { setNewContact } = useAppContext();
 
-  const handleNewContactPress = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setShowing(true);
-  };
-
-  const handleCancel = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setShowing(false);
-  };
-
   const handleContactSave = () => {
     setName('');
     setContacts([]);
-    setShowing(false);
   };
 
   const getPhoneContact = (name: string) => {
@@ -88,7 +77,7 @@ const NewContact: FunctionComponent<Props> = ({ navigate }) => {
     });
   };
 
-  const onContactPress = (contact: any) => {
+  const handleContactPress = (contact: any) => {
     const contactName = `${contact.givenName} ${contact.familyName}`;
     setNewContact(contact);
     navigate('AddContact', { contactName, onContactSave: handleContactSave });
@@ -99,12 +88,13 @@ const NewContact: FunctionComponent<Props> = ({ navigate }) => {
 
     return contacts.map((contact: any) => {
       const name = `${contact.givenName || ''} ${contact.familyName || ''}`;
+      const onPress = () => handleContactPress(contact);
       return (
-        <TouchableOpacity
-          key={contact.recordID}
-          onPress={() => onContactPress(contact)}>
+        <TouchableOpacity key={contact.recordID} onPress={onPress}>
           <View style={styles.nameView}>
-            <AppText size="large">{name}</AppText>
+            <AppText size="large" color="black">
+              {name}
+            </AppText>
             <Icon
               name="arrow-right"
               type="font-awesome"
@@ -117,72 +107,34 @@ const NewContact: FunctionComponent<Props> = ({ navigate }) => {
   };
 
   return (
-    <View
-      style={[
-        isShowing && {
-          height: '75%'
-        },
-        styles.overlay
-      ]}>
-      <TouchableWithoutFeedback onPress={handleNewContactPress}>
-        <View style={styles.newContactButton}>
-          <AppText color="white" size="large">
-            New Contact
-          </AppText>
-        </View>
-      </TouchableWithoutFeedback>
-      {isShowing && (
-        <View style={styles.overlayInner}>
-          <View>
-            <Input
-              placeholder="Start typing a name..."
-              onChangeText={handleChangeText}
-              value={name}
-              color="white"
-            />
-            <ScrollView style={styles.scrollView}>{renderNames()}</ScrollView>
-          </View>
-          <Button size="medium" type="secondary" onPress={handleCancel}>
-            Close
-          </Button>
-        </View>
-      )}
-    </View>
+    <Overlay buttonText="New Contact">
+      <View>
+        <Input
+          placeholder="Start typing a name..."
+          onChangeText={handleChangeText}
+          value={name}
+          color="white"
+        />
+        <ScrollView style={styles.scrollView}>{renderNames()}</ScrollView>
+      </View>
+    </Overlay>
   );
 };
 
 const styles = StyleSheet.create({
-  searchContainer: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderBottomWidth: 0,
-    paddingTop: 5
-  },
-  button: {
-    margin: 10
-  },
   nameView: {
-    backgroundColor: colors.backgroundGrey,
+    backgroundColor: 'white',
     borderRadius: 5,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     margin: 5,
-    padding: 10
-  },
-  overlay: {
-    backgroundColor: colors.tertiaryBlue,
     padding: 10,
-    paddingBottom: 0,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20
+    borderColor: colors.textGrey,
+    borderWidth: 1
   },
-  overlayInner: { flex: 1, justifyContent: 'space-between' },
   scrollView: {
     marginTop: 20
-  },
-  newContactButton: {
-    padding: 5,
-    alignItems: 'center'
   }
 });
 

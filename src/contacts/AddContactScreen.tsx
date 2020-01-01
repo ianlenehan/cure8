@@ -74,7 +74,7 @@ const AddContactScreen: NavigationStackScreenComponent<NavigationStackScreenProp
   );
 
   useEffect(() => {
-    if (data) {
+    if (data && navigation.state.params) {
       navigation.state.params.onContactSave();
       navigation.goBack();
     }

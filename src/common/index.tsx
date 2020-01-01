@@ -125,12 +125,12 @@ export const Input: FunctionComponent<InputProps> = props => {
     : {};
 
   const textInputStyle = {
-    height: props.small ? 35 : 50,
+    height: props.small ? 35 : 45,
     flex: 1,
     flexShrink: 0,
     padding: 10,
     borderRadius: 5,
-    fontSize: props.small ? 16 : 24,
+    fontSize: props.small ? 16 : 20,
     backgroundColor,
     color: textColor,
     ...borderedStyle

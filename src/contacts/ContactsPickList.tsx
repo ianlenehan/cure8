@@ -13,18 +13,19 @@ const styles = StyleSheet.create({
 });
 
 type Props = {
-  selectedContactIds: [string];
+  selectedContactIds: string[];
   onPress: (contactId: string) => void;
   contacts: any;
   editMode: boolean;
-  loading: boolean;
+  loading?: boolean;
+  groups?: any;
 };
 
 const ContactPickList: FunctionComponent<Props> = ({
   selectedContactIds,
   onPress,
   contacts,
-  groups,
+  groups = [],
   loading,
   editMode
 }) => {

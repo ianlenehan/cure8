@@ -16,7 +16,7 @@ import {
   colors
 } from '../common';
 import validate from './validate';
-import ContactsPickList from './ContactsPickList';
+import ContactsPickList from '../contacts/ContactsPickList';
 
 const FETCH_LINKS = gql`
   query curations {
@@ -145,7 +145,7 @@ const NewLinkScreen = ({ navigation }) => {
           value={url}
           color="grey"
         />
-        <Spacer size={2} />
+        <Spacer />
         <Input
           onChangeText={handleCommentChange}
           value={comment || ''}
@@ -176,9 +176,6 @@ const NewLinkScreen = ({ navigation }) => {
       <Button onPress={handleSubmit} loading={processing}>
         Save
       </Button>
-      {/* <Button onPress={handleCancel} loading={loading}>
-          Cancel
-        </Button> */}
     </Container>
   );
 };
@@ -190,7 +187,7 @@ const styles = StyleSheet.create({
   checkbox: {
     color: colors.textGrey,
     fontFamily: 'KohinoorBangla-Semibold',
-    fontSize: 18
+    fontSize: 16
   }
 });
 
