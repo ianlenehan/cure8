@@ -74,6 +74,7 @@ const ContactRow: FunctionComponent<Props> = props => {
     } else if (rightIcon) {
       return rightIcon;
     }
+
     return (
       <Icon
         name={chevronType || 'chevron-right'}

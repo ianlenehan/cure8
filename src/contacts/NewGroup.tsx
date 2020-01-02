@@ -17,18 +17,26 @@ const CREATE_GROUP_MUTATION = gql`
   }
 `;
 
+const UPDATE_GROUP_MUTATION = gql`
+  mutation UpdateGroup($id: String!, $name: String!, $memberIds: [String!]!) {
+    updateGroup(id: $id, name: $name, memberIds: $memberIds) {
+      group {
+        id
+      }
+    }
+  }
+`;
+
 type Props = {
-  navigate: any;
   contacts: any;
-  onCreateGroupCompletion: () => void;
+  onGroupSaveCompletion: () => void;
   onGroupOverlayClose: () => void;
   selectedGroup?: any;
 };
 
 const NewGroup: FunctionComponent<Props> = ({
-  navigate,
   contacts,
-  onCreateGroupCompletion,
+  onGroupSaveCompletion,
   onGroupOverlayClose,
   selectedGroup
 }) => {
@@ -46,12 +54,19 @@ const NewGroup: FunctionComponent<Props> = ({
   }, [selectedGroup]);
 
   const [createGroup, { loading, error }] = useMutation(CREATE_GROUP_MUTATION);
+  const [updateGroup] = useMutation(UPDATE_GROUP_MUTATION);
 
   const handleGroupSave = async () => {
     setName('');
     setSelectedContactIds([]);
-    await createGroup({ variables: { name, memberIds: selectedContactIds } });
-    onCreateGroupCompletion();
+    if (selectedGroup) {
+      await updateGroup({
+        variables: { id: selectedGroup.id, name, memberIds: selectedContactIds }
+      });
+    } else {
+      await createGroup({ variables: { name, memberIds: selectedContactIds } });
+    }
+    onGroupSaveCompletion();
   };
 
   // const handleChangeText = (value: string) => {

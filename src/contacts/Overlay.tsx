@@ -18,10 +18,13 @@ const Overlay: FunctionComponent<Props> = ({
   children,
   buttonText,
   isOpen,
-  onSave = () => {},
+  onSave,
   onClose = () => {}
 }) => {
   const [isShowing, setShowing] = useState(false);
+  // TODO this should probably be one level up
+  // will need refactoring but will allow me to
+  // close this after adding a new contact etc
 
   useEffect(() => {
     if (isOpen && !isShowing) {
@@ -41,7 +44,7 @@ const Overlay: FunctionComponent<Props> = ({
   };
 
   const handleSave = () => {
-    onSave();
+    onSave && onSave();
     handleCancel();
   };
 
@@ -65,7 +68,7 @@ const Overlay: FunctionComponent<Props> = ({
           {children}
           <View>
             {onSave && (
-              <Button size="small" type="primary" onPress={onSave}>
+              <Button size="small" type="primary" onPress={handleSave}>
                 Save
               </Button>
             )}

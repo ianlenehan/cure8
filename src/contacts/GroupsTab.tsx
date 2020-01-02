@@ -24,6 +24,16 @@ const FETCH_GROUPS = gql`
   }
 `;
 
+const DELETE_GROUP = gql`
+  mutation DeleteGroup($id: String!) {
+    deleteGroup(id: $id) {
+      groups {
+        id
+      }
+    }
+  }
+`;
+
 type Props = {
   navigate: any;
   editMode: boolean;
@@ -34,6 +44,8 @@ type Props = {
 type GroupType = {
   id: string;
   name: string;
+  memberIds: [string];
+  members: [{ id: string; name: string }];
   owner: {
     id: string;
     name: string;
@@ -48,15 +60,17 @@ const GroupsTab: FunctionComponent<Props> = props => {
   const [selectedGroupId, setSelectedGroupId] = useState<string>('');
 
   const { data, loading, error, refetch } = useQuery(FETCH_GROUPS);
+  const [deleteGroup] = useMutation(DELETE_GROUP);
 
   const handleDelete = async (id: string) => {
-    // await deleteContact({ variables: { id } });
-    // await refetch();
-    // onDeleteCompletion();
+    await deleteGroup({ variables: { id } });
+    await refetch();
+    onDeleteCompletion();
   };
 
   const handleGroupSaveCompletion = () => {
     refetch();
+    setSelectedGroupId('');
   };
 
   const handleGroupOverlayClose = () => {
@@ -67,12 +81,15 @@ const GroupsTab: FunctionComponent<Props> = props => {
     const onDeletePress = () => handleDelete(item.id);
     const handlePress = () => setSelectedGroupId(item.id);
 
+    const memberList = item.members.map(m => m.name).join(', ');
+
     return (
       <ContactRow
         title={item.name}
         isMember={false}
         disabled={loading}
         onPress={handlePress}
+        subtitle={memberList}
         {...{ editMode, onDeletePress }}
       />
     );
@@ -105,9 +122,9 @@ const GroupsTab: FunctionComponent<Props> = props => {
     <View style={styles.container}>
       <Container style={styles.pageContainer}>{renderContent()}</Container>
       <NewGroup
-        onCreateGroupCompletion={refetch}
+        onGroupSaveCompletion={handleGroupSaveCompletion}
         onGroupOverlayClose={handleGroupOverlayClose}
-        {...{ navigate, contacts, selectedGroup }}
+        {...{ contacts, selectedGroup }}
       />
     </View>
   );
