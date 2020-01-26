@@ -15,7 +15,6 @@ import { AppText, colors } from '../common';
 
 import LinksScreen from '../links/LinksScreen';
 import ArchivedLinksScreen from '../links/ArchivedLinksScreen';
-import NewLinkScreen from '../links/NewLinkScreen';
 import ContactsScreen from '../contacts/ContactsScreen';
 import AddContactScreen from '../contacts/AddContactScreen';
 
@@ -41,16 +40,6 @@ const defaultNavigationOptions: NavigationStackOptions = {
   },
   headerTitle: <LogoTitle />
 };
-
-const NewLinkStack = createStackNavigator(
-  {
-    NewLink: NewLinkScreen
-  },
-  {
-    mode: 'modal',
-    headerMode: 'none'
-  }
-);
 
 const MainTabNavigator = createBottomTabNavigator(
   {
@@ -87,19 +76,24 @@ const RootStackNavigator = createStackNavigator(
     Main: {
       screen: MainTabNavigator
     },
-    NewLink: NewLinkStack,
     AddContact: AddContactScreen
   },
   {
     defaultNavigationOptions: ({ navigation }) => {
-      let contactsParams: any = null;
+      let contactsParams: any = {};
+      let linksParams: any = {};
       let routeName = navigation.state.routeName;
 
       if (navigation.state.routes) {
         const contactsRoute = navigation.state.routes.find(
-          route => route.routeName === 'Contacts'
+          ({ routeName }) => routeName === 'Contacts'
         );
         contactsParams = (contactsRoute && contactsRoute.params) || {};
+
+        const linksRoute = navigation.state.routes.find(
+          ({ routeName }) => routeName === 'Links'
+        );
+        linksParams = (linksRoute && linksRoute.params) || {};
 
         routeName = navigation.state.routes[navigation.state.index].routeName;
       }
@@ -108,13 +102,12 @@ const RootStackNavigator = createStackNavigator(
       let headerTitle = defaultNavigationOptions.headerTitle;
 
       if (routeName === 'Links') {
-        const handleNewLinkPress = () => navigation.navigate('NewLink');
         headerRight = () => (
           <Icon
             name="plus"
             type="font-awesome"
             color="white"
-            onPress={handleNewLinkPress}
+            onPress={linksParams.onNewLinkPress}
             containerStyle={{ marginRight: 25 }}
           />
         );

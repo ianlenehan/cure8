@@ -1,41 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, FunctionComponent } from 'react';
 import { StyleSheet } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 import { useMutation, useQuery } from 'react-apollo';
 import gql from 'graphql-tag';
 import useForm from '../hooks/useForm';
 import useToast from '../hooks/useToast';
-import {
-  Container,
-  PageWrapper,
-  AppText,
-  Button,
-  Input,
-  Spacer,
-  Header,
-  colors
-} from '../common';
+import { Input, Spacer, Overlay, Spinner, colors } from '../common';
 import validate from './validate';
 import ContactsPickList from '../contacts/ContactsPickList';
 
-const FETCH_LINKS = gql`
-  query curations {
-    curations {
-      id
-      createdAt
-      curatorName
-      link {
-        id
-        image
-        title
-        url
-      }
-    }
-  }
-`;
-
-const FETCH_CONTACTS = gql`
-  query contacts {
+const FETCH_CONTACTS_AND_GROUPS = gql`
+  query contactsAndGroups {
     contacts {
       id
       name
@@ -47,6 +22,19 @@ const FETCH_CONTACTS = gql`
         id
         name
         phone
+      }
+    }
+    groups {
+      id
+      name
+      memberIds
+      owner {
+        id
+        name
+      }
+      members {
+        id
+        name
       }
     }
   }
@@ -72,19 +60,26 @@ const CREATE_CURATION = gql`
   }
 `;
 
-const NewLinkScreen = ({ navigation }) => {
+type Props = {
+  onOverlayCancel: () => void;
+  overlayIsOpen: boolean;
+  refetchLinks: () => void;
+};
+
+const NewLink: FunctionComponent<Props> = ({
+  onOverlayCancel,
+  overlayIsOpen,
+  refetchLinks
+}) => {
   const [saveToMyLinks, setSaveToMyLinks] = useState<boolean>(false);
   const [selectedContactIds, setSelectedContactIds] = useState<string[]>([]);
 
-  const { data: contactsData, loading: loadingContacts } = useQuery(
-    FETCH_CONTACTS
+  const { data, loading: loadingContacts } = useQuery(
+    FETCH_CONTACTS_AND_GROUPS
   );
 
   const [createCuration, { loading: processing, error }] = useMutation(
-    CREATE_CURATION,
-    {
-      refetchQueries: [{ query: FETCH_LINKS }]
-    }
+    CREATE_CURATION
   );
 
   const saveCuration = async (values: any) => {
@@ -101,8 +96,9 @@ const NewLinkScreen = ({ navigation }) => {
 
     setSaveToMyLinks(false);
     setSelectedContactIds([]);
-    navigation.goBack();
 
+    onOverlayCancel();
+    refetchLinks();
     useToast('Curation successfully created');
   };
 
@@ -134,49 +130,57 @@ const NewLinkScreen = ({ navigation }) => {
     }
   };
 
+  if (loadingContacts) return <Spinner />;
+
+  if (!data) return null;
+
+  const buttonText = 'New Link';
+  const saveDisabled = false;
+
   return (
-    <Container style={styles.container}>
-      <Spacer size={2} />
-      <PageWrapper>
-        <Input
-          placeholder="Link URL"
-          autoCapitalize="none"
-          onChangeText={handleUrlChange}
-          value={url}
-          color="grey"
-        />
-        <Spacer />
-        <Input
-          onChangeText={handleCommentChange}
-          value={comment || ''}
-          color="grey"
-          placeholder="Comment"
-        />
-        <CheckBox
-          title="Save to my links"
-          center
-          checked={saveToMyLinks}
-          checkedColor={colors.darkerGreen}
-          textStyle={styles.checkbox}
-          onPress={handleCheckboxChange}
-          containerStyle={{
-            backgroundColor: 'rgba(0,0,0,0)',
-            borderColor: 'rgba(0,0,0,0)'
-          }}
-        />
-      </PageWrapper>
+    <Overlay
+      {...{ buttonText, saveDisabled }}
+      fullscreen
+      hideMainButton
+      onSave={handleSubmit}
+      onCancel={onOverlayCancel}
+      loading={processing}
+      isOpen={overlayIsOpen}>
+      <Input
+        placeholder="Link URL"
+        autoCapitalize="none"
+        onChangeText={handleUrlChange}
+        value={url}
+        color="white"
+      />
+      <Spacer />
+      <Input
+        onChangeText={handleCommentChange}
+        value={comment || ''}
+        color="white"
+        placeholder="Comment"
+      />
+      <CheckBox
+        title="Save to my links"
+        center
+        checked={saveToMyLinks}
+        checkedColor={colors.darkerGreen}
+        textStyle={styles.checkbox}
+        onPress={handleCheckboxChange}
+        containerStyle={{
+          backgroundColor: 'rgba(0,0,0,0)',
+          borderColor: 'rgba(0,0,0,0)'
+        }}
+      />
       <ContactsPickList
         onPress={handleContactPress}
         selectedContactIds={selectedContactIds}
-        contacts={contactsData && contactsData.contacts}
+        contacts={data.contacts}
+        groups={data.groups}
         loading={loadingContacts}
-        groups={[]}
         editMode={false}
       />
-      <Button onPress={handleSubmit} loading={processing}>
-        Save
-      </Button>
-    </Container>
+    </Overlay>
   );
 };
 
@@ -191,4 +195,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default NewLinkScreen;
+export default NewLink;

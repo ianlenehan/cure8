@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FunctionComponent } from 'react';
+import React, { FunctionComponent } from 'react';
 import {
   View,
   LayoutAnimation,
@@ -10,49 +10,48 @@ import { Button, colors, AppText } from '../common';
 type Props = {
   buttonText: string;
   onSave?: () => void;
-  isOpen?: boolean;
-  onClose?: () => void;
+  isOpen: boolean;
+  onCancel: () => void;
+  onPress?: () => void;
+  saveDisabled?: boolean;
+  fullscreen?: boolean;
+  hideMainButton?: boolean;
+  loading?: boolean;
 };
 
-const Overlay: FunctionComponent<Props> = ({
-  children,
-  buttonText,
-  isOpen,
-  onSave,
-  onClose = () => {}
-}) => {
-  const [isShowing, setShowing] = useState(false);
-  // TODO this should probably be one level up
-  // will need refactoring but will allow me to
-  // close this after adding a new contact etc
-
-  useEffect(() => {
-    if (isOpen && !isShowing) {
-      handlePress();
-    }
-  }, [isOpen]);
+const Overlay: FunctionComponent<Props> = props => {
+  const {
+    buttonText,
+    children,
+    isOpen,
+    onCancel,
+    onPress,
+    onSave,
+    fullscreen,
+    hideMainButton,
+    saveDisabled,
+    loading
+  } = props;
 
   const handlePress = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setShowing(true);
+    onPress && onPress();
   };
 
   const handleCancel = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setShowing(false);
-    onClose();
+    onCancel();
   };
 
-  const handleSave = () => {
-    onSave && onSave();
-    handleCancel();
-  };
+  const height = fullscreen ? '95%' : '85%';
+
+  if (hideMainButton && !isOpen) return null;
 
   return (
     <View
       style={[
-        isShowing && {
-          height: '85%'
+        isOpen && {
+          height
         },
         styles.overlay
       ]}>
@@ -63,12 +62,17 @@ const Overlay: FunctionComponent<Props> = ({
           </AppText>
         </View>
       </TouchableWithoutFeedback>
-      {isShowing && (
+      {isOpen && (
         <View style={styles.overlayInner}>
           {children}
           <View>
             {onSave && (
-              <Button size="small" type="primary" onPress={handleSave}>
+              <Button
+                size="small"
+                type="primary"
+                onPress={onSave}
+                loading={loading}
+                disabled={saveDisabled}>
                 Save
               </Button>
             )}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useQuery } from 'react-apollo';
 import {
   NavigationBottomTabScreenComponent,
@@ -15,17 +15,13 @@ const LinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> 
 }) => {
   const { data, loading, error, refetch } = useQuery(FETCH_NEW_LINKS);
 
-  const handleNewLinkPress = () => {
-    navigation.navigate('NewLink');
-  };
-
   if (loading) return <Spinner />;
 
   return (
     <Links
       curations={data && data.curations}
-      onNewLinkPress={handleNewLinkPress}
       refetch={refetch}
+      setParams={navigation.setParams}
     />
   );
 };

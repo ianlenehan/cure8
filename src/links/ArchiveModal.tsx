@@ -90,7 +90,7 @@ const ArchiveModal: FunctionComponent<Props> = props => {
           <Button size="small" onPress={onArchiveConfirm}>
             Archive
           </Button>
-          <Button size="small" type="secondary" onPress={onHideModal}>
+          <Button size="small" type="tertiary" onPress={onHideModal}>
             Cancel
           </Button>
         </View>

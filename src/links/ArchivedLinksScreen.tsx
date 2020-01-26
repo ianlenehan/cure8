@@ -15,18 +15,12 @@ type Tag = {
   name: string;
 };
 
-const ArchivedLinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> = ({
-  navigation
-}) => {
+const ArchivedLinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> = () => {
   const [filteredTagIds, setFilteredTagIds] = useState<string[]>([]);
 
   const { data, loading, error, refetch } = useQuery(FETCH_ARCHIVED_LINKS, {
     variables: { tagIds: filteredTagIds }
   });
-
-  const handleNewLinkPress = () => {
-    navigation.navigate('NewLink');
-  };
 
   const handleTagPress = (tag: Tag) => {
     if (filteredTagIds.includes(tag.id)) {
@@ -46,7 +40,6 @@ const ArchivedLinksScreen: NavigationBottomTabScreenComponent<NavigationTabScree
   return (
     <Links
       {...{ refetch, filteredTagIds, curations }}
-      onNewLinkPress={handleNewLinkPress}
       onTagPress={handleTagPress}
       onClearTagFilter={handleClearTagFilter}
       isArchivedLinks

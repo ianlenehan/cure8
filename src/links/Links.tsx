@@ -13,7 +13,9 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 
 import { AppText, Button, Spacer, Tag, TagContainer, colors } from '../common';
 import useToast from '../hooks/useToast';
+import useBoolean from '../hooks/useBoolean';
 import Card from './Card';
+import NewLink from './NewLink';
 import ArchiveModal from './ArchiveModal';
 import { ARCHIVE_CURATION, DELETE_CURATION, FETCH_TAGS } from './graphql';
 
@@ -34,22 +36,22 @@ type Curation = {
 
 type Props = {
   curations: [Curation];
-  onNewLinkPress: () => void;
   refetch: () => void;
   isArchivedLinks?: boolean;
-  onTagPress: (tag: TagType) => void;
-  onClearTagFilter: () => void;
-  filteredTagIds: string[];
+  onTagPress?: (tag: TagType) => void;
+  onClearTagFilter?: () => void;
+  filteredTagIds?: string[];
+  setParams?: any;
 };
 
 const Links: FunctionComponent<Props> = ({
   curations,
-  onNewLinkPress,
   refetch,
   isArchivedLinks,
   onTagPress = () => {},
   onClearTagFilter = () => {},
-  filteredTagIds = []
+  filteredTagIds = [],
+  setParams
 }) => {
   const [openRows, setOpenRows] = useState<string[]>([]);
   const [archiveModalVisible, setArchiveModalVisible] = useState<boolean>(
@@ -62,9 +64,21 @@ const Links: FunctionComponent<Props> = ({
   const [selectedCurationId, setSelectedCurationId] = useState();
   const [selectedRating, setRating] = useState('');
   const [tagSelectorOpen, setTagSelectorOpen] = useState(false);
+  const [showingNewLink, showNewLink, hideNewLink] = useBoolean(false);
 
   const { data: tagsData, refetch: refetchTags } = useQuery(FETCH_TAGS);
   const tags = tagsData ? tagsData.tags : [];
+
+  const handleNewLinkPress = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    showNewLink();
+  };
+
+  useEffect(() => {
+    if (setParams) {
+      setParams({ onNewLinkPress: handleNewLinkPress });
+    }
+  }, []);
 
   const handleRatingPress = (rating: string) => {
     if (rating === selectedRating) {
@@ -160,7 +174,7 @@ const Links: FunctionComponent<Props> = ({
             type="font-awesome"
             reverse
             size={18}
-            onPress={onNewLinkPress}
+            onPress={handleNewLinkPress}
           />
         </View>
       </View>
@@ -234,7 +248,7 @@ const Links: FunctionComponent<Props> = ({
         <IonIcon.Button
           name="plus-square"
           backgroundColor={colors.primaryGreen}
-          onPress={onNewLinkPress}>
+          onPress={handleNewLinkPress}>
           Create One
         </IonIcon.Button>
       </View>
@@ -285,6 +299,11 @@ const Links: FunctionComponent<Props> = ({
           </View>
         </View>
       </Modal>
+      <NewLink
+        onOverlayCancel={hideNewLink}
+        overlayIsOpen={showingNewLink}
+        refetchLinks={refetch}
+      />
     </View>
   );
 };

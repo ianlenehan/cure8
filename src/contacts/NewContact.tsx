@@ -10,9 +10,9 @@ import {
 import { Icon } from 'react-native-elements';
 import Contacts, { Contact } from 'react-native-contacts';
 
-import Overlay from './Overlay';
-import { Input, colors, AppText } from '../common';
+import { Input, Overlay, colors, AppText } from '../common';
 import useAppContext from '../hooks/useAppContext';
+import useBoolean from '../hooks/useBoolean';
 
 type Props = {
   navigate: any;
@@ -21,6 +21,7 @@ type Props = {
 const NewContact: FunctionComponent<Props> = ({ navigate }) => {
   const [name, setName] = useState('');
   const [contacts, setContacts] = useState();
+  const [showingNewContact, showNewContact, hideNewContact] = useBoolean(false);
   const { setNewContact } = useAppContext();
 
   const handleContactSave = () => {
@@ -107,7 +108,11 @@ const NewContact: FunctionComponent<Props> = ({ navigate }) => {
   };
 
   return (
-    <Overlay buttonText="New Contact">
+    <Overlay
+      buttonText="New Contact"
+      isOpen={showingNewContact}
+      onPress={showNewContact}
+      onCancel={hideNewContact}>
       <View>
         <Input
           placeholder="Start typing a name..."

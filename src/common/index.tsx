@@ -22,6 +22,7 @@ export { default as Header } from './Header';
 export { default as Tag } from './Tag';
 export { default as TagContainer } from './TagContainer';
 export { default as ContactRow } from './ContactRow';
+export { default as Overlay } from './Overlay';
 
 type LogoProps = {
   size?: 'small' | 'medium' | 'large';

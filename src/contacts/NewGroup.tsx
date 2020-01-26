@@ -1,11 +1,11 @@
 import React, { useState, useEffect, FunctionComponent } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, LayoutAnimation } from 'react-native';
 import { useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import Overlay from './Overlay';
-import { Input, colors } from '../common';
+import { Input, Overlay } from '../common';
 import ContactsPickList from './ContactsPickList';
+import useBoolean from '../hooks/useBoolean';
 
 const CREATE_GROUP_MUTATION = gql`
   mutation CreateGroup($name: String!, $memberIds: [String!]!) {
@@ -42,10 +42,12 @@ const NewGroup: FunctionComponent<Props> = ({
 }) => {
   const [name, setName] = useState<string>('');
   const [selectedContactIds, setSelectedContactIds] = useState<string[]>([]);
+  const [showingNewGroup, showNewGroup, hideNewGroup] = useBoolean(false);
 
   useEffect(() => {
     if (selectedGroup) {
       setName(selectedGroup.name);
+      handleShow();
       setSelectedContactIds(selectedGroup.memberIds);
     } else {
       setName('');
@@ -55,6 +57,16 @@ const NewGroup: FunctionComponent<Props> = ({
 
   const [createGroup, { loading, error }] = useMutation(CREATE_GROUP_MUTATION);
   const [updateGroup] = useMutation(UPDATE_GROUP_MUTATION);
+
+  const handleCancel = () => {
+    hideNewGroup();
+    onGroupOverlayClose();
+  };
+
+  const handleShow = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    showNewGroup();
+  };
 
   const handleGroupSave = async () => {
     setName('');
@@ -89,13 +101,15 @@ const NewGroup: FunctionComponent<Props> = ({
   };
 
   const buttonText = selectedGroup ? 'Edit Group' : 'New Group';
+  const saveDisabled = !name || !selectedContactIds.length;
 
   return (
     <Overlay
-      {...{ buttonText }}
-      onClose={onGroupOverlayClose}
+      {...{ buttonText, saveDisabled }}
       onSave={handleGroupSave}
-      isOpen={!!selectedGroup}>
+      onPress={showNewGroup}
+      onCancel={handleCancel}
+      isOpen={showingNewGroup}>
       <View>
         <Input
           placeholder="Group name"
@@ -115,22 +129,5 @@ const NewGroup: FunctionComponent<Props> = ({
     </Overlay>
   );
 };
-
-const styles = StyleSheet.create({
-  nameView: {
-    backgroundColor: 'white',
-    borderRadius: 5,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    margin: 5,
-    padding: 10,
-    borderColor: colors.textGrey,
-    borderWidth: 1
-  },
-  scrollView: {
-    marginTop: 20
-  }
-});
 
 export default NewGroup;
