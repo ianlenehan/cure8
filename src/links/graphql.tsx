@@ -6,6 +6,7 @@ export const FETCH_NEW_LINKS = gql`
       id
       createdAt
       curatorName
+      curatorId
       comment
       link {
         id
@@ -23,6 +24,7 @@ export const FETCH_ARCHIVED_LINKS = gql`
       id
       createdAt
       curatorName
+      curatorId
       comment
       tags {
         id
@@ -62,6 +64,15 @@ export const ARCHIVE_CURATION = gql`
 export const FETCH_TAGS = gql`
   query Tags {
     tags {
+      id
+      name
+    }
+  }
+`;
+
+export const FETCH_CURRENT_USER = gql`
+  query currentUser {
+    appUser {
       id
       name
     }

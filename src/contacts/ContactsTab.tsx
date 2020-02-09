@@ -3,7 +3,7 @@ import { FlatList, View, StyleSheet } from 'react-native';
 import { useQuery, useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import { Container, AppText, Spinner, ContactRow } from '../common';
+import { Container, Spinner, ContactRow, EmptyPage } from '../common';
 import NewContact from './NewContact';
 
 const FETCH_CONTACTS = gql`
@@ -89,7 +89,7 @@ const ContactsTab: FunctionComponent<Props> = props => {
 
   const renderContent = () => {
     if (!loading && !contacts.length) {
-      return <AppText>No Contacts Yet</AppText>;
+      return <EmptyPage text="No Contacts Yet" />;
     } else {
       return (
         <FlatList

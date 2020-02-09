@@ -3,7 +3,7 @@ import { FlatList, View, StyleSheet } from 'react-native';
 import { useQuery, useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import { Container, AppText, Spinner, ContactRow } from '../common';
+import { Container, Spinner, ContactRow, EmptyPage } from '../common';
 import NewGroup from './NewGroup';
 
 const FETCH_GROUPS = gql`
@@ -97,7 +97,7 @@ const GroupsTab: FunctionComponent<Props> = props => {
 
   const renderContent = () => {
     if (!loading && !data.groups.length) {
-      return <AppText>No Groups Yet</AppText>;
+      return <EmptyPage text="No Groups Yet" />;
     } else {
       return (
         <FlatList

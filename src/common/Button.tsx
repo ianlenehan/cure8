@@ -63,13 +63,15 @@ const Button: FunctionComponent<ButtonProps> = props => {
       }
     : {};
 
-  const borderedStyle = props.bordered
-    ? {
-        borderColor: 'white',
-        borderWidth: 1.5,
-        opacity: 0.8
-      }
-    : {};
+  let borderedStyle = {};
+
+  if (props.bordered) {
+    borderedStyle = {
+      borderColor: props.disabled ? colors.darkerGreen : 'white',
+      borderWidth: 1.5,
+      opacity: 0.8
+    };
+  }
 
   return (
     <TouchableOpacity

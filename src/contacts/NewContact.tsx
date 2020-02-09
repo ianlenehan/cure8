@@ -93,14 +93,10 @@ const NewContact: FunctionComponent<Props> = ({ navigate }) => {
       return (
         <TouchableOpacity key={contact.recordID} onPress={onPress}>
           <View style={styles.nameView}>
-            <AppText size="large" color="black">
+            <AppText size="large" color="white">
               {name}
             </AppText>
-            <Icon
-              name="arrow-right"
-              type="font-awesome"
-              color={colors.textGrey}
-            />
+            <Icon name="arrow-right" type="font-awesome" color="white" />
           </View>
         </TouchableOpacity>
       );
@@ -128,15 +124,13 @@ const NewContact: FunctionComponent<Props> = ({ navigate }) => {
 
 const styles = StyleSheet.create({
   nameView: {
-    backgroundColor: 'white',
+    backgroundColor: colors.primaryGreen,
     borderRadius: 5,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     margin: 5,
-    padding: 10,
-    borderColor: colors.textGrey,
-    borderWidth: 1
+    padding: 10
   },
   scrollView: {
     marginTop: 20

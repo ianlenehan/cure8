@@ -23,6 +23,7 @@ export { default as Tag } from './Tag';
 export { default as TagContainer } from './TagContainer';
 export { default as ContactRow } from './ContactRow';
 export { default as Overlay } from './Overlay';
+export { default as EmptyPage } from './EmptyPage';
 
 type LogoProps = {
   size?: 'small' | 'medium' | 'large';
@@ -101,12 +102,14 @@ type InputProps = {
   placeholder?: string;
   value?: string | undefined;
   color?: 'green' | 'grey' | 'white';
+  labelColor?: 'grey' | 'white';
   small?: boolean;
 };
 
 export const Input: FunctionComponent<InputProps> = props => {
   let backgroundColor = colors.darkerGreen;
   let textColor = 'white';
+  const labelColor = props.labelColor || 'grey';
 
   if (props.color === 'white') {
     backgroundColor = 'white';
@@ -116,8 +119,6 @@ export const Input: FunctionComponent<InputProps> = props => {
     backgroundColor = colors.backgroundGrey;
     textColor = colors.textGrey;
   }
-
-  const labelColor = props.color === 'white' ? 'white' : 'grey';
 
   // if (Platform.OS === 'android') backgroundColor = 'rgba(0,0,0,0)';
 
