@@ -1,6 +1,7 @@
-import React, { FunctionComponent } from 'react';
+import React, { useState, FunctionComponent } from 'react';
 import { Text, SectionList, StyleSheet } from 'react-native';
 import { ContactRow, colors } from '../common';
+import { Item } from 'native-base';
 
 const styles = StyleSheet.create({
   sectionHeader: {
@@ -14,9 +15,8 @@ const styles = StyleSheet.create({
 
 type Props = {
   selectedContactIds: string[];
-  onPress: (contactId: string) => void;
+  onPress: (contactIds: string[]) => void;
   contacts: any;
-  editMode: boolean;
   loading?: boolean;
   groups?: any;
 };
@@ -26,18 +26,39 @@ const ContactPickList: FunctionComponent<Props> = ({
   onPress,
   contacts,
   groups = [],
-  loading,
-  editMode
+  loading
 }) => {
-  const getIconColour = (contactId: string) => {
-    if (selectedContactIds.includes(contactId)) {
+  const [selectedGroupIds, setSelectdGroupIds] = useState<string[]>([]);
+
+  const getIconColour = (item: any) => {
+    if (item.memberIds && selectedGroupIds.includes(item.id)) {
+      return colors.primaryGreen;
+    }
+    if (!item.memberIds && selectedContactIds.includes(item.id)) {
       return colors.primaryGreen;
     }
     return colors.backgroundGrey;
   };
 
   const renderItem = ({ item }: any) => {
-    const iconColour = getIconColour(item.id);
+    const iconColour = getIconColour(item);
+
+    let handlePress = () => onPress([item.id]);
+
+    if (item.memberIds) {
+      handlePress = () => {
+        onPress(item.memberIds);
+        if (selectedGroupIds.includes(item.id)) {
+          const otherIds = selectedGroupIds.filter(
+            groupId => groupId !== item.id
+          );
+          setSelectdGroupIds(otherIds);
+        } else {
+          setSelectdGroupIds(prevState => [...prevState, item.id]);
+        }
+      };
+    }
+
     return (
       <ContactRow
         title={item.name}
@@ -45,7 +66,7 @@ const ContactPickList: FunctionComponent<Props> = ({
         chevronType="circle"
         iconType="font-awesome"
         iconColour={iconColour}
-        onPress={() => onPress(item.id)}
+        onPress={handlePress}
       />
     );
   };
@@ -67,7 +88,6 @@ const ContactPickList: FunctionComponent<Props> = ({
         ]}
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
-        // editMode={editMode}
         keyExtractor={item => item.id.toString()}
         removeClippedSubviews={false}
       />

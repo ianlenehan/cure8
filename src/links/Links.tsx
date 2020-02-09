@@ -63,7 +63,8 @@ const Links: FunctionComponent<Props> = ({
   const [tag, setTag] = useState<string>('');
   const [selectedCurationId, setSelectedCurationId] = useState();
   const [selectedCuration, setSelectedCuration] = useState();
-  const [selectedRating, setRating] = useState('');
+  const [forwardUrl, setForwardUrl] = useState<string>('');
+  const [selectedRating, setRating] = useState<string>('');
   const [tagSelectorOpen, setTagSelectorOpen] = useState(false);
   const [showingNewLink, showNewLink, hideNewLink] = useBoolean(false);
 
@@ -152,7 +153,18 @@ const Links: FunctionComponent<Props> = ({
 
   const handleWebViewerClose = () => setSelectedCuration(null);
 
+  const handleNewLinkSubmit = () => {
+    refetch();
+    setOpenRows([]);
+    setForwardUrl('');
+  };
+
   const renderHiddenItem = ({ item }: { item: Curation }) => {
+    const handleForwardLinkPress = () => {
+      setForwardUrl(item.link.url);
+      handleNewLinkPress();
+    };
+
     return (
       <View style={styles.rowBack}>
         <View></View>
@@ -181,7 +193,7 @@ const Links: FunctionComponent<Props> = ({
             type="font-awesome"
             reverse
             size={18}
-            onPress={handleNewLinkPress}
+            onPress={handleForwardLinkPress}
           />
         </View>
       </View>
@@ -332,7 +344,8 @@ const Links: FunctionComponent<Props> = ({
       <NewLink
         onOverlayCancel={hideNewLink}
         overlayIsOpen={showingNewLink}
-        refetchLinks={refetch}
+        onSubmitComplete={handleNewLinkSubmit}
+        {...{ forwardUrl }}
       />
       <WebViewer
         onRequestClose={handleWebViewerClose}

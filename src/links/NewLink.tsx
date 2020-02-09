@@ -1,4 +1,4 @@
-import React, { useState, FunctionComponent } from 'react';
+import React, { useState, useEffect, FunctionComponent } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 import { useMutation, useQuery } from 'react-apollo';
@@ -63,13 +63,15 @@ const CREATE_CURATION = gql`
 type Props = {
   onOverlayCancel: () => void;
   overlayIsOpen: boolean;
-  refetchLinks: () => void;
+  forwardUrl?: string;
+  onSubmitComplete: () => void;
 };
 
 const NewLink: FunctionComponent<Props> = ({
   onOverlayCancel,
   overlayIsOpen,
-  refetchLinks
+  forwardUrl,
+  onSubmitComplete
 }) => {
   const [saveToMyLinks, setSaveToMyLinks] = useState<boolean>(false);
   const [selectedContactIds, setSelectedContactIds] = useState<string[]>([]);
@@ -98,7 +100,7 @@ const NewLink: FunctionComponent<Props> = ({
     setSelectedContactIds([]);
 
     onOverlayCancel();
-    refetchLinks();
+    onSubmitComplete();
     useToast('Curation successfully created');
   };
 
@@ -108,6 +110,12 @@ const NewLink: FunctionComponent<Props> = ({
   );
 
   const { url, comment } = values as any;
+
+  useEffect(() => {
+    if (forwardUrl) {
+      handleChange('url', forwardUrl);
+    }
+  }, [forwardUrl]);
 
   const handleCheckboxChange = () => {
     setSaveToMyLinks(!saveToMyLinks);
@@ -121,13 +129,16 @@ const NewLink: FunctionComponent<Props> = ({
     handleChange('comment', text);
   };
 
-  const handleContactPress = (contactId: string) => {
-    if (selectedContactIds.includes(contactId)) {
-      const otherContacts = selectedContactIds.filter(c => c !== contactId);
-      setSelectedContactIds(otherContacts);
-    } else {
-      setSelectedContactIds(prevState => [...prevState, contactId]);
-    }
+  const handleContactPress = (contactIds: string[]) => {
+    let newIds = [...selectedContactIds];
+    contactIds.forEach(contactId => {
+      if (selectedContactIds.includes(contactId)) {
+        newIds = newIds.filter(c => c !== contactId);
+      } else {
+        newIds.push(contactId);
+      }
+    });
+    setSelectedContactIds(newIds);
   };
 
   if (loadingContacts) return <Spinner />;
@@ -161,18 +172,22 @@ const NewLink: FunctionComponent<Props> = ({
           color="white"
           placeholder="Comment"
         />
-        <CheckBox
-          title="Save to my links"
-          center
-          checked={saveToMyLinks}
-          checkedColor={colors.darkerGreen}
-          textStyle={styles.checkbox}
-          onPress={handleCheckboxChange}
-          containerStyle={{
-            backgroundColor: 'rgba(0,0,0,0)',
-            borderColor: 'rgba(0,0,0,0)'
-          }}
-        />
+        {!forwardUrl ? (
+          <CheckBox
+            title="Save to my links"
+            center
+            checked={saveToMyLinks}
+            checkedColor={colors.darkerGreen}
+            textStyle={styles.checkbox}
+            onPress={handleCheckboxChange}
+            containerStyle={{
+              backgroundColor: 'rgba(0,0,0,0)',
+              borderColor: 'rgba(0,0,0,0)'
+            }}
+          />
+        ) : (
+          <Spacer size={2} />
+        )}
       </View>
       <ContactsPickList
         onPress={handleContactPress}
@@ -180,7 +195,6 @@ const NewLink: FunctionComponent<Props> = ({
         contacts={data.contacts}
         groups={data.groups}
         loading={loadingContacts}
-        editMode={false}
       />
     </Overlay>
   );
