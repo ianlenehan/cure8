@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState, useEffect } from 'react';
+import React, { Fragment, FunctionComponent, useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -10,14 +10,28 @@ import { useQuery, useMutation } from 'react-apollo';
 import IonIcon from 'react-native-vector-icons/FontAwesome';
 import { Icon } from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import { get } from 'lodash';
 
-import { AppText, Button, Spacer, Tag, TagContainer, colors } from '../common';
+import {
+  AppText,
+  Button,
+  Spacer,
+  Tag,
+  TagContainer,
+  colors,
+  EmptyPage
+} from '../common';
 import useToast from '../hooks/useToast';
 import useBoolean from '../hooks/useBoolean';
 import Card from './Card';
 import NewLink from './NewLink';
 import ArchiveModal from './ArchiveModal';
-import { ARCHIVE_CURATION, DELETE_CURATION, FETCH_TAGS } from './graphql';
+import {
+  ARCHIVE_CURATION,
+  DELETE_CURATION,
+  FETCH_TAGS,
+  FETCH_CURRENT_USER
+} from './graphql';
 
 type TagType = {
   id: string;
@@ -30,6 +44,7 @@ type Curation = {
   comment?: string;
   createdAt: string;
   curatorName: string;
+  curatorId: string;
   rating: string;
   tags: [TagType];
 };
@@ -45,7 +60,7 @@ type Props = {
 };
 
 const Links: FunctionComponent<Props> = ({
-  curations,
+  curations = [],
   refetch,
   isArchivedLinks,
   onTagPress = () => {},
@@ -65,6 +80,10 @@ const Links: FunctionComponent<Props> = ({
   const [selectedRating, setRating] = useState('');
   const [tagSelectorOpen, setTagSelectorOpen] = useState(false);
   const [showingNewLink, showNewLink, hideNewLink] = useBoolean(false);
+
+  const { data: currentUser, loading: loadingCurrentUser } = useQuery(
+    FETCH_CURRENT_USER
+  );
 
   const { data: tagsData, refetch: refetchTags } = useQuery(FETCH_TAGS);
   const tags = tagsData ? tagsData.tags : [];
@@ -182,7 +201,11 @@ const Links: FunctionComponent<Props> = ({
   };
 
   const renderCuration = ({ item }: { item: Curation }) => {
-    const { id, link, comment, createdAt, curatorName, rating, tags } = item;
+    const currentUserId = get(currentUser, 'appUser.id');
+
+    const curatorName =
+      item.curatorId === currentUserId ? 'you' : item.curatorName;
+    const { id, link, comment, createdAt, rating, tags } = item;
     return (
       <Card
         key={id}
@@ -240,71 +263,88 @@ const Links: FunctionComponent<Props> = ({
     );
   };
 
-  if (!curations) {
+  const renderContent = () => {
+    if (!curations.length) {
+      const message = isArchivedLinks
+        ? 'You have no archived curations!'
+        : 'You have no curations!';
+      return (
+        <EmptyPage text={message}>
+          <View>
+            <Spacer size={2} />
+            <IonIcon.Button
+              name="plus-square"
+              backgroundColor={colors.primaryGreen}
+              onPress={handleNewLinkPress}>
+              Create One
+            </IonIcon.Button>
+          </View>
+        </EmptyPage>
+      );
+    }
+
     return (
-      <View style={[styles.container, styles.noLinks]}>
-        <AppText size="large">You have no links here!</AppText>
-        <Spacer size={2} />
-        <IonIcon.Button
-          name="plus-square"
-          backgroundColor={colors.primaryGreen}
-          onPress={handleNewLinkPress}>
-          Create One
-        </IonIcon.Button>
-      </View>
-    );
-  }
+      <View style={styles.container}>
+        {renderTagSelector()}
+        <SwipeListView
+          data={curations}
+          renderItem={renderCuration}
+          keyExtractor={item => item.id.toString()}
+          removeClippedSubviews={false}
+          renderHiddenItem={renderHiddenItem}
+          disableRightSwipe
+          rightOpenValue={-80}
+          onRowDidOpen={handleScrollEnabled}
+          onRowDidClose={handleRowDidClose}
+        />
 
-  return (
-    <View style={styles.container}>
-      {renderTagSelector()}
-      <SwipeListView
-        data={curations}
-        renderItem={renderCuration}
-        keyExtractor={item => item.id.toString()}
-        removeClippedSubviews={false}
-        renderHiddenItem={renderHiddenItem}
-        disableRightSwipe
-        rightOpenValue={-80}
-        onRowDidOpen={handleScrollEnabled}
-        onRowDidClose={handleRowDidClose}
-      />
+        <ArchiveModal
+          isVisible={archiveModalVisible}
+          onTagChange={handleTagChange}
+          onTagPress={handleTagPress}
+          onSaveNewTag={handleSaveNewTag}
+          onHideModal={() => setArchiveModalVisible(false)}
+          onRatingPress={handleRatingPress}
+          onArchiveConfirm={handleArchiveConfirm}
+          existingTags={(tagsData && tagsData.tags) || []}
+          {...{ tagNames, tag, selectedRating }}
+        />
 
-      <ArchiveModal
-        isVisible={archiveModalVisible}
-        onTagChange={handleTagChange}
-        onTagPress={handleTagPress}
-        onSaveNewTag={handleSaveNewTag}
-        onHideModal={() => setArchiveModalVisible(false)}
-        onRatingPress={handleRatingPress}
-        onArchiveConfirm={handleArchiveConfirm}
-        existingTags={(tagsData && tagsData.tags) || []}
-        {...{ tagNames, tag, selectedRating }}
-      />
-
-      <Modal animationType="fade" visible={deleteModalVisible} transparent>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalInner}>
-            <AppText size="large" style={{ textAlign: 'center' }}>
-              Are you sure you want to delete this curation?
-            </AppText>
-            <View>
-              <Button size="small" type="warning" onPress={handleDeleteConfirm}>
-                Yes
-              </Button>
-              <Button size="small" onPress={() => setDeleteModalVisible(false)}>
-                No
-              </Button>
+        <Modal animationType="fade" visible={deleteModalVisible} transparent>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalInner}>
+              <AppText size="large" style={{ textAlign: 'center' }}>
+                Are you sure you want to delete this curation?
+              </AppText>
+              <View>
+                <Button
+                  size="small"
+                  type="warning"
+                  onPress={handleDeleteConfirm}>
+                  Yes
+                </Button>
+                <Button
+                  size="small"
+                  onPress={() => setDeleteModalVisible(false)}>
+                  No
+                </Button>
+              </View>
             </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
+      </View>
+    );
+  };
+
+  return (
+    <Fragment>
+      {renderContent()}
       <NewLink
         onOverlayCancel={hideNewLink}
         overlayIsOpen={showingNewLink}
         refetchLinks={refetch}
       />
-    </View>
+    </Fragment>
   );
 };
 

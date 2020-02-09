@@ -81,10 +81,14 @@ const AddContactScreen: NavigationStackScreenComponent<NavigationStackScreenProp
   }, [data]);
 
   const getUserLocation = () => {
-    Geolocation.getCurrentPosition(info => {
-      const coords = [info.coords.latitude, info.coords.longitude];
-      getCountryCode(coords);
-    });
+    try {
+      Geolocation.getCurrentPosition(info => {
+        const coords = [info.coords.latitude, info.coords.longitude];
+        getCountryCode(coords);
+      });
+    } catch (error) {
+      console.error('There was an error with geolocation', error);
+    }
   };
 
   const getCountryCode = async (coords: number[]) => {

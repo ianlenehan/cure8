@@ -1,5 +1,5 @@
 import React, { useState, FunctionComponent } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 import { useMutation, useQuery } from 'react-apollo';
 import gql from 'graphql-tag';
@@ -135,7 +135,7 @@ const NewLink: FunctionComponent<Props> = ({
   if (!data) return null;
 
   const buttonText = 'New Link';
-  const saveDisabled = false;
+  const saveDisabled = !saveToMyLinks && !selectedContactIds.length;
 
   return (
     <Overlay
@@ -146,32 +146,34 @@ const NewLink: FunctionComponent<Props> = ({
       onCancel={onOverlayCancel}
       loading={processing}
       isOpen={overlayIsOpen}>
-      <Input
-        placeholder="Link URL"
-        autoCapitalize="none"
-        onChangeText={handleUrlChange}
-        value={url}
-        color="white"
-      />
-      <Spacer />
-      <Input
-        onChangeText={handleCommentChange}
-        value={comment || ''}
-        color="white"
-        placeholder="Comment"
-      />
-      <CheckBox
-        title="Save to my links"
-        center
-        checked={saveToMyLinks}
-        checkedColor={colors.darkerGreen}
-        textStyle={styles.checkbox}
-        onPress={handleCheckboxChange}
-        containerStyle={{
-          backgroundColor: 'rgba(0,0,0,0)',
-          borderColor: 'rgba(0,0,0,0)'
-        }}
-      />
+      <View>
+        <Input
+          placeholder="Link URL"
+          autoCapitalize="none"
+          onChangeText={handleUrlChange}
+          value={url}
+          color="white"
+        />
+        <Spacer />
+        <Input
+          onChangeText={handleCommentChange}
+          value={comment || ''}
+          color="white"
+          placeholder="Comment"
+        />
+        <CheckBox
+          title="Save to my links"
+          center
+          checked={saveToMyLinks}
+          checkedColor={colors.darkerGreen}
+          textStyle={styles.checkbox}
+          onPress={handleCheckboxChange}
+          containerStyle={{
+            backgroundColor: 'rgba(0,0,0,0)',
+            borderColor: 'rgba(0,0,0,0)'
+          }}
+        />
+      </View>
       <ContactsPickList
         onPress={handleContactPress}
         selectedContactIds={selectedContactIds}
