@@ -17,6 +17,7 @@ import LinksScreen from '../links/LinksScreen';
 import ArchivedLinksScreen from '../links/ArchivedLinksScreen';
 import ContactsScreen from '../contacts/ContactsScreen';
 import AddContactScreen from '../contacts/AddContactScreen';
+import SettingsScreen from '../settings/SettingsScreen';
 
 const LogoTitle = () => {
   return (
@@ -45,7 +46,8 @@ const MainTabNavigator = createBottomTabNavigator(
   {
     Links: LinksScreen,
     ArchivedLinks: ArchivedLinksScreen,
-    Contacts: ContactsScreen
+    Contacts: ContactsScreen,
+    Settings: SettingsScreen
   },
   {
     defaultNavigationOptions: ({ navigation }) => {
@@ -57,6 +59,8 @@ const MainTabNavigator = createBottomTabNavigator(
             iconName = 'address-book';
           } else if (routeName === 'ArchivedLinks') {
             iconName = 'archive';
+          } else if (routeName === 'Settings') {
+            iconName = 'gears';
           }
 
           return <IonIcon name={iconName} size={25} color={tintColor} />;
@@ -145,6 +149,14 @@ const RootStackNavigator = createStackNavigator(
         headerTitle = (
           <AppText color="white" size="large">
             Archived Links
+          </AppText>
+        );
+      }
+
+      if (routeName === 'Settings') {
+        headerTitle = (
+          <AppText color="white" size="large">
+            Settings
           </AppText>
         );
       }
