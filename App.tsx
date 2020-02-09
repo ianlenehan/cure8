@@ -71,7 +71,8 @@ const App = () => {
   return (
     <ApolloProvider client={apolloClient}>
       <Root>
-        <AppContext.Provider value={{ authUser, newContact, setNewContact }}>
+        <AppContext.Provider
+          value={{ authUser, setAuthUser, newContact, setNewContact }}>
           <StatusBar barStyle="light-content" />
           <View style={styles.container}>{renderApp()}</View>
         </AppContext.Provider>

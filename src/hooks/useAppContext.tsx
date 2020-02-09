@@ -2,13 +2,9 @@ import { useContext } from 'react';
 import AppContext from '../utils/AppContext';
 
 const useAppContext = () => {
-  const { authUser, newContact, setNewContact } = useContext(AppContext);
+  const context = useContext(AppContext);
 
-  return {
-    authUser,
-    newContact,
-    setNewContact
-  };
+  return context;
 };
 
 export default useAppContext;

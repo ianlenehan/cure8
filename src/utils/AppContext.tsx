@@ -4,8 +4,10 @@ const AppContext = React.createContext({
   authUser: {
     uid: '',
     phoneNumber: '',
-    displayName: ''
+    displayName: '',
+    updateProfile: ({}: any) => {}
   },
+  setAuthUser: (authUser: any) => {},
   newContact: {
     familyName: '',
     givenName: '',

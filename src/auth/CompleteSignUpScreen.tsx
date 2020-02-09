@@ -1,4 +1,9 @@
-import React, { useState, useContext, FunctionComponent } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  FunctionComponent
+} from 'react';
 import { View } from 'react-native';
 import firebase from 'react-native-firebase';
 import { useQuery, useMutation } from 'react-apollo';
@@ -34,31 +39,35 @@ const CompleteSignUpScreen: FunctionComponent = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
 
-  const { authUser } = useContext(AppContext);
-  // const handleLogout = () => {
-  //   firebase.auth().signOut();
-  // };
-  const { data, loading, error } = useQuery(USER_QUERY, {
-    variables: { phone: authUser.phoneNumber }
-  });
+  const { authUser, setAuthUser } = useContext(AppContext);
+  // const { data, loading, error } = useQuery(USER_QUERY, {
+  //   variables: { phone: authUser.phoneNumber }
+  // });
+
+  // useEffect(() => {
+  //   if (data.user) {
+
+  //   }
+  // }, [data.user])
+
   const [createUser] = useMutation(CREATE_USER_MUTATION);
 
   const handleSubmit = async () => {
-    if (!data) {
-      const firebaseAuthUser = firebase.auth().currentUser;
-      if (firebaseAuthUser) {
-        await firebaseAuthUser.updateProfile({
-          displayName: `${firstName} ${lastName}`
-        });
-        await createUser({
-          variables: { firstName, lastName, phone: authUser.phoneNumber }
-        });
-      }
+    if (authUser) {
+      await authUser.updateProfile({
+        displayName: `${firstName} ${lastName}`
+      });
+      await createUser({
+        variables: { firstName, lastName, phone: authUser.phoneNumber }
+      });
+      const newAuthUser = firebase.auth().currentUser;
+      setAuthUser(newAuthUser);
     }
   };
 
   return (
-    <Container style={{ marginTop: 30 }}>
+    <Container>
+      <Spacer size={2} />
       <Header headerNumber={3} color="white">
         What shall we call you?
       </Header>
@@ -69,6 +78,7 @@ const CompleteSignUpScreen: FunctionComponent = () => {
           label="First Name"
           placeholder="Holly"
           value={firstName}
+          labelColor="white"
         />
         <Spacer size={2} />
         <Input
@@ -76,10 +86,14 @@ const CompleteSignUpScreen: FunctionComponent = () => {
           label="Last Name"
           placeholder="Golightly"
           value={lastName}
+          labelColor="white"
         />
         <Spacer size={4} />
 
-        <Button disabled={!firstName || !lastName} onPress={handleSubmit}>
+        <Button
+          disabled={!firstName || !lastName}
+          bordered
+          onPress={handleSubmit}>
           Continue
         </Button>
       </View>
