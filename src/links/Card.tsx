@@ -1,6 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import { Icon } from 'react-native-elements';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import moment from 'moment';
 import { AppText, Tag } from '../common';
 
@@ -15,6 +14,7 @@ type Props = {
   date: any;
   filteredTagIds: string[];
   image: string;
+  onPress: () => void;
   onTagPress: (tag: TagType) => void;
   rating?: string;
   tags?: any;
@@ -27,6 +27,7 @@ const Card: FunctionComponent<Props> = ({
   date,
   filteredTagIds = [],
   image,
+  onPress,
   onTagPress,
   rating,
   tags,
@@ -41,7 +42,9 @@ const Card: FunctionComponent<Props> = ({
 
   return (
     <View style={styles.container}>
-      <Image source={{ uri: image }} style={styles.image} />
+      <TouchableOpacity {...{ onPress }}>
+        <Image source={{ uri: image }} style={styles.image} />
+      </TouchableOpacity>
       <View style={styles.textArea}>
         <AppText size="medium" style={styles.centredText}>
           {title}

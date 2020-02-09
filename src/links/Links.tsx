@@ -26,28 +26,14 @@ import useBoolean from '../hooks/useBoolean';
 import Card from './Card';
 import NewLink from './NewLink';
 import ArchiveModal from './ArchiveModal';
+import WebViewer from './WebViewer';
 import {
   ARCHIVE_CURATION,
   DELETE_CURATION,
   FETCH_TAGS,
   FETCH_CURRENT_USER
 } from './graphql';
-
-type TagType = {
-  id: string;
-  name: string;
-};
-
-type Curation = {
-  id: string;
-  link: { title: string; image: string };
-  comment?: string;
-  createdAt: string;
-  curatorName: string;
-  curatorId: string;
-  rating: string;
-  tags: [TagType];
-};
+import { Curation, TagType } from './types';
 
 type Props = {
   curations: [Curation];
@@ -75,8 +61,8 @@ const Links: FunctionComponent<Props> = ({
   const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
   const [tagNames, setTagNames] = useState<string[]>([]);
   const [tag, setTag] = useState<string>('');
-
   const [selectedCurationId, setSelectedCurationId] = useState();
+  const [selectedCuration, setSelectedCuration] = useState();
   const [selectedRating, setRating] = useState('');
   const [tagSelectorOpen, setTagSelectorOpen] = useState(false);
   const [showingNewLink, showNewLink, hideNewLink] = useBoolean(false);
@@ -164,6 +150,8 @@ const Links: FunctionComponent<Props> = ({
     }
   };
 
+  const handleWebViewerClose = () => setSelectedCuration(null);
+
   const renderHiddenItem = ({ item }: { item: Curation }) => {
     return (
       <View style={styles.rowBack}>
@@ -206,6 +194,7 @@ const Links: FunctionComponent<Props> = ({
     const curatorName =
       item.curatorId === currentUserId ? 'you' : item.curatorName;
     const { id, link, comment, createdAt, rating, tags } = item;
+    const handlePress = () => setSelectedCuration(item);
     return (
       <Card
         key={id}
@@ -213,6 +202,7 @@ const Links: FunctionComponent<Props> = ({
         title={link.title}
         date={createdAt}
         curatedBy={curatorName}
+        onPress={handlePress}
         {...{ comment, rating, tags, onTagPress, filteredTagIds }}
       />
     );
@@ -343,6 +333,10 @@ const Links: FunctionComponent<Props> = ({
         onOverlayCancel={hideNewLink}
         overlayIsOpen={showingNewLink}
         refetchLinks={refetch}
+      />
+      <WebViewer
+        onRequestClose={handleWebViewerClose}
+        curationUrl={get(selectedCuration, 'link.url')}
       />
     </Fragment>
   );
