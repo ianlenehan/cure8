@@ -6,6 +6,7 @@ import {
   Modal,
   TouchableWithoutFeedback
 } from 'react-native';
+import faker from 'faker';
 
 import { Button, Input, Tag, TagContainer, colors } from '../common';
 
@@ -45,6 +46,10 @@ const ArchiveModal: FunctionComponent<Props> = props => {
     tagNames = []
   } = props;
 
+  const newTags = tagNames.filter(
+    tagName => !existingTags.find(tag => tag.name === tagName)
+  );
+
   return (
     <Modal animationType="fade" visible={isVisible} transparent>
       <View style={styles.modalContainer}>
@@ -55,6 +60,7 @@ const ArchiveModal: FunctionComponent<Props> = props => {
               color="grey"
               label="Add tags"
               onChangeText={onTagChange}
+              value={tag}
               small
             />
             {!!tag && (
@@ -64,6 +70,12 @@ const ArchiveModal: FunctionComponent<Props> = props => {
             )}
 
             <TagContainer>
+              {newTags.map((tagName: string) => {
+                const tag = { id: faker.random.uuid(), name: tagName };
+                return (
+                  <Tag key={tag.id} onPress={onTagPress} selected tag={tag} />
+                );
+              })}
               {existingTags.map((tag: Tag) => (
                 <Tag
                   key={tag.id}
@@ -78,10 +90,10 @@ const ArchiveModal: FunctionComponent<Props> = props => {
             {RATINGS.map(rating => {
               const activeStyle =
                 rating === selectedRating ? styles.activeRating : {};
+              const handlePress = () => onRatingPress(rating);
+
               return (
-                <TouchableWithoutFeedback
-                  key={rating}
-                  onPress={() => onRatingPress(rating)}>
+                <TouchableWithoutFeedback key={rating} onPress={handlePress}>
                   <Text style={[styles.rating, activeStyle]}>{rating}</Text>
                 </TouchableWithoutFeedback>
               );

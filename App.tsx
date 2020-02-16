@@ -35,6 +35,7 @@ const App = () => {
           getIdToken(userFromAuth);
         } else {
           console.log('no user');
+          setAuthUser(undefined);
           setLoading(false);
         }
       });

@@ -42,18 +42,22 @@ type Props = {
   onTagPress?: (tag: TagType) => void;
   onClearTagFilter?: () => void;
   filteredTagIds?: string[];
+  fetchArchivedLinks?: () => void;
   setParams?: any;
 };
 
-const Links: FunctionComponent<Props> = ({
-  curations = [],
-  refetch,
-  isArchivedLinks,
-  onTagPress = () => {},
-  onClearTagFilter = () => {},
-  filteredTagIds = [],
-  setParams
-}) => {
+const Links: FunctionComponent<Props> = props => {
+  const {
+    curations = [],
+    fetchArchivedLinks = () => {},
+    filteredTagIds = [],
+    isArchivedLinks,
+    onClearTagFilter = () => {},
+    onTagPress = () => {},
+    refetch,
+    setParams
+  } = props;
+
   const [openRows, setOpenRows] = useState<string[]>([]);
   const [archiveModalVisible, setArchiveModalVisible] = useState<boolean>(
     false
@@ -107,11 +111,22 @@ const Links: FunctionComponent<Props> = ({
 
   const handleArchiveConfirm = async () => {
     await archiveCuration({
-      variables: { id: selectedCurationId, tags, rating: selectedRating }
+      variables: {
+        id: selectedCurationId,
+        tags: tagNames,
+        rating: selectedRating
+      }
     });
     setArchiveModalVisible(false);
-    refetch();
+    setTag('');
+    await refetch();
+    fetchArchivedLinks();
     setOpenRows([]);
+  };
+
+  const handleArchivePress = (curationId: string) => {
+    setSelectedCurationId(curationId);
+    setArchiveModalVisible(true);
   };
 
   const [deleteCuration] = useMutation(DELETE_CURATION);
@@ -129,17 +144,13 @@ const Links: FunctionComponent<Props> = ({
     refetch();
   };
 
-  const handleArchivePress = (curationId: string) => {
-    setSelectedCurationId(curationId);
-    setArchiveModalVisible(true);
-  };
-
   const handleTagChange = (value: string) => {
     setTag(value);
   };
 
   const handleSaveNewTag = () => {
     setTagNames(prevState => [...prevState, tag]);
+    setTag('');
   };
 
   const handleTagPress = (tag: TagType) => {
@@ -268,18 +279,20 @@ const Links: FunctionComponent<Props> = ({
   const renderContent = () => {
     if (!curations.length) {
       const message = isArchivedLinks
-        ? 'You have no archived curations!'
-        : 'You have no curations!';
+        ? "You've not archived any links yet!"
+        : 'You have no new curations!';
       return (
         <EmptyPage text={message}>
           <View>
             <Spacer size={2} />
-            <IonIcon.Button
-              name="plus-square"
-              backgroundColor={colors.primaryGreen}
-              onPress={handleNewLinkPress}>
-              Create One
-            </IonIcon.Button>
+            {!isArchivedLinks && (
+              <IonIcon.Button
+                name="plus-square"
+                backgroundColor={colors.primaryGreen}
+                onPress={handleNewLinkPress}>
+                Create One
+              </IonIcon.Button>
+            )}
           </View>
         </EmptyPage>
       );

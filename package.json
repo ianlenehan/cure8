@@ -11,9 +11,11 @@
   },
   "dependencies": {
     "@react-native-community/geolocation": "^2.0.2",
+    "@types/faker": "^4.1.9",
     "@types/lodash": "^4.14.149",
     "@types/react-native-phone-input": "^0.2.0",
     "apollo-boost": "^0.4.4",
+    "faker": "^4.1.0",
     "firebase": "^7.0.0",
     "firebaseui": "^4.2.0",
     "graphql": "^14.5.8",

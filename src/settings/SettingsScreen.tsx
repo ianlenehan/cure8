@@ -34,7 +34,7 @@ const SettingsScreen = () => {
   console.log('TCL: SettingsScreen -> data', data);
   const [toggleSetting] = useMutation(TOGGLE_SETTING);
 
-  if (loading) return <Spinner />;
+  if (loading || !data) return <Spinner />;
 
   const {
     name,

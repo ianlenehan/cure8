@@ -68,7 +68,7 @@ const Card: FunctionComponent<Props> = ({
           <Text style={styles.date}>{`${formatDate(
             date
           )} from ${curatedBy}`}</Text>
-          {rating && <Text>{rating}</Text>}
+          <Text>{rating || ''}</Text>
         </View>
       </View>
     </View>
