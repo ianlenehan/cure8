@@ -21,7 +21,6 @@ const LinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> 
       fetchPolicy: 'network-only'
     }
   );
-  console.log('TCL: archivedData', archivedData);
 
   if (loading) return <Spinner />;
 

@@ -31,7 +31,7 @@ export const TOGGLE_SETTING = gql`
 
 const SettingsScreen = () => {
   const { data, loading, refetch } = useQuery(FETCH_CURRENT_USER);
-  console.log('TCL: SettingsScreen -> data', data);
+
   const [toggleSetting] = useMutation(TOGGLE_SETTING);
 
   if (loading || !data) return <Spinner />;
