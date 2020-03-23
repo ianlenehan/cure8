@@ -1,7 +1,6 @@
 import React, { useState, FunctionComponent } from 'react';
 import { Text, SectionList, StyleSheet } from 'react-native';
 import { ContactRow, colors } from '../common';
-import { Item } from 'native-base';
 
 const styles = StyleSheet.create({
   sectionHeader: {

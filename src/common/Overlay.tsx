@@ -43,6 +43,11 @@ const Overlay: FunctionComponent<Props> = props => {
     onCancel();
   };
 
+  const handleSave = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    onSave && onSave();
+  };
+
   const height = fullscreen ? '95%' : '85%';
 
   if (hideMainButton && !isOpen) return null;
@@ -70,7 +75,7 @@ const Overlay: FunctionComponent<Props> = props => {
               <Button
                 size="small"
                 type="primary"
-                onPress={onSave}
+                onPress={handleSave}
                 loading={loading}
                 disabled={saveDisabled}>
                 Save

@@ -69,8 +69,6 @@ const NewGroup: FunctionComponent<Props> = ({
   };
 
   const handleGroupSave = async () => {
-    setName('');
-    setSelectedContactIds([]);
     if (selectedGroup) {
       await updateGroup({
         variables: { id: selectedGroup.id, name, memberIds: selectedContactIds }
@@ -78,7 +76,10 @@ const NewGroup: FunctionComponent<Props> = ({
     } else {
       await createGroup({ variables: { name, memberIds: selectedContactIds } });
     }
+    setName('');
+    setSelectedContactIds([]);
     onGroupSaveCompletion();
+    hideNewGroup();
   };
 
   // const handleChangeText = (value: string) => {
@@ -91,13 +92,15 @@ const NewGroup: FunctionComponent<Props> = ({
   //   }
   // };
 
-  const handleContactPress = (contactId: string) => {
-    if (selectedContactIds.includes(contactId)) {
-      const otherContacts = selectedContactIds.filter(c => c !== contactId);
-      setSelectedContactIds(otherContacts);
-    } else {
-      setSelectedContactIds(prevState => [...prevState, contactId]);
-    }
+  const handleContactPress = (contactIds: string[]) => {
+    contactIds.forEach((contactId: string) => {
+      if (selectedContactIds.includes(contactId)) {
+        const otherContacts = selectedContactIds.filter(c => c !== contactId);
+        setSelectedContactIds(otherContacts);
+      } else {
+        setSelectedContactIds(prevState => [...prevState, contactId]);
+      }
+    });
   };
 
   const buttonText = selectedGroup ? 'Edit Group' : 'New Group';
@@ -117,14 +120,11 @@ const NewGroup: FunctionComponent<Props> = ({
           value={name}
           color="white"
         />
-        {/* <ScrollView style={styles.scrollView}> */}
         <ContactsPickList
           onPress={handleContactPress}
           selectedContactIds={selectedContactIds}
           contacts={contacts}
-          editMode={false}
         />
-        {/* </ScrollView> */}
       </View>
     </Overlay>
   );
