@@ -1,5 +1,6 @@
 import React, { useState, FunctionComponent } from 'react';
 import { Text, SectionList, StyleSheet } from 'react-native';
+import { uniq } from 'lodash';
 import { ContactRow, colors } from '../common';
 
 const styles = StyleSheet.create({
@@ -12,12 +13,20 @@ const styles = StyleSheet.create({
   }
 });
 
+type Group = {
+  id: string;
+  name: string;
+  memberIds: string[];
+  owner: any;
+  members: any;
+};
+
 type Props = {
   selectedContactIds: string[];
   onPress: (contactIds: string[]) => void;
   contacts: any;
   loading?: boolean;
-  groups?: any;
+  groups?: Group[];
 };
 
 const ContactPickList: FunctionComponent<Props> = ({
@@ -39,23 +48,54 @@ const ContactPickList: FunctionComponent<Props> = ({
     return colors.backgroundGrey;
   };
 
+  const getSelectedMemberIds = (groupIds: string[]) => {
+    const selectedGroups:
+      | Group
+      | any = groups.filter(({ id }: { id: string }) => groupIds.includes(id));
+
+    return uniq(
+      selectedGroups
+        .map(({ memberIds }: { memberIds: string[] }) => memberIds)
+        .flat()
+    );
+  };
+
+  const handleDeselectGroup = (itemId: string) => {
+    const otherIds = selectedGroupIds.filter(groupId => groupId !== itemId);
+    const groupIds: string[] = otherIds;
+
+    const group: Group | any =
+      groups.find(({ id }: { id: string }) => id === itemId) || {};
+    const contactIds: string[] = group.memberIds.filter((id: string) => {
+      const otherGroupMemberIds = getSelectedMemberIds(groupIds);
+      return !otherGroupMemberIds.includes(id);
+    });
+    setSelectdGroupIds(groupIds);
+    onPress(contactIds);
+  };
+
+  const handleSelectGroup = (itemId: string) => {
+    const groupIds: string[] = [...selectedGroupIds, itemId];
+    const selectedMemberIds: any = getSelectedMemberIds(groupIds);
+    const contactIds: string[] = selectedMemberIds.filter(
+      (id: string) => !selectedContactIds.includes(id)
+    );
+
+    setSelectdGroupIds(groupIds);
+    onPress(contactIds);
+  };
+
   const renderItem = ({ item }: any) => {
     const iconColour = getIconColour(item);
 
     let handlePress = () => onPress([item.id]);
 
     if (item.memberIds) {
-      handlePress = () => {
-        onPress(item.memberIds);
-        if (selectedGroupIds.includes(item.id)) {
-          const otherIds = selectedGroupIds.filter(
-            groupId => groupId !== item.id
-          );
-          setSelectdGroupIds(otherIds);
-        } else {
-          setSelectdGroupIds(prevState => [...prevState, item.id]);
-        }
-      };
+      if (selectedGroupIds.includes(item.id)) {
+        handlePress = () => handleDeselectGroup(item.id);
+      } else {
+        handlePress = () => handleSelectGroup(item.id);
+      }
     }
 
     return (
