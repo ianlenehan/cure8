@@ -46,9 +46,11 @@ const Card: FunctionComponent<Props> = ({
         <Image source={{ uri: image }} style={styles.image} />
       </TouchableOpacity>
       <View style={styles.textArea}>
-        <AppText size="medium" style={styles.centredText}>
-          {title}
-        </AppText>
+        <TouchableOpacity {...{ onPress }}>
+          <AppText size="medium" style={styles.centredText}>
+            {title}
+          </AppText>
+        </TouchableOpacity>
         {comment ? (
           <AppText size="small" style={styles.subtitle}>
             "{comment}"
@@ -82,13 +84,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderBottomWidth: 0,
     borderColor: '#ddd',
-    borderRadius: 2,
     borderWidth: 0,
     elevation: 1,
+    margin: 10,
+    marginTop: 10,
     marginBottom: 5,
-    marginLeft: 0,
-    marginRight: 0,
-    marginTop: 5,
+    borderRadius: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -96,7 +97,9 @@ const styles = StyleSheet.create({
   },
   image: {
     height: 220,
-    paddingBottom: 5
+    paddingBottom: 5,
+    borderTopRightRadius: 5,
+    borderTopLeftRadius: 5
   },
   centredText: {
     textAlign: 'center'

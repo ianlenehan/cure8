@@ -18,6 +18,7 @@ import ArchivedLinksScreen from '../links/ArchivedLinksScreen';
 import ContactsScreen from '../contacts/ContactsScreen';
 import AddContactScreen from '../contacts/AddContactScreen';
 import SettingsScreen from '../settings/SettingsScreen';
+import ActivityScreen from '../activity/ActivityScreen';
 
 const LogoTitle = () => {
   return (
@@ -47,6 +48,7 @@ const MainTabNavigator = createBottomTabNavigator(
     Links: LinksScreen,
     ArchivedLinks: ArchivedLinksScreen,
     Contacts: ContactsScreen,
+    Activity: ActivityScreen,
     Settings: SettingsScreen
   },
   {
@@ -61,6 +63,8 @@ const MainTabNavigator = createBottomTabNavigator(
             iconName = 'archive';
           } else if (routeName === 'Settings') {
             iconName = 'gears';
+          } else if (routeName === 'Activity') {
+            iconName = 'list';
           }
 
           return <IonIcon name={iconName} size={25} color={tintColor} />;
@@ -137,18 +141,18 @@ const RootStackNavigator = createStackNavigator(
         );
       }
 
-      if (routeName === 'NewLink') {
-        headerTitle = (
-          <AppText color="white" size="large">
-            Curate New Link
-          </AppText>
-        );
-      }
-
       if (routeName === 'ArchivedLinks') {
         headerTitle = (
           <AppText color="white" size="large">
             Archived Links
+          </AppText>
+        );
+      }
+
+      if (routeName === 'Activity') {
+        headerTitle = (
+          <AppText color="white" size="large">
+            Activity
           </AppText>
         );
       }

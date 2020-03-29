@@ -65,8 +65,10 @@ const Links: FunctionComponent<Props> = props => {
   const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
   const [tagNames, setTagNames] = useState<string[]>([]);
   const [tag, setTag] = useState<string>('');
-  const [selectedCurationId, setSelectedCurationId] = useState();
-  const [selectedCuration, setSelectedCuration] = useState();
+  const [selectedCurationId, setSelectedCurationId] = useState<string>('');
+  const [selectedCuration, setSelectedCuration] = useState<
+    Curation | undefined
+  >();
   const [forwardUrl, setForwardUrl] = useState<string>('');
   const [selectedRating, setRating] = useState<string>('');
   const [tagSelectorOpen, setTagSelectorOpen] = useState(false);
@@ -162,7 +164,7 @@ const Links: FunctionComponent<Props> = props => {
     }
   };
 
-  const handleWebViewerClose = () => setSelectedCuration(null);
+  const handleWebViewerClose = () => setSelectedCuration(undefined);
 
   const handleNewLinkSubmit = () => {
     refetch();
@@ -412,8 +414,10 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap'
   },
   tagSelector: {
-    backgroundColor: 'white',
-    padding: 5
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+    padding: 5,
+    paddingLeft: 15,
+    paddingRight: 15
   },
   tagSelectorTop: {
     flexDirection: 'row',
