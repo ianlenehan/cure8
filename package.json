@@ -15,6 +15,7 @@
     "@types/lodash": "^4.14.149",
     "@types/react-native-phone-input": "^0.2.0",
     "apollo-boost": "^0.4.4",
+    "apollo-utilities": "^1.3.3",
     "faker": "^4.1.0",
     "firebase": "^7.0.0",
     "firebaseui": "^4.2.0",

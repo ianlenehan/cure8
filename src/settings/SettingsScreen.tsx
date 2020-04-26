@@ -6,7 +6,7 @@ import gql from 'graphql-tag';
 
 import { Container, AppText, Button, Spinner, Spacer } from '../common';
 
-export const FETCH_CURRENT_USER = gql`
+const FETCH_CURRENT_USER = gql`
   query currentUser {
     appUser {
       id
@@ -19,7 +19,7 @@ export const FETCH_CURRENT_USER = gql`
   }
 `;
 
-export const TOGGLE_SETTING = gql`
+const TOGGLE_SETTING = gql`
   mutation ToggleSetting($settingName: String!) {
     toggleSetting(settingName: $settingName) {
       user {

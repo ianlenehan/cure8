@@ -10,9 +10,9 @@ import { Spinner } from '../common';
 import Links from './Links';
 import { FETCH_NEW_LINKS, FETCH_ARCHIVED_LINKS } from './graphql';
 
-const LinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> = ({
-  navigation
-}) => {
+const LinksScreen: NavigationBottomTabScreenComponent<
+  NavigationTabScreenProps
+> = ({ navigation }) => {
   const { data, loading, error, refetch } = useQuery(FETCH_NEW_LINKS);
   const [fetchArchivedLinks, { data: archivedData }] = useLazyQuery(
     FETCH_ARCHIVED_LINKS,

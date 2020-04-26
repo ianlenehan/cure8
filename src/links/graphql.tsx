@@ -14,6 +14,11 @@ export const FETCH_NEW_LINKS = gql`
         title
         url
       }
+      sharedWith {
+        id
+        name
+        phone
+      }
     }
   }
 `;
@@ -36,6 +41,11 @@ export const FETCH_ARCHIVED_LINKS = gql`
         image
         title
         url
+      }
+      sharedWith {
+        id
+        name
+        phone
       }
     }
   }

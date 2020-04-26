@@ -12,18 +12,21 @@ import CompleteSignUpScreen from './src/auth/CompleteSignUpScreen';
 import AppContext from './src/utils/AppContext';
 import { Spinner } from './src/common';
 
-const rootURL = 'http://localhost:3000/';
+const rootURL = 'http://localhost:3001/';
 
 const MainApp = createAppContainer(RootNavigator);
 
-const initialApolloClient = new ApolloClient({
-  uri: `${rootURL}graphql`
-});
+const getApolloClient = (token: string) => {
+  return new ApolloClient({
+    uri: `${rootURL}graphql`,
+    headers: { token }
+  });
+};
 
 const App = () => {
   const [authUser, setAuthUser] = useState<RNFirebase.User>();
   const [newContact, setNewContact] = useState({});
-  const [apolloClient, setApolloClient] = useState(initialApolloClient);
+  const [apolloClient, setApolloClient] = useState<any>();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -46,10 +49,7 @@ const App = () => {
   const getIdToken = async (authUser: RNFirebase.User) => {
     try {
       const token = await authUser.getIdToken(true);
-      const client = new ApolloClient({
-        uri: `${rootURL}graphql`,
-        headers: { token }
-      });
+      const client = getApolloClient(token);
       setApolloClient(client);
       setLoading(false);
     } catch (error) {
