@@ -51,9 +51,9 @@ type PhoneNumbers = {
   label: string;
 };
 
-const AddContactScreen: NavigationStackScreenComponent<NavigationStackScreenProps> = ({
-  navigation
-}) => {
+const AddContactScreen: NavigationStackScreenComponent<
+  NavigationStackScreenProps
+> = ({ navigation }) => {
   const [callingCode, setCallingCode] = useState('');
   const [countryCode, setCountryCode] = useState<CountryCode>();
 
@@ -94,7 +94,7 @@ const AddContactScreen: NavigationStackScreenComponent<NavigationStackScreenProp
   const getCountryCode = async (coords: number[]) => {
     const [lat, long] = coords;
     const countryCodeRes = await fetch(
-      `http://localhost:3000/country?lat=${lat}&long=${long}`
+      `http://localhost:3001/country?lat=${lat}&long=${long}` // TODO make this `rootUrl`
     );
     const codeJson = await countryCodeRes.json();
     const code = codeJson.results.toUpperCase();

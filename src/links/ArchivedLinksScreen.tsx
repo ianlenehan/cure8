@@ -15,7 +15,9 @@ type Tag = {
   name: string;
 };
 
-const ArchivedLinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> = () => {
+const ArchivedLinksScreen: NavigationBottomTabScreenComponent<
+  NavigationTabScreenProps
+> = () => {
   const [filteredTagIds, setFilteredTagIds] = useState<string[]>([]);
 
   const { data, loading, error, refetch } = useQuery(FETCH_ARCHIVED_LINKS, {

@@ -62,6 +62,12 @@ const GroupsTab: FunctionComponent<Props> = props => {
   const { data, loading, error, refetch } = useQuery(FETCH_GROUPS);
   const [deleteGroup] = useMutation(DELETE_GROUP);
 
+  if (loading) {
+    return <Spinner size="large" text="Loading groups..." />;
+  }
+
+  const groups = data.groups || [];
+
   const handleDelete = async (id: string) => {
     await deleteGroup({ variables: { id } });
     await refetch();
@@ -96,12 +102,12 @@ const GroupsTab: FunctionComponent<Props> = props => {
   };
 
   const renderContent = () => {
-    if (!loading && !data.groups.length) {
+    if (!groups.length) {
       return <EmptyPage text="No Groups Yet" />;
     } else {
       return (
         <FlatList
-          data={data.groups}
+          data={groups}
           renderItem={renderItem}
           keyExtractor={item => item.id.toString()}
           removeClippedSubviews={false}
@@ -110,11 +116,7 @@ const GroupsTab: FunctionComponent<Props> = props => {
     }
   };
 
-  if (loading) {
-    return <Spinner size="large" text="Loading groups..." />;
-  }
-
-  const selectedGroup = data.groups.find(
+  const selectedGroup = groups.find(
     (group: any) => group.id === selectedGroupId
   );
 
