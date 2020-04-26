@@ -9,7 +9,7 @@ import firebase from 'react-native-firebase';
 import { useQuery, useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
 import AppContext from '../utils/AppContext';
-import { Container, Input, Header, Spacer, Button } from '../common';
+import { Container, Input, Header, Spacer, Button, Spinner } from '../common';
 
 const USER_QUERY = gql`
   query user($phone: String!) {
@@ -40,28 +40,34 @@ const CompleteSignUpScreen: FunctionComponent = () => {
   const [lastName, setLastName] = useState('');
 
   const { authUser, setAuthUser } = useContext(AppContext);
-  // const { data, loading, error } = useQuery(USER_QUERY, {
-  //   variables: { phone: authUser.phoneNumber }
-  // });
+  const { data, loading } = useQuery(USER_QUERY, {
+    variables: { phone: authUser.phoneNumber }
+  });
 
-  // useEffect(() => {
-  //   if (data.user) {
-
-  //   }
-  // }, [data.user])
+  useEffect(() => {
+    if (data.user) {
+      updateAuthUserName(data.user.name);
+    }
+  }, [data.user]);
 
   const [createUser] = useMutation(CREATE_USER_MUTATION);
 
+  if (loading) return <Spinner />;
+
+  const updateAuthUserName = async (displayName: string) => {
+    await authUser.updateProfile({
+      displayName
+    });
+    const newAuthUser = firebase.auth().currentUser;
+    setAuthUser(newAuthUser);
+  };
+
   const handleSubmit = async () => {
     if (authUser) {
-      await authUser.updateProfile({
-        displayName: `${firstName} ${lastName}`
-      });
+      await updateAuthUserName(`${firstName} ${lastName}`);
       await createUser({
         variables: { firstName, lastName, phone: authUser.phoneNumber }
       });
-      const newAuthUser = firebase.auth().currentUser;
-      setAuthUser(newAuthUser);
     }
   };
 
