@@ -38,6 +38,7 @@ type Props = {
   isArchivedLinks?: boolean;
   onArchive: (variables: ArchiveVariablesType) => void;
   onClearTagFilter?: () => void;
+  onCreateConversation: (id: string, userIds: string[]) => void;
   onDelete: (id: string) => void;
   onTagPress?: (tag: TagType) => void;
   onNewLinkSubmit: () => void;
@@ -53,6 +54,7 @@ const Links: FunctionComponent<Props> = props => {
     isArchivedLinks,
     onArchive,
     onClearTagFilter = () => {},
+    onCreateConversation,
     onDelete,
     onTagPress = () => {},
     onNewLinkSubmit,
@@ -167,8 +169,13 @@ const Links: FunctionComponent<Props> = props => {
       // const sharedWithOnlyYou = item.sharedWith.length > 1 &&
 
       const handlePress = () => {
-        const discussWithOwner = () => {};
-        const discussWithEveryone = () => {};
+        const discussWithOwner = () =>
+          onCreateConversation(item.link.id, [item.curatorId]);
+        const discussWithEveryone = () => {
+          const ids = item.sharedWith.map(({ id }: { id: string }) => id);
+          onCreateConversation(item.link.id, [...ids, item.curatorId]);
+        };
+
         const message =
           item.sharedWith.length > 1
             ? `Discuss article with ${item.curatorName} or with everyone ${
@@ -178,7 +185,6 @@ const Links: FunctionComponent<Props> = props => {
 
         const cancelOption = {
           text: 'Cancel',
-          onPress: () => console.log('cancel'),
           style: 'cancel'
         };
 
@@ -260,7 +266,14 @@ const Links: FunctionComponent<Props> = props => {
         curatedBy={curatorName}
         onPress={handlePress}
         sharedWith={sharedWith}
-        {...{ comment, rating, tags, onTagPress, filteredTagIds, sharedWith }}
+        {...{
+          comment,
+          rating,
+          tags,
+          onTagPress,
+          filteredTagIds,
+          sharedWith
+        }}
       />
     );
   };

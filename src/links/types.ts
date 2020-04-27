@@ -1,6 +1,6 @@
 export type CurationType = {
   id: string;
-  link: { title: string; image: string; url: string };
+  link: { id: string; title: string; image: string; url: string };
   comment?: string;
   createdAt: string;
   curatorName: string;

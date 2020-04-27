@@ -28,7 +28,7 @@ type Message = {
   conversationId: string;
   text: string | undefined;
   userId: string;
-  userName: string;
+  userName?: string;
   id?: string;
   createdAt: Date;
   date?: string;

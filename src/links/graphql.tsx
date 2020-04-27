@@ -1,5 +1,7 @@
 import gql from 'graphql-tag';
 
+/* **************** QUERIES **************** */
+
 export const FETCH_NEW_LINKS = gql`
   query curations {
     curations(status: "new", tagIds: []) {
@@ -51,6 +53,26 @@ export const FETCH_ARCHIVED_LINKS = gql`
   }
 `;
 
+export const FETCH_TAGS = gql`
+  query Tags {
+    tags {
+      id
+      name
+    }
+  }
+`;
+
+export const FETCH_CURRENT_USER = gql`
+  query currentUser {
+    appUser {
+      id
+      name
+    }
+  }
+`;
+
+/* **************** MUTATIONS **************** */
+
 export const DELETE_CURATION = gql`
   mutation DeleteCuration($id: String!) {
     deleteCuration(id: $id) {
@@ -71,20 +93,13 @@ export const ARCHIVE_CURATION = gql`
   }
 `;
 
-export const FETCH_TAGS = gql`
-  query Tags {
-    tags {
-      id
-      name
-    }
-  }
-`;
-
-export const FETCH_CURRENT_USER = gql`
-  query currentUser {
-    appUser {
-      id
-      name
+export const CREATE_CONVERSATION = gql`
+  mutation CreateConversation($linkId: String!, $userIds: [String!]!) {
+    createConversation(linkId: $linkId, userIds: $userIds) {
+      conversation {
+        id
+        title
+      }
     }
   }
 `;

@@ -1,7 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, FlatList, View } from 'react-native';
 import { useQuery } from 'react-apollo';
 import gql from 'graphql-tag';
+
+import ConversationItem from './ConversationItem';
+import { ConversationType } from './types';
 
 import { AppText, Spinner } from '../common';
 
@@ -10,6 +13,12 @@ const QUERY = gql`
     conversations {
       id
       title
+      updatedAt
+      users {
+        id
+        name
+        phone
+      }
     }
   }
 `;
@@ -18,6 +27,10 @@ const ConversationsScreen = () => {
   const { data, loading } = useQuery(QUERY);
   console.log('ConversationsScreen -> data', data);
   if (loading) return <Spinner />;
+
+  const renderItem = ({ item }: { item: ConversationType }) => {
+    return <ConversationItem conversation={item} />;
+  };
 
   if (!data.conversations.length) {
     return (
@@ -31,7 +44,12 @@ const ConversationsScreen = () => {
 
   return (
     <View>
-      <Text>Chat list</Text>
+      <FlatList
+        data={data.conversations}
+        renderItem={renderItem}
+        keyExtractor={item => item.id.toString()}
+        removeClippedSubviews={false}
+      />
     </View>
   );
 };
