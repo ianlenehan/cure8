@@ -45,12 +45,17 @@ const defaultNavigationOptions: NavigationStackOptions = {
   headerTitle: <LogoTitle />
 };
 
+const ConversationStackNavigator = createStackNavigator({
+  Conversations: { screen: ConversationsScreen },
+  Conversation: ConversationScreen
+});
+
 const MainTabNavigator = createBottomTabNavigator(
   {
     Links: LinksScreen,
     ArchivedLinks: ArchivedLinksScreen,
     Contacts: ContactsScreen,
-    Conversations: ConversationsScreen,
+    Conversations: ConversationStackNavigator,
     Activity: ActivityScreen,
     Settings: SettingsScreen
   },

@@ -1,24 +1,28 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import moment from 'moment';
 
 import { colors } from '../common';
 
 import { ConversationType, UserType } from './types';
 
-const ConversationItem = ({
-  conversation
-}: {
+type Props = {
   conversation: ConversationType;
-}) => {
+  onPress: (conversationId: string) => void;
+};
+
+const ConversationItem = ({ conversation, onPress }: Props) => {
   console.log('conversation', conversation);
   const users = useMemo(() => {
-    return conversation.users.map((user: UserType) => {
+    const conversationUsers = conversation.users.map((user: UserType) => {
       const [firstName, secondName] = user.name.split(' ');
       const lastInitial = secondName ? secondName.slice(0, 1) : '';
       return `${firstName} ${lastInitial}`;
     });
+    return conversationUsers.join(', ');
   }, [conversation.users]);
+
+  const handlePress = () => onPress(conversation.id);
 
   const formatDate = (date: string) => {
     const currentDate = new Date();
@@ -28,15 +32,15 @@ const ConversationItem = ({
   };
 
   return (
-    <View style={styles.wrapper}>
+    <TouchableOpacity style={styles.wrapper} onPress={handlePress}>
       <Text style={styles.title}>{conversation.title}</Text>
       <View style={styles.footer}>
-        <Text style={styles.footerText}>{users.join(', ')}</Text>
+        <Text style={styles.footerText}>{users}</Text>
         <Text style={styles.footerText}>
           {formatDate(conversation.updatedAt)}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

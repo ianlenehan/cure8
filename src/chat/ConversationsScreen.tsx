@@ -25,11 +25,16 @@ const QUERY = gql`
 
 const ConversationsScreen = () => {
   const { data, loading } = useQuery(QUERY);
-  console.log('ConversationsScreen -> data', data);
   if (loading) return <Spinner />;
 
+  const handleConversationPress = (conversationId: string) => {
+    console.log('handleConversationPress -> conversationId', conversationId);
+  };
+
   const renderItem = ({ item }: { item: ConversationType }) => {
-    return <ConversationItem conversation={item} />;
+    return (
+      <ConversationItem conversation={item} onPress={handleConversationPress} />
+    );
   };
 
   if (!data.conversations.length) {
@@ -43,7 +48,7 @@ const ConversationsScreen = () => {
   }
 
   return (
-    <View>
+    <View style={styles.container}>
       <FlatList
         data={data.conversations}
         renderItem={renderItem}
@@ -60,6 +65,9 @@ const styles = StyleSheet.create({
   emptyPage: {
     justifyContent: 'center',
     alignItems: 'center',
+    flex: 1
+  },
+  container: {
     flex: 1
   }
 });
