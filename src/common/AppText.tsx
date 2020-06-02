@@ -6,7 +6,7 @@ import colors from './colors';
 type AppTextProps = {
   children: any;
   style?: {};
-  color?: 'white' | 'black';
+  color?: string;
   size?: 'small' | 'medium' | 'large' | 'xlarge';
   align?: 'left' | 'center' | 'right';
 };
@@ -23,8 +23,7 @@ const AppText: FunctionComponent<AppTextProps> = ({
   if (size === 'large') fontSize = 20;
   if (size === 'xlarge') fontSize = 28;
 
-  let textColor = colors.textGrey;
-  if (color === 'white') textColor = 'white';
+  const textColor = color || colors.textGrey;
 
   return (
     <Text

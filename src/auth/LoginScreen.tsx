@@ -62,12 +62,10 @@ class LoginScreen extends Component<Props, State> {
 
   onPhoneChange = () => {
     if (!this.phoneRef) return null;
-    const valid = this.phoneRef.isValidNumber();
     const type = this.phoneRef.getNumberType();
+    const valid = this.phoneRef.isValidNumber();
     const phoneNumber = this.phoneRef.getValue();
-
-    const isValid =
-      phoneNumber === testPhoneNumber || (valid && type === 'MOBILE');
+    const isValid = phoneNumber === testPhoneNumber || valid;
     this.setState({ phoneNumber, isValid });
   };
 

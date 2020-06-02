@@ -1,28 +1,31 @@
 import React, { useState } from 'react';
 import { useQuery } from 'react-apollo';
-import {
-  NavigationBottomTabScreenComponent,
-  NavigationTabScreenProps
-} from 'react-navigation-tabs';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { Icon } from 'react-native-elements';
 
 import { Spinner } from '../common';
 
 import Links from './Links';
 import { FETCH_ARCHIVED_LINKS } from './graphql';
 
+import { LinkScreenNavigationProp } from './LinksScreen';
+
 type Tag = {
   id: string;
   name: string;
 };
 
-const ArchivedLinksScreen: NavigationBottomTabScreenComponent<
-  NavigationTabScreenProps
-> = () => {
+type Props = {
+  navigation: LinkScreenNavigationProp;
+};
+
+const ArchivedLinksScreen = ({ navigation }: Props) => {
   const [filteredTagIds, setFilteredTagIds] = useState<string[]>([]);
 
   const { data, loading, error, refetch } = useQuery(FETCH_ARCHIVED_LINKS, {
     variables: { tagIds: filteredTagIds }
   });
+  console.log('ArchivedLinksScreen -> data', error);
 
   const handleTagPress = (tag: Tag) => {
     if (filteredTagIds.includes(tag.id)) {
@@ -31,6 +34,20 @@ const ArchivedLinksScreen: NavigationBottomTabScreenComponent<
     } else {
       setFilteredTagIds(prevState => [...prevState, tag.id]);
     }
+  };
+
+  const handleSetOptions = (onPress: () => void) => {
+    return navigation.setOptions({
+      headerRight: () => (
+        <Icon
+          name="plus"
+          type="font-awesome"
+          color="white"
+          containerStyle={{ marginRight: 25 }}
+          {...{ onPress }}
+        />
+      )
+    });
   };
 
   const handleClearTagFilter = () => setFilteredTagIds([]);
@@ -42,6 +59,7 @@ const ArchivedLinksScreen: NavigationBottomTabScreenComponent<
   return (
     <Links
       {...{ refetch, filteredTagIds, curations }}
+      onSetOptions={handleSetOptions}
       onTagPress={handleTagPress}
       onClearTagFilter={handleClearTagFilter}
       isArchivedLinks

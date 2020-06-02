@@ -46,12 +46,11 @@ const ConversationItem = ({ conversation, onPress }: Props) => {
 
 const styles = StyleSheet.create({
   wrapper: {
-    paddingTop: 15,
-    paddingBottom: 10,
-    paddingLeft: 20,
-    paddingRight: 20,
-    borderBottomColor: colors.backgroundGrey,
-    borderBottomWidth: 1
+    padding: 10,
+    backgroundColor: 'white',
+    margin: 10,
+    marginBottom: 0,
+    borderRadius: 5
   },
   title: {
     fontSize: 16

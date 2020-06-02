@@ -31,7 +31,9 @@ const LoaderLinks = (props: Props) => {
     filteredTagIds,
     isArchivedLinks,
     onClearTagFilter,
+    navigation,
     onTagPress,
+    onSetOptions,
     refetch,
     setParams
   } = props;
@@ -61,8 +63,13 @@ const LoaderLinks = (props: Props) => {
     linkId: string,
     userIds: string[]
   ) => {
-    const res = await createConversation({ variables: { linkId, userIds } });
-    console.log('handleCreateConversation -> res', res);
+    const { data } = await createConversation({
+      variables: { linkId, userIds }
+    });
+    console.log('LoaderLinks -> data', data);
+    navigation.navigate('Conversations', {
+      conversationId: data.createConversation.conversation.id
+    });
   };
 
   const tags = tagsData ? tagsData.tags : [];
@@ -75,6 +82,7 @@ const LoaderLinks = (props: Props) => {
         isArchivedLinks,
         onClearTagFilter,
         onTagPress,
+        onSetOptions,
         setParams,
         tags
       }}

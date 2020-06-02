@@ -45,10 +45,10 @@ const CompleteSignUpScreen: FunctionComponent = () => {
   });
 
   useEffect(() => {
-    if (data.user) {
+    if (data && data.user) {
       updateAuthUserName(data.user.name);
     }
-  }, [data.user]);
+  }, [data]);
 
   const [createUser] = useMutation(CREATE_USER_MUTATION);
 

@@ -7,9 +7,11 @@ import { uniq } from 'lodash';
 import { useQuery } from 'react-apollo';
 import gql from 'graphql-tag';
 
+import useBoolean from '../hooks/useBoolean';
+
 import ChatBubble from './ChatBubble';
 
-import { colors, Spinner } from '../common';
+import { colors, Spinner, AppText, EmptyPage } from '../common';
 
 const FETCH_CURRENT_USER = gql`
   query currentUser {
@@ -29,45 +31,55 @@ type Message = {
   text: string | undefined;
   userId: string;
   userName?: string;
-  id?: string;
+  id: string;
   createdAt: Date;
   date?: string;
 };
 
-const ConversationScreen = () => {
+const ConversationScreen = ({ route }: any) => {
   const [message, setMessage] = useState<string>();
   const [messages, setMessages] = useState<Message[]>([]);
 
   const { data, loading } = useQuery(FETCH_CURRENT_USER);
-  const { currentUser } = data;
-  console.log('ConversationScreen -> data', data);
+  const [
+    loadingMessages,
+    startLoadingMessages,
+    stopLoadingMessages
+  ] = useBoolean(false);
+
+  const { conversationId } = route.params;
 
   const firestore = firebase.firestore();
   const messageRef = firestore.collection('messages');
 
   useEffect(() => {
+    startLoadingMessages();
     const unsubscribe = messageRef
-      .orderBy('createdAt', 'desc')
+      .orderBy('createdAt')
+      .where('conversationId', '==', conversationId)
       .onSnapshot(snapshot => {
+        console.log('unsubscribe -> snapshot', snapshot);
         const updatedMessages = snapshot.docs.map((doc: any) => {
-          const { text, createdAt, userId, conversationId } = doc.data();
+          const { createdAt, ...rest } = doc.data();
 
           return {
-            conversationId,
             createdAt,
             date: moment(createdAt.toDate()).format('MMM D, YYYY'),
             id: doc.id,
-            text,
-            userId
+            ...rest
           };
         });
         setMessages(updatedMessages);
+        stopLoadingMessages();
+        console.log('unsubscribe -> updatedMessages', updatedMessages);
       });
 
     return () => unsubscribe();
   }, []);
 
-  if (loading) return <Spinner />;
+  if (loading || loadingMessages) return <Spinner />;
+
+  const { currentUser } = data;
 
   const getMessageSections = () => {
     const sections = uniq(messages.map(message => message.date));
@@ -78,9 +90,9 @@ const ConversationScreen = () => {
   };
 
   const handleNewMessage = async () => {
-    const newMessage: Message = {
+    const newMessage = {
       text: message,
-      conversationId: '1',
+      conversationId,
       userId: currentUser.id,
       userName: currentUser.name,
       createdAt: new Date()
@@ -94,21 +106,35 @@ const ConversationScreen = () => {
   };
 
   const renderChatBubble = ({ item }: any) => {
+    const userName = item.userId === currentUser.id ? undefined : item.userName;
+
     return (
       <ChatBubble
         text={item.text}
-        currentUserMessage={item.id === currentUser.id}
+        time={moment(item.createdAt.toDate()).format('LT')}
+        currentUserMessage={item.userId === currentUser.id}
+        {...{ userName }}
       />
     );
+  };
+
+  const renderContent = () => {
+    if (!messages.length) {
+      return (
+        <EmptyPage>
+          <AppText size="medium">Start the conversation below!</AppText>
+        </EmptyPage>
+      );
+    }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.conversationContainer}>
-        <Text>Conversations</Text>
+        {renderContent()}
         <SectionList
           sections={getMessageSections()}
-          keyExtractor={(item, index) => item + index}
+          keyExtractor={item => item.id}
           renderItem={renderChatBubble}
           renderSectionHeader={({ section: { title } }) => (
             <Text style={styles.sectionTitle}>{title}</Text>
@@ -141,8 +167,8 @@ const styles = StyleSheet.create({
     flex: 1
   },
   conversationContainer: {
-    flex: 1
-    // alignItems: 'flex-start'
+    flex: 1,
+    padding: 15
   },
   chatFooter: {
     backgroundColor: colors.tertiaryBlue,

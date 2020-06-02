@@ -42,11 +42,13 @@ type Props = {
   onDelete: (id: string) => void;
   onTagPress?: (tag: TagType) => void;
   onNewLinkSubmit: () => void;
-  setParams?: any;
+  onSetOptions: (onPress: () => void) => void;
+  hello?: any;
   tags: TagType[];
 };
 
 const Links: FunctionComponent<Props> = props => {
+  console.log('props', props);
   const {
     curations = [],
     currentUserId,
@@ -58,7 +60,7 @@ const Links: FunctionComponent<Props> = props => {
     onDelete,
     onTagPress = () => {},
     onNewLinkSubmit,
-    setParams,
+    onSetOptions,
     tags
   } = props;
 
@@ -79,9 +81,7 @@ const Links: FunctionComponent<Props> = props => {
   const [showingNewLink, showNewLink, hideNewLink] = useBoolean(false);
 
   useEffect(() => {
-    if (setParams) {
-      setParams({ onNewLinkPress: handleNewLinkPress });
-    }
+    onSetOptions(showNewLink);
   }, []);
 
   const handleNewLinkPress = () => {
@@ -163,7 +163,7 @@ const Links: FunctionComponent<Props> = props => {
     };
 
     const renderChatButton = () => {
-      if (!item.sharedWith.length || item.curatorId !== currentUserId)
+      if (!item.sharedWith.length || item.curatorId === currentUserId)
         // TODO should be ===
         return null;
       // const sharedWithOnlyYou = item.sharedWith.length > 1 &&
@@ -199,7 +199,7 @@ const Links: FunctionComponent<Props> = props => {
         ];
 
         const buttons =
-          item.sharedWith.length < 1 ? twoOptionButtons : oneOptionButtons;
+          item.sharedWith.length > 1 ? twoOptionButtons : oneOptionButtons;
         // @ts-ignore
         Alert.alert('Discuss', message, buttons);
       };
@@ -223,6 +223,14 @@ const Links: FunctionComponent<Props> = props => {
           {renderChatButton()}
           <Icon
             color={colors.tertiaryBlue}
+            name="share"
+            type="font-awesome"
+            reverse
+            size={18}
+            onPress={handleForwardLinkPress}
+          />
+          <Icon
+            color={colors.tertiaryBlue}
             name="trash"
             type="font-awesome"
             reverse
@@ -239,14 +247,6 @@ const Links: FunctionComponent<Props> = props => {
               onPress={() => handleArchivePress(item.id)}
             />
           )}
-          <Icon
-            color={colors.tertiaryBlue}
-            name="share"
-            type="font-awesome"
-            reverse
-            size={18}
-            onPress={handleForwardLinkPress}
-          />
         </View>
       </View>
     );
