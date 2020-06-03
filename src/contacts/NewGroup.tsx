@@ -82,16 +82,6 @@ const NewGroup: FunctionComponent<Props> = ({
     hideNewGroup();
   };
 
-  // const handleChangeText = (value: string) => {
-  //   setName(value);
-  //   if (value.length > 2) {
-  //     const hasPermission = getPhonePermissions();
-  //     if (hasPermission) getPhoneContact(value);
-  //   } else {
-  //     setContacts([]);
-  //   }
-  // };
-
   const handleContactPress = (contactIds: string[]) => {
     contactIds.forEach((contactId: string) => {
       if (selectedContactIds.includes(contactId)) {

@@ -10,7 +10,11 @@ import CompleteSignUpScreen from './auth/CompleteSignUpScreen';
 const Main = (props: any) => {
   const { apolloClient, authUser, setAuthUser, showSignupScreen } = props;
 
-  const [newContact, setNewContact] = useState({});
+  const [newContact, setNewContact] = useState({
+    familyName: '',
+    givenName: '',
+    phoneNumbers: []
+  });
   const [selectedConversationId, setSelectedConversationId] = useState('');
 
   if (!apolloClient) {

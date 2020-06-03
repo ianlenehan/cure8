@@ -2,7 +2,6 @@ import React, { useState, FunctionComponent } from 'react';
 import {
   View,
   TouchableOpacity,
-  LayoutAnimation,
   ScrollView,
   Alert,
   StyleSheet
@@ -20,13 +19,14 @@ type Props = {
 
 const NewContact: FunctionComponent<Props> = ({ navigate }) => {
   const [name, setName] = useState('');
-  const [contacts, setContacts] = useState();
+  const [contacts, setContacts] = useState([]);
   const [showingNewContact, showNewContact, hideNewContact] = useBoolean(false);
   const { setNewContact } = useAppContext();
 
   const handleContactSave = () => {
     setName('');
     setContacts([]);
+    hideNewContact();
   };
 
   const getPhoneContact = (name: string) => {
@@ -85,7 +85,7 @@ const NewContact: FunctionComponent<Props> = ({ navigate }) => {
   };
 
   const renderNames = () => {
-    if (!contacts) return null;
+    if (!contacts.length) return null;
 
     return contacts.map((contact: any) => {
       const name = `${contact.givenName || ''} ${contact.familyName || ''}`;

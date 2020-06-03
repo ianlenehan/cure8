@@ -8,7 +8,11 @@ const AppContext = React.createContext({
     updateProfile: ({  }: any) => {}
   },
   setAuthUser: (authUser: any) => {},
-  newContact: {},
+  newContact: {
+    familyName: '',
+    givenName: '',
+    phoneNumbers: []
+  },
   setNewContact: (contact: any) => {},
   selectedConversationId: '',
   setSelectedConversationId: (conversationId: string) => {}

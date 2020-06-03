@@ -51,13 +51,12 @@ type PhoneNumbers = {
   label: string;
 };
 
-const AddContactScreen: NavigationStackScreenComponent<
-  NavigationStackScreenProps
-> = ({ navigation }) => {
+const AddContactScreen = ({ navigation, route }: any) => {
   const [callingCode, setCallingCode] = useState('');
   const [countryCode, setCountryCode] = useState<CountryCode>();
 
   const { newContact } = useAppContext();
+  const { onContactSave } = route.params;
 
   const { familyName, givenName, phoneNumbers } = newContact;
   const name = `${givenName} ${familyName}`;
@@ -74,8 +73,8 @@ const AddContactScreen: NavigationStackScreenComponent<
   );
 
   useEffect(() => {
-    if (data && navigation.state.params) {
-      navigation.state.params.onContactSave();
+    if (data && onContactSave) {
+      onContactSave();
       navigation.goBack();
     }
   }, [data]);
