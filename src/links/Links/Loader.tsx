@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { useQuery, useMutation } from 'react-apollo';
 
+import useAppContext from '../../hooks/useAppContext';
 import Links from './Links';
 import { ArchiveVariablesType, CurationType, TagType } from '../types';
 
@@ -19,6 +20,8 @@ type Props = {
   isArchivedLinks?: boolean;
   onTagPress?: (tag: TagType) => void;
   onClearTagFilter?: () => void;
+  onSetOptions: any;
+  navigation: any;
   filteredTagIds?: string[];
   fetchArchivedLinks?: () => void;
   setParams?: any;
@@ -46,6 +49,8 @@ const LoaderLinks = (props: Props) => {
   const [deleteCuration] = useMutation(DELETE_CURATION);
   const [createConversation] = useMutation(CREATE_CONVERSATION);
 
+  const { setSelectedConversationId } = useAppContext();
+
   if (loadingCurrentUser || loadingTags) return null;
 
   const handleArchive = async (variables: ArchiveVariablesType) => {
@@ -66,10 +71,8 @@ const LoaderLinks = (props: Props) => {
     const { data } = await createConversation({
       variables: { linkId, userIds }
     });
-    console.log('LoaderLinks -> data', data);
-    navigation.navigate('Conversations', {
-      conversationId: data.createConversation.conversation.id
-    });
+    setSelectedConversationId(data.createConversation.conversation.id);
+    navigation.navigate('Conversations');
   };
 
   const tags = tagsData ? tagsData.tags : [];

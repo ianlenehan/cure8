@@ -23,7 +23,6 @@ const getApolloClient = (token: string) => {
 
 const App = () => {
   const [authUser, setAuthUser] = useState<RNFirebase.User>();
-  const [newContact, setNewContact] = useState({});
   const [apolloClient, setApolloClient] = useState<any>();
   const [loading, setLoading] = useState(true);
 
@@ -68,8 +67,6 @@ const App = () => {
           apolloClient,
           authUser,
           setAuthUser,
-          newContact,
-          setNewContact,
           showSignupScreen
         }}
       />

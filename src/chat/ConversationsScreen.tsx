@@ -2,11 +2,11 @@ import React, { useEffect } from 'react';
 import { StyleSheet, FlatList, View } from 'react-native';
 import { useQuery } from 'react-apollo';
 import gql from 'graphql-tag';
-import { get } from 'lodash';
 
 import ConversationItem from './ConversationItem';
 import { ConversationType } from './types';
 
+import useAppContext from '../hooks/useAppContext';
 import { AppText, Spinner } from '../common';
 
 const QUERY = gql`
@@ -24,16 +24,18 @@ const QUERY = gql`
   }
 `;
 
-const ConversationsScreen = ({ navigation, route }: any) => {
+const ConversationsScreen = ({ navigation }: any) => {
   const { data, loading } = useQuery(QUERY);
+  const { selectedConversationId, setSelectedConversationId } = useAppContext();
 
   useEffect(() => {
-    if (get(route, 'params.conversationId')) {
+    if (selectedConversationId) {
       navigation.navigate('Conversation', {
-        conversationId: route.params.conversationId
+        conversationId: selectedConversationId
       });
+      setSelectedConversationId('');
     }
-  }, [route.params]);
+  }, [selectedConversationId]);
 
   if (loading) return <Spinner />;
 

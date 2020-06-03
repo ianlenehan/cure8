@@ -48,7 +48,6 @@ type Props = {
 };
 
 const Links: FunctionComponent<Props> = props => {
-  console.log('props', props);
   const {
     curations = [],
     currentUserId,
@@ -169,8 +168,10 @@ const Links: FunctionComponent<Props> = props => {
       // const sharedWithOnlyYou = item.sharedWith.length > 1 &&
 
       const handlePress = () => {
-        const discussWithOwner = () =>
+        const discussWithOwner = () => {
           onCreateConversation(item.link.id, [item.curatorId]);
+        };
+
         const discussWithEveryone = () => {
           const ids = item.sharedWith.map(({ id }: { id: string }) => id);
           onCreateConversation(item.link.id, [...ids, item.curatorId]);

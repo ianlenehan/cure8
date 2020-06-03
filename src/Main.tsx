@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
 import { Root } from 'native-base';
 import { ApolloProvider } from 'react-apollo';
@@ -8,14 +8,10 @@ import RootTab from './navigation/RootTab';
 import CompleteSignUpScreen from './auth/CompleteSignUpScreen';
 
 const Main = (props: any) => {
-  const {
-    apolloClient,
-    authUser,
-    setAuthUser,
-    newContact,
-    setNewContact,
-    showSignupScreen
-  } = props;
+  const { apolloClient, authUser, setAuthUser, showSignupScreen } = props;
+
+  const [newContact, setNewContact] = useState({});
+  const [selectedConversationId, setSelectedConversationId] = useState('');
 
   if (!apolloClient) {
     return null;
@@ -25,7 +21,14 @@ const Main = (props: any) => {
     <ApolloProvider client={apolloClient}>
       <Root>
         <AppContext.Provider
-          value={{ authUser, setAuthUser, newContact, setNewContact }}>
+          value={{
+            authUser,
+            setAuthUser,
+            newContact,
+            setNewContact,
+            selectedConversationId,
+            setSelectedConversationId
+          }}>
           <StatusBar barStyle="light-content" />
           <View style={styles.container}>
             {showSignupScreen ? <CompleteSignUpScreen /> : <RootTab />}

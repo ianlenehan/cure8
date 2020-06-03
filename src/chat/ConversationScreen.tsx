@@ -7,6 +7,7 @@ import { uniq } from 'lodash';
 import { useQuery } from 'react-apollo';
 import gql from 'graphql-tag';
 
+import useAppContext from '../hooks/useAppContext';
 import useBoolean from '../hooks/useBoolean';
 
 import ChatBubble from './ChatBubble';
@@ -40,14 +41,14 @@ const ConversationScreen = ({ route }: any) => {
   const [message, setMessage] = useState<string>();
   const [messages, setMessages] = useState<Message[]>([]);
 
+  const { conversationId } = route.params;
+
   const { data, loading } = useQuery(FETCH_CURRENT_USER);
   const [
     loadingMessages,
     startLoadingMessages,
     stopLoadingMessages
   ] = useBoolean(false);
-
-  const { conversationId } = route.params;
 
   const firestore = firebase.firestore();
   const messageRef = firestore.collection('messages');
@@ -58,7 +59,6 @@ const ConversationScreen = ({ route }: any) => {
       .orderBy('createdAt')
       .where('conversationId', '==', conversationId)
       .onSnapshot(snapshot => {
-        console.log('unsubscribe -> snapshot', snapshot);
         const updatedMessages = snapshot.docs.map((doc: any) => {
           const { createdAt, ...rest } = doc.data();
 
@@ -137,7 +137,11 @@ const ConversationScreen = ({ route }: any) => {
           keyExtractor={item => item.id}
           renderItem={renderChatBubble}
           renderSectionHeader={({ section: { title } }) => (
-            <Text style={styles.sectionTitle}>{title}</Text>
+            <View style={styles.sectionHeaderWrapper}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>{title}</Text>
+              </View>
+            </View>
           )}
         />
       </View>
@@ -168,7 +172,8 @@ const styles = StyleSheet.create({
   },
   conversationContainer: {
     flex: 1,
-    padding: 15
+    paddingRight: 15,
+    paddingLeft: 15
   },
   chatFooter: {
     backgroundColor: colors.tertiaryBlue,
@@ -189,5 +194,18 @@ const styles = StyleSheet.create({
   sectionTitle: {
     textAlign: 'center',
     color: colors.textGrey
+  },
+  sectionHeader: {
+    backgroundColor: '#fff',
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingRight: 10,
+    paddingLeft: 10,
+    borderRadius: 10
+  },
+  sectionHeaderWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    marginTop: 5
   }
 });
