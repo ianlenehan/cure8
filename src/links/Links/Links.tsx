@@ -1,9 +1,8 @@
-import React, { Fragment, FunctionComponent, useState, useEffect } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import {
   Alert,
   View,
   StyleSheet,
-  Modal,
   LayoutAnimation,
   TouchableWithoutFeedback
 } from 'react-native';
@@ -28,6 +27,7 @@ import Card from '../Card';
 import NewLink from '../NewLink';
 import ArchiveModal from '../ArchiveModal';
 import WebViewer from '../WebViewer';
+import DeleteModal from './DeleteModal';
 
 import { ArchiveVariablesType, CurationType, TagType } from '../types';
 
@@ -40,6 +40,7 @@ type Props = {
   onClearTagFilter?: () => void;
   onCreateConversation: (id: string, userIds: string[]) => void;
   onDelete: (id: string) => void;
+  onLoadMore: () => void;
   onTagPress?: (tag: TagType) => void;
   onNewLinkSubmit: () => void;
   onSetOptions: (onPress: () => void) => void;
@@ -47,7 +48,7 @@ type Props = {
   tags: TagType[];
 };
 
-const Links: FunctionComponent<Props> = props => {
+const Links = (props: Props) => {
   const {
     curations = [],
     currentUserId,
@@ -57,6 +58,7 @@ const Links: FunctionComponent<Props> = props => {
     onClearTagFilter = () => {},
     onCreateConversation,
     onDelete,
+    onLoadMore,
     onTagPress = () => {},
     onNewLinkSubmit,
     onSetOptions,
@@ -67,7 +69,7 @@ const Links: FunctionComponent<Props> = props => {
   const [archiveModalVisible, setArchiveModalVisible] = useState<boolean>(
     false
   );
-  const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
+
   const [tagNames, setTagNames] = useState<string[]>([]);
   const [tag, setTag] = useState<string>('');
   const [selectedCurationId, setSelectedCurationId] = useState<string>('');
@@ -78,6 +80,9 @@ const Links: FunctionComponent<Props> = props => {
   const [selectedRating, setRating] = useState<string>('');
   const [tagSelectorOpen, setTagSelectorOpen] = useState(false);
   const [showingNewLink, showNewLink, hideNewLink] = useBoolean(false);
+  const [isDeleteModalVisible, openDeleteModal, closeDeleteModal] = useBoolean(
+    false
+  );
 
   useEffect(() => {
     onSetOptions(showNewLink);
@@ -123,12 +128,12 @@ const Links: FunctionComponent<Props> = props => {
 
   const handleDeletePress = async (curationId: string) => {
     setSelectedCurationId(curationId);
-    setDeleteModalVisible(true);
+    openDeleteModal();
   };
 
   const handleDeleteConfirm = async () => {
     await onDelete(selectedCurationId);
-    setDeleteModalVisible(false);
+    closeDeleteModal();
     useToast('Curation successfully deleted');
     setOpenRows([]);
   };
@@ -329,6 +334,7 @@ const Links: FunctionComponent<Props> = props => {
       const message = isArchivedLinks
         ? "You've not archived any links yet!"
         : 'You have no new curations!';
+
       return (
         <EmptyPage text={message}>
           <View>
@@ -359,6 +365,8 @@ const Links: FunctionComponent<Props> = props => {
           rightOpenValue={-80}
           onRowDidOpen={handleScrollEnabled}
           onRowDidClose={handleRowDidClose}
+          onEndReachedThreshold={0.4}
+          onEndReached={onLoadMore}
         />
 
         <ArchiveModal
@@ -373,28 +381,11 @@ const Links: FunctionComponent<Props> = props => {
           {...{ tagNames, tag, selectedRating }}
         />
 
-        <Modal animationType="fade" visible={deleteModalVisible} transparent>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalInner}>
-              <AppText size="large" style={{ textAlign: 'center' }}>
-                Are you sure you want to delete this curation?
-              </AppText>
-              <View>
-                <Button
-                  size="small"
-                  type="warning"
-                  onPress={handleDeleteConfirm}>
-                  Yes
-                </Button>
-                <Button
-                  size="small"
-                  onPress={() => setDeleteModalVisible(false)}>
-                  No
-                </Button>
-              </View>
-            </View>
-          </View>
-        </Modal>
+        <DeleteModal
+          isVisible={isDeleteModalVisible}
+          onDeleteConfirm={handleArchiveConfirm}
+          onDismiss={closeDeleteModal}
+        />
       </View>
     );
   };
@@ -436,20 +427,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     flex: 1,
     alignItems: 'flex-end'
-  },
-  modalInner: {
-    backgroundColor: 'white',
-    height: '25%',
-    padding: 10,
-    paddingBottom: 15,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    justifyContent: 'space-around'
-  },
-  modalContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    flex: 1,
-    justifyContent: 'flex-end'
   },
   tagContainer: {
     borderTopWidth: 1,

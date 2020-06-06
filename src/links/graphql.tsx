@@ -3,8 +3,8 @@ import gql from 'graphql-tag';
 /* **************** QUERIES **************** */
 
 export const FETCH_NEW_LINKS = gql`
-  query curations {
-    curations(status: "new", tagIds: []) {
+  query Curations($showItemCount: Int!) {
+    curations(status: "new", tagIds: [], showItemCount: $showItemCount) {
       id
       createdAt
       curatorName
@@ -22,12 +22,21 @@ export const FETCH_NEW_LINKS = gql`
         phone
       }
     }
+    hasMorePages: curationsPageInfo(
+      status: "new"
+      tagIds: []
+      showItemCount: $showItemCount
+    )
   }
 `;
 
 export const FETCH_ARCHIVED_LINKS = gql`
-  query ArchivedCurations($tagIds: [String!]) {
-    curations(status: "archived", tagIds: $tagIds) {
+  query ArchivedCurations($tagIds: [String!], $showItemCount: Int!) {
+    curations(
+      status: "archived"
+      tagIds: $tagIds
+      showItemCount: $showItemCount
+    ) {
       id
       createdAt
       curatorName
@@ -50,6 +59,11 @@ export const FETCH_ARCHIVED_LINKS = gql`
         phone
       }
     }
+    hasMorePages: curationsPageInfo(
+      status: "archived"
+      tagIds: $tagIds
+      showItemCount: $showItemCount
+    )
   }
 `;
 

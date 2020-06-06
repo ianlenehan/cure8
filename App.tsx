@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { StatusBar, StyleSheet, View } from 'react-native';
 import firebase, { RNFirebase } from 'react-native-firebase';
-import { Root } from 'native-base';
 import ApolloClient from 'apollo-boost/lib/index';
-import { ApolloProvider } from 'react-apollo';
 import { NavigationContainer } from '@react-navigation/native';
 
 import Main from './src/Main';
-import RootTab from './src/navigation/RootTab';
 import LoginScreen from './src/auth/LoginScreen';
 
 import { Spinner } from './src/common';
 
-const rootURL = 'http://localhost:3001/';
+export const rootURL = 'http://localhost:3001/';
+// export const rootURL = 'https://cure8.herokuapp.com/';
 
 const getApolloClient = (token: string) => {
   return new ApolloClient({

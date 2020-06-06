@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery, useLazyQuery } from 'react-apollo';
 import { Icon } from 'react-native-elements';
 
@@ -8,7 +8,13 @@ import Links from './Links';
 import { FETCH_NEW_LINKS, FETCH_ARCHIVED_LINKS } from './graphql';
 
 const LinksScreen = ({ navigation }: any) => {
-  const { data, loading, error, refetch } = useQuery(FETCH_NEW_LINKS);
+  const [page, setPage] = useState(1);
+  const itemCount = page * 10;
+
+  const { data, loading, refetch } = useQuery(FETCH_NEW_LINKS, {
+    variables: { showItemCount: itemCount }
+  });
+
   const [fetchArchivedLinks, { data: archivedData }] = useLazyQuery(
     FETCH_ARCHIVED_LINKS,
     {
@@ -19,8 +25,17 @@ const LinksScreen = ({ navigation }: any) => {
 
   if (loading) return <Spinner />;
 
+  const { curations, hasMorePages } = data;
+
+  const handleLoadMore = () => {
+    if (!hasMorePages) {
+      return null;
+    }
+
+    setPage(page + 1);
+  };
+
   const handleSetOptions = (onPress: () => void) => {
-    console.log('called set');
     return navigation.setOptions({
       headerRight: () => (
         <Icon
@@ -36,8 +51,8 @@ const LinksScreen = ({ navigation }: any) => {
 
   return (
     <Links
-      {...{ refetch, fetchArchivedLinks, navigation }}
-      curations={data && data.curations}
+      {...{ curations, refetch, fetchArchivedLinks, navigation }}
+      onLoadMore={handleLoadMore}
       onSetOptions={handleSetOptions}
     />
   );

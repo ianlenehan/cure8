@@ -16,14 +16,15 @@ import {
 
 type Props = {
   curations: [CurationType];
-  refetch: () => void;
-  isArchivedLinks?: boolean;
-  onTagPress?: (tag: TagType) => void;
-  onClearTagFilter?: () => void;
-  onSetOptions: any;
-  navigation: any;
-  filteredTagIds?: string[];
   fetchArchivedLinks?: () => void;
+  filteredTagIds?: string[];
+  isArchivedLinks?: boolean;
+  navigation: any;
+  onClearTagFilter?: () => void;
+  onLoadMore: () => void;
+  onSetOptions: any;
+  onTagPress?: (tag: TagType) => void;
+  refetch: () => void;
   setParams?: any;
 };
 
@@ -33,10 +34,11 @@ const LoaderLinks = (props: Props) => {
     fetchArchivedLinks,
     filteredTagIds,
     isArchivedLinks,
-    onClearTagFilter,
     navigation,
-    onTagPress,
+    onClearTagFilter,
+    onLoadMore,
     onSetOptions,
+    onTagPress,
     refetch,
     setParams
   } = props;
@@ -84,6 +86,7 @@ const LoaderLinks = (props: Props) => {
         filteredTagIds,
         isArchivedLinks,
         onClearTagFilter,
+        onLoadMore,
         onTagPress,
         onSetOptions,
         setParams,

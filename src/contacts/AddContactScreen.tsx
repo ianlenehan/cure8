@@ -6,13 +6,10 @@ import CountryPicker, {
   CountryCode,
   getCallingCode
 } from 'react-native-country-picker-modal';
-import {
-  NavigationStackScreenComponent,
-  NavigationStackScreenProps
-} from 'react-navigation-stack';
 import { useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
 
+import { rootURL } from '../../App';
 import { AppText, colors, ContactRow } from '../common';
 
 import useAppContext from '../hooks/useAppContext';
@@ -93,7 +90,7 @@ const AddContactScreen = ({ navigation, route }: any) => {
   const getCountryCode = async (coords: number[]) => {
     const [lat, long] = coords;
     const countryCodeRes = await fetch(
-      `http://localhost:3001/country?lat=${lat}&long=${long}` // TODO make this `rootUrl`
+      `${rootURL}country?lat=${lat}&long=${long}`
     );
     const codeJson = await countryCodeRes.json();
     const code = codeJson.results.toUpperCase();
