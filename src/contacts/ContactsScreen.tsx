@@ -9,7 +9,7 @@ import {
 import { useQuery } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import { Container, AppText, colors } from '../common';
+import { Container, AppText, colors, Spinner } from '../common';
 import ContactsTab from './ContactsTab';
 import GroupsTab from './GroupsTab';
 
@@ -31,9 +31,9 @@ const FETCH_CONTACTS = gql`
   }
 `;
 
-const ContactsScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> = ({
-  navigation
-}) => {
+const ContactsScreen: NavigationBottomTabScreenComponent<
+  NavigationTabScreenProps
+> = ({ navigation }) => {
   const [editMode, setEditMode] = useState(false);
   const buttonText: string = editMode ? 'Done' : 'Edit';
 
@@ -43,8 +43,10 @@ const ContactsScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProp
 
   const { data, loading, refetch } = useQuery(FETCH_CONTACTS);
 
+  if (loading) return <Spinner text="Loading contacts..." />;
+
   const toggleEditMode = () => setEditMode(prevState => !prevState);
-  const contacts = data ? data.contacts : [];
+  const contacts = data.contacts || [];
   return (
     <Container>
       <Tabs>

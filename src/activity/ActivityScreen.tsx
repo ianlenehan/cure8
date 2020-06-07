@@ -50,6 +50,8 @@ const ActivityScreen = () => {
 
   if (loading) return <Spinner text="Loading recent activity..." />;
 
+  const activity = get(data, 'activity', []);
+
   const handleWebViewerClose = () => setSelectedCuration(undefined);
 
   const renderSharedWith = (item: Item) => {
@@ -72,7 +74,7 @@ const ActivityScreen = () => {
   };
 
   const renderItems = () => {
-    return data.activity.map((item: Item) => {
+    return activity.map((item: Item) => {
       const onPress = () => setSelectedCuration(item);
       return (
         <View key={item.createdAt} style={styles.itemContainer}>

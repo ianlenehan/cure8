@@ -6,13 +6,10 @@ import CountryPicker, {
   CountryCode,
   getCallingCode
 } from 'react-native-country-picker-modal';
-import {
-  NavigationStackScreenComponent,
-  NavigationStackScreenProps
-} from 'react-navigation-stack';
 import { useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
 
+import { rootURL } from '../../App';
 import { AppText, colors, ContactRow } from '../common';
 
 import useAppContext from '../hooks/useAppContext';
@@ -51,13 +48,12 @@ type PhoneNumbers = {
   label: string;
 };
 
-const AddContactScreen: NavigationStackScreenComponent<NavigationStackScreenProps> = ({
-  navigation
-}) => {
+const AddContactScreen = ({ navigation, route }: any) => {
   const [callingCode, setCallingCode] = useState('');
   const [countryCode, setCountryCode] = useState<CountryCode>();
 
   const { newContact } = useAppContext();
+  const { onContactSave } = route.params;
 
   const { familyName, givenName, phoneNumbers } = newContact;
   const name = `${givenName} ${familyName}`;
@@ -74,8 +70,8 @@ const AddContactScreen: NavigationStackScreenComponent<NavigationStackScreenProp
   );
 
   useEffect(() => {
-    if (data && navigation.state.params) {
-      navigation.state.params.onContactSave();
+    if (data && onContactSave) {
+      onContactSave();
       navigation.goBack();
     }
   }, [data]);
@@ -94,7 +90,7 @@ const AddContactScreen: NavigationStackScreenComponent<NavigationStackScreenProp
   const getCountryCode = async (coords: number[]) => {
     const [lat, long] = coords;
     const countryCodeRes = await fetch(
-      `http://localhost:3000/country?lat=${lat}&long=${long}`
+      `${rootURL}country?lat=${lat}&long=${long}`
     );
     const codeJson = await countryCodeRes.json();
     const code = codeJson.results.toUpperCase();

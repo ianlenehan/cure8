@@ -1,29 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { StatusBar, StyleSheet, View } from 'react-native';
 import firebase, { RNFirebase } from 'react-native-firebase';
-import('react-native-firebase');
-import { Root } from 'native-base';
 import ApolloClient from 'apollo-boost/lib/index';
-import { ApolloProvider } from 'react-apollo';
-import { createAppContainer } from 'react-navigation';
-import RootNavigator from './src/navigation/RootNavigator';
+import { NavigationContainer } from '@react-navigation/native';
+
+import Main from './src/Main';
 import LoginScreen from './src/auth/LoginScreen';
-import CompleteSignUpScreen from './src/auth/CompleteSignUpScreen';
-import AppContext from './src/utils/AppContext';
+
 import { Spinner } from './src/common';
 
-const rootURL = 'http://localhost:3000/';
+// export const rootURL = 'http://localhost:3001/';
+export const rootURL = 'https://cure8.herokuapp.com/';
 
-const MainApp = createAppContainer(RootNavigator);
-
-const initialApolloClient = new ApolloClient({
-  uri: `${rootURL}graphql`
-});
+const getApolloClient = (token: string) => {
+  return new ApolloClient({
+    uri: `${rootURL}graphql`,
+    headers: { token }
+  });
+};
 
 const App = () => {
   const [authUser, setAuthUser] = useState<RNFirebase.User>();
-  const [newContact, setNewContact] = useState({});
-  const [apolloClient, setApolloClient] = useState(initialApolloClient);
+  const [apolloClient, setApolloClient] = useState<any>();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -46,10 +43,7 @@ const App = () => {
   const getIdToken = async (authUser: RNFirebase.User) => {
     try {
       const token = await authUser.getIdToken(true);
-      const client = new ApolloClient({
-        uri: `${rootURL}graphql`,
-        headers: { token }
-      });
+      const client = getApolloClient(token);
       setApolloClient(client);
       setLoading(false);
     } catch (error) {
@@ -61,32 +55,24 @@ const App = () => {
     if (!authUser) {
       return <LoginScreen />;
     }
-    if (authUser.uid && !authUser.displayName) {
-      return <CompleteSignUpScreen />;
-    }
-    return <MainApp />;
+
+    const showSignupScreen = authUser.uid && !authUser.displayName;
+
+    return (
+      <Main
+        {...{
+          apolloClient,
+          authUser,
+          setAuthUser,
+          showSignupScreen
+        }}
+      />
+    );
   };
 
   if (loading) return <Spinner />;
 
-  return (
-    <ApolloProvider client={apolloClient}>
-      <Root>
-        <AppContext.Provider
-          value={{ authUser, setAuthUser, newContact, setNewContact }}>
-          <StatusBar barStyle="light-content" />
-          <View style={styles.container}>{renderApp()}</View>
-        </AppContext.Provider>
-      </Root>
-    </ApolloProvider>
-  );
+  return <NavigationContainer>{renderApp()}</NavigationContainer>;
 };
 
 export default App;
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'grey',
-    flex: 1
-  }
-});

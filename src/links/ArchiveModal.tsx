@@ -18,9 +18,9 @@ type TagType = {
 };
 
 type Props = {
-  existingTags: [TagType];
+  existingTags: TagType[];
   isVisible: boolean;
-  onArchiveConfirm: () => void;
+  onArchive: () => void;
   onHideModal: () => void;
   onRatingPress: (rating: string) => void;
   onSaveNewTag: () => void;
@@ -35,7 +35,7 @@ const ArchiveModal: FunctionComponent<Props> = props => {
   const {
     existingTags,
     isVisible,
-    onArchiveConfirm,
+    onArchive,
     onHideModal,
     onRatingPress,
     onSaveNewTag,
@@ -99,7 +99,7 @@ const ArchiveModal: FunctionComponent<Props> = props => {
               );
             })}
           </View>
-          <Button size="small" onPress={onArchiveConfirm}>
+          <Button size="small" onPress={onArchive}>
             Archive
           </Button>
           <Button size="small" type="tertiary" onPress={onHideModal}>

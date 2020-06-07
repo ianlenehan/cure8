@@ -1,8 +1,10 @@
 import gql from 'graphql-tag';
 
+/* **************** QUERIES **************** */
+
 export const FETCH_NEW_LINKS = gql`
-  query curations {
-    curations(status: "new", tagIds: []) {
+  query Curations($showItemCount: Int!) {
+    curations(status: "new", tagIds: [], showItemCount: $showItemCount) {
       id
       createdAt
       curatorName
@@ -14,13 +16,27 @@ export const FETCH_NEW_LINKS = gql`
         title
         url
       }
+      sharedWith {
+        id
+        name
+        phone
+      }
     }
+    hasMorePages: curationsPageInfo(
+      status: "new"
+      tagIds: []
+      showItemCount: $showItemCount
+    )
   }
 `;
 
 export const FETCH_ARCHIVED_LINKS = gql`
-  query ArchivedCurations($tagIds: [String!]) {
-    curations(status: "archived", tagIds: $tagIds) {
+  query ArchivedCurations($tagIds: [String!], $showItemCount: Int!) {
+    curations(
+      status: "archived"
+      tagIds: $tagIds
+      showItemCount: $showItemCount
+    ) {
       id
       createdAt
       curatorName
@@ -37,9 +53,39 @@ export const FETCH_ARCHIVED_LINKS = gql`
         title
         url
       }
+      sharedWith {
+        id
+        name
+        phone
+      }
+    }
+    hasMorePages: curationsPageInfo(
+      status: "archived"
+      tagIds: $tagIds
+      showItemCount: $showItemCount
+    )
+  }
+`;
+
+export const FETCH_TAGS = gql`
+  query Tags {
+    tags {
+      id
+      name
     }
   }
 `;
+
+export const FETCH_CURRENT_USER = gql`
+  query currentUser {
+    appUser {
+      id
+      name
+    }
+  }
+`;
+
+/* **************** MUTATIONS **************** */
 
 export const DELETE_CURATION = gql`
   mutation DeleteCuration($id: String!) {
@@ -61,20 +107,13 @@ export const ARCHIVE_CURATION = gql`
   }
 `;
 
-export const FETCH_TAGS = gql`
-  query Tags {
-    tags {
-      id
-      name
-    }
-  }
-`;
-
-export const FETCH_CURRENT_USER = gql`
-  query currentUser {
-    appUser {
-      id
-      name
+export const CREATE_CONVERSATION = gql`
+  mutation CreateConversation($linkId: String!, $userIds: [String!]!) {
+    createConversation(linkId: $linkId, userIds: $userIds) {
+      conversation {
+        id
+        title
+      }
     }
   }
 `;

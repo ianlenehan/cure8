@@ -19,6 +19,8 @@ import ContactsScreen from '../contacts/ContactsScreen';
 import AddContactScreen from '../contacts/AddContactScreen';
 import SettingsScreen from '../settings/SettingsScreen';
 import ActivityScreen from '../activity/ActivityScreen';
+import ConversationsScreen from '../chat/ConversationsScreen';
+import ConversationScreen from '../chat/ConversationScreen';
 
 const LogoTitle = () => {
   return (
@@ -43,11 +45,17 @@ const defaultNavigationOptions: NavigationStackOptions = {
   headerTitle: <LogoTitle />
 };
 
+const ConversationStackNavigator = createStackNavigator({
+  Conversations: { screen: ConversationsScreen },
+  Conversation: ConversationScreen
+});
+
 const MainTabNavigator = createBottomTabNavigator(
   {
     Links: LinksScreen,
     ArchivedLinks: ArchivedLinksScreen,
     Contacts: ContactsScreen,
+    Conversations: ConversationStackNavigator,
     Activity: ActivityScreen,
     Settings: SettingsScreen
   },
@@ -65,6 +73,8 @@ const MainTabNavigator = createBottomTabNavigator(
             iconName = 'gears';
           } else if (routeName === 'Activity') {
             iconName = 'list';
+          } else if (routeName === 'Conversations') {
+            iconName = 'comments';
           }
 
           return <IonIcon name={iconName} size={25} color={tintColor} />;
@@ -145,6 +155,14 @@ const RootStackNavigator = createStackNavigator(
         headerTitle = (
           <AppText color="white" size="large">
             Archived Links
+          </AppText>
+        );
+      }
+
+      if (routeName === 'Conversations') {
+        headerTitle = (
+          <AppText color="white" size="large">
+            Conversations
           </AppText>
         );
       }

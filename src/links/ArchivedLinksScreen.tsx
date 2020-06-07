@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from 'react-apollo';
-import {
-  NavigationBottomTabScreenComponent,
-  NavigationTabScreenProps
-} from 'react-navigation-tabs';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { Icon } from 'react-native-elements';
 
 import { Spinner } from '../common';
 
@@ -15,11 +13,13 @@ type Tag = {
   name: string;
 };
 
-const ArchivedLinksScreen: NavigationBottomTabScreenComponent<NavigationTabScreenProps> = () => {
+const ArchivedLinksScreen = ({ navigation }: any) => {
   const [filteredTagIds, setFilteredTagIds] = useState<string[]>([]);
+  const [page, setPage] = useState(1);
+  const itemCount = page * 10;
 
-  const { data, loading, error, refetch } = useQuery(FETCH_ARCHIVED_LINKS, {
-    variables: { tagIds: filteredTagIds }
+  const { data, loading, refetch } = useQuery(FETCH_ARCHIVED_LINKS, {
+    variables: { tagIds: filteredTagIds, showItemCount: itemCount }
   });
 
   const handleTagPress = (tag: Tag) => {
@@ -31,15 +31,39 @@ const ArchivedLinksScreen: NavigationBottomTabScreenComponent<NavigationTabScree
     }
   };
 
+  const handleSetOptions = (onPress: () => void) => {
+    return navigation.setOptions({
+      headerRight: () => (
+        <Icon
+          name="plus"
+          type="font-awesome"
+          color="white"
+          containerStyle={{ marginRight: 25 }}
+          {...{ onPress }}
+        />
+      )
+    });
+  };
+
   const handleClearTagFilter = () => setFilteredTagIds([]);
 
   if (loading && !data) return <Spinner />;
 
-  const curations = data && data.curations;
+  const { curations, hasMorePages } = data;
+
+  const handleLoadMore = () => {
+    if (!hasMorePages) {
+      return null;
+    }
+
+    setPage(page + 1);
+  };
 
   return (
     <Links
-      {...{ refetch, filteredTagIds, curations }}
+      {...{ refetch, filteredTagIds, curations, navigation }}
+      onLoadMore={handleLoadMore}
+      onSetOptions={handleSetOptions}
       onTagPress={handleTagPress}
       onClearTagFilter={handleClearTagFilter}
       isArchivedLinks

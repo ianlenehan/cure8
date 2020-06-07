@@ -1,11 +1,26 @@
 import React, { FunctionComponent } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import {
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View
+} from 'react-native';
+import { Icon } from 'react-native-elements';
 import moment from 'moment';
-import { AppText, Tag } from '../common';
+import { AppText, Tag, colors } from '../common';
 
 type TagType = {
   id: string;
   name: string;
+};
+
+type SharedWithType = {
+  id: string;
+  name: string;
+  phone: string;
 };
 
 type Props = {
@@ -19,6 +34,7 @@ type Props = {
   rating?: string;
   tags?: any;
   title: string;
+  sharedWith?: SharedWithType[];
 };
 
 const Card: FunctionComponent<Props> = ({
@@ -30,6 +46,7 @@ const Card: FunctionComponent<Props> = ({
   onPress,
   onTagPress,
   rating,
+  sharedWith = [],
   tags,
   title
 }) => {
@@ -40,10 +57,51 @@ const Card: FunctionComponent<Props> = ({
       .from(currentDate);
   };
 
+  const handleShowSharedWith = () => {
+    if (!sharedWith.length) return null;
+
+    const sharedWithNames = sharedWith.map(
+      (user: any) => user.name || user.phone
+    );
+
+    const message = `This has also been shared with ${sharedWithNames.join(
+      ', '
+    )}.`;
+    Alert.alert('Shared With', message);
+  };
+
+  const renderSharedWith = () => {
+    if (!sharedWith.length) return null;
+
+    return (
+      <View style={styles.sharedWith}>
+        <Icon name="people" size={18} color={colors.darkerGreen} />
+        <Text style={styles.count}> {sharedWith.length}</Text>
+      </View>
+    );
+  };
+
+  const renderTags = () => {
+    if (!tags) return null;
+
+    return (
+      <View style={styles.tagContainer}>
+        {tags.map((tag: TagType) => (
+          <Tag
+            key={tag.id}
+            tag={tag}
+            selected={filteredTagIds.includes(tag.id)}
+            onPress={onTagPress}
+          />
+        ))}
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity {...{ onPress }}>
-        <Image source={{ uri: image }} style={styles.image} />
+        {image && <Image source={{ uri: image }} style={styles.image} />}
       </TouchableOpacity>
       <View style={styles.textArea}>
         <TouchableOpacity {...{ onPress }}>
@@ -53,23 +111,19 @@ const Card: FunctionComponent<Props> = ({
         </TouchableOpacity>
         {comment ? (
           <AppText size="small" style={styles.subtitle}>
-            "{comment}"
+            {`"${comment}"`}
           </AppText>
         ) : null}
-        {tags &&
-          tags.map((tag: TagType) => (
-            <View style={styles.tagContainer} key={tag.id}>
-              <Tag
-                tag={tag}
-                selected={filteredTagIds.includes(tag.id)}
-                onPress={onTagPress}
-              />
+        {renderTags()}
+        <View style={styles.footer}>
+          <TouchableWithoutFeedback onPress={handleShowSharedWith}>
+            <View style={styles.footerLeft}>
+              <Text style={styles.date}>{`${formatDate(
+                date
+              )} from ${curatedBy}`}</Text>
+              {renderSharedWith()}
             </View>
-          ))}
-        <View style={styles.dateView}>
-          <Text style={styles.date}>{`${formatDate(
-            date
-          )} from ${curatedBy}`}</Text>
+          </TouchableWithoutFeedback>
           <Text>{rating || ''}</Text>
         </View>
       </View>
@@ -112,20 +166,33 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 11,
     color: 'grey',
-    flex: 1,
-    marginTop: 10
+    marginRight: 10
   },
   textArea: {
     padding: 10
   },
-  dateView: {
+  footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-end'
+    alignItems: 'flex-end',
+    marginTop: 10
+  },
+  footerLeft: {
+    flexDirection: 'row',
+    flex: 1,
+    alignItems: 'center'
   },
   tagContainer: {
     paddingTop: 5,
     flexDirection: 'row',
     flexWrap: 'wrap'
+  },
+  sharedWith: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  count: {
+    fontSize: 10,
+    color: colors.darkerGreen
   }
 });
