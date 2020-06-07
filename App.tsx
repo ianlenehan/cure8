@@ -8,8 +8,8 @@ import LoginScreen from './src/auth/LoginScreen';
 
 import { Spinner } from './src/common';
 
-export const rootURL = 'http://localhost:3001/';
-// export const rootURL = 'https://cure8.herokuapp.com/';
+// export const rootURL = 'http://localhost:3001/';
+export const rootURL = 'https://cure8.herokuapp.com/';
 
 const getApolloClient = (token: string) => {
   return new ApolloClient({
