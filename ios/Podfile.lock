@@ -136,6 +136,7 @@ PODS:
     - nanopb/encode (= 0.3.901)
   - nanopb/decode (0.3.901)
   - nanopb/encode (0.3.901)
+  - OneSignal (2.13.1)
   - Protobuf (3.9.0)
   - RCTRequired (0.61.1)
   - RCTTypeSafety (0.61.1):
@@ -304,6 +305,9 @@ PODS:
     - React
   - react-native-geolocation (2.0.2):
     - React
+  - react-native-onesignal (3.7.3):
+    - OneSignal (= 2.13.1)
+    - React (< 1.0.0, >= 0.13.0)
   - react-native-safari-view (1.0.0):
     - React
   - react-native-safe-area-context (1.0.0):
@@ -345,6 +349,8 @@ PODS:
     - React-cxxreact (= 0.61.1)
     - React-jsi (= 0.61.1)
     - ReactCommon/jscallinvoker (= 0.61.1)
+  - RNCAsyncStorage (1.11.0):
+    - React
   - RNCMaskedView (0.1.10):
     - React
   - RNFirebase (5.5.7):
@@ -375,6 +381,7 @@ DEPENDENCIES:
   - Firebase/Firestore
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
+  - OneSignal (< 3.0, >= 2.9.3)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
   - React (from `../node_modules/react-native/`)
@@ -388,6 +395,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-contacts (from `../node_modules/react-native-contacts`)
   - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
+  - react-native-onesignal (from `../node_modules/react-native-onesignal`)
   - react-native-safari-view (from `../node_modules/react-native-safari-view`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-webview (from `../node_modules/react-native-webview`)
@@ -402,6 +410,7 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/jscallinvoker (from `../node_modules/react-native/ReactCommon`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
   - RNFirebase (from `../node_modules/react-native-firebase/ios`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
@@ -435,6 +444,8 @@ SPEC REPOS:
     - leveldb-library
     - nanopb
     - Protobuf
+  trunk:
+    - OneSignal
 
 EXTERNAL SOURCES:
   DoubleConversion:
@@ -469,6 +480,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-contacts"
   react-native-geolocation:
     :path: "../node_modules/@react-native-community/geolocation"
+  react-native-onesignal:
+    :path: "../node_modules/react-native-onesignal"
   react-native-safari-view:
     :path: "../node_modules/react-native-safari-view"
   react-native-safe-area-context:
@@ -495,6 +508,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/Libraries/Vibration"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RNCAsyncStorage:
+    :path: "../node_modules/@react-native-community/async-storage"
   RNCMaskedView:
     :path: "../node_modules/@react-native-community/masked-view"
   RNFirebase:
@@ -538,6 +553,7 @@ SPEC CHECKSUMS:
   GTMSessionFetcher: 61bb0f61a4cb560030f1222021178008a5727a23
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
+  OneSignal: fa98eaa90372bb367b6a4a1c1622ffb9832c7600
   Protobuf: 1097ca58584c8d9be81bfbf2c5ff5975648dd87a
   RCTRequired: 53825815218847d3e9c7b6d92ad2d197a926d51e
   RCTTypeSafety: d886540c518e53064dfa081bf7693fd650699b92
@@ -550,6 +566,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 574d597112f9ea3d1b717f6fb62aef764c70dd6f
   react-native-contacts: f7e0e6f8f3c3e53a97c8a2974f2a65beba8f268f
   react-native-geolocation: c956aeb136625c23e0dce0467664af2c437888c9
+  react-native-onesignal: 417b2ae5c3148a47a6ef70b6af443186048b2022
   react-native-safari-view: 955d7160d159241b8e9395d12d10ea0ef863dcdd
   react-native-safe-area-context: a346c75f2288147527365ce27b59ca6d38c27805
   react-native-webview: 160ac8d6bb974e2933f2de6bb7464a8e934ff31d
@@ -563,6 +580,7 @@ SPEC CHECKSUMS:
   React-RCTText: 81b62b4e7f11531a5154e4daa5617670d5a2d5de
   React-RCTVibration: 8be61459e3749d1fb02cf414edd05b3007622882
   ReactCommon: 4fba5be89efdf0b5720e0adb3d8d7edf6e532db0
+  RNCAsyncStorage: d059c3ee71738c39834a627476322a5a8cd5bf36
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
   RNFirebase: 3c0d26909841ad3c72ca46d85aba333ef49903bc
   RNGestureHandler: 8f09cd560f8d533eb36da5a6c5a843af9f056b38
@@ -571,6 +589,6 @@ SPEC CHECKSUMS:
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
   Yoga: d8c572ddec8d05b7dba08e4e5f1924004a177078
 
-PODFILE CHECKSUM: 362a8ab01e119b2dbb31b6bddb27a34196229364
+PODFILE CHECKSUM: e9476490510eac061ff207a2e98267fd60109778
 
 COCOAPODS: 1.8.3

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import firebase, { RNFirebase } from 'react-native-firebase';
 import ApolloClient from 'apollo-boost/lib/index';
 import { NavigationContainer } from '@react-navigation/native';
+import OneSignal from 'react-native-onesignal';
 
 import Main from './src/Main';
 import LoginScreen from './src/auth/LoginScreen';
@@ -39,6 +41,24 @@ const App = () => {
 
     return () => unsubscriber();
   }, []);
+
+  useEffect(() => {
+    OneSignal.init('3202b90a-81b5-4d06-9e51-c20c4417907d', {
+      kOSSettingsKeyInFocusDisplayOption: 2
+    });
+    requestNotificationPermissions();
+  });
+
+  const requestNotificationPermissions = async () => {
+    if (Platform.OS === 'ios') {
+      const permissions = {
+        alert: true,
+        badge: true,
+        sound: true
+      };
+      OneSignal.requestPermissions(permissions);
+    }
+  };
 
   const getIdToken = async (authUser: RNFirebase.User) => {
     try {

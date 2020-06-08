@@ -40,6 +40,8 @@ target 'cure8' do
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 
 
+  pod 'react-native-onesignal', :path => '../node_modules/react-native-onesignal'
+
   target 'cure8Tests' do
     inherit! :search_paths
     # Pods for testing
@@ -56,4 +58,8 @@ target 'cure8-tvOS' do
     # Pods for testing
   end
 
+end
+
+target 'OneSignalNotificationServiceExtension' do
+  pod 'OneSignal', '>= 2.9.3', '< 3.0'
 end

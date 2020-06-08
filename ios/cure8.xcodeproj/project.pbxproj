@@ -18,10 +18,13 @@
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* cure8Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* cure8Tests.m */; };
 		74129611CAF746B6EC68B9B4 /* libPods-cure8-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E9B4846A87E40DBFC56CC44 /* libPods-cure8-tvOS.a */; };
+		7B0E312C248CD4B100864515 /* NotificationService.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B0E312B248CD4B100864515 /* NotificationService.m */; };
+		7B0E3130248CD4B100864515 /* OneSignalNotificationServiceExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 7B0E3128248CD4B100864515 /* OneSignalNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7BEF905D23702F6400BBA064 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = 7B1C6DF2236C5412004AC1D6 /* Fonts */; };
 		7BF88DDD233F1EA0004B6B65 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7BF88DDC233F1EA0004B6B65 /* GoogleService-Info.plist */; };
 		B26F9E19CB7C5C30DAE4262F /* libPods-cure8Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 880CC23685E54205C871DABB /* libPods-cure8Tests.a */; };
 		C6E58033AD4281F7252B9FB1 /* libPods-cure8.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7858D0556D06F4882E53AD /* libPods-cure8.a */; };
+		F7107E5A07F4306F192C51E4 /* libPods-OneSignalNotificationServiceExtension.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CB90B4D0844ADAAA956B71F /* libPods-OneSignalNotificationServiceExtension.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,7 +42,28 @@
 			remoteGlobalIDString = 2D02E47A1E0B4A5D006451C7;
 			remoteInfo = "cure8-tvOS";
 		};
+		7B0E312E248CD4B100864515 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7B0E3127248CD4B100864515;
+			remoteInfo = OneSignalNotificationServiceExtension;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		7B0E3131248CD4B100864515 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				7B0E3130248CD4B100864515 /* OneSignalNotificationServiceExtension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
@@ -55,8 +79,15 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = cure8/main.m; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* cure8-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "cure8-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* cure8-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "cure8-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3CB90B4D0844ADAAA956B71F /* libPods-OneSignalNotificationServiceExtension.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-OneSignalNotificationServiceExtension.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BB31BD38C77CC82054647B2 /* Pods-cure8-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-cure8-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-cure8-tvOSTests/Pods-cure8-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		5B22345BFC82C5EFD2A8E738 /* Pods-cure8-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-cure8-tvOS.release.xcconfig"; path = "Target Support Files/Pods-cure8-tvOS/Pods-cure8-tvOS.release.xcconfig"; sourceTree = "<group>"; };
+		7B0E3123248CC6BD00864515 /* cure8.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = cure8.entitlements; path = cure8/cure8.entitlements; sourceTree = "<group>"; };
+		7B0E3128248CD4B100864515 /* OneSignalNotificationServiceExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OneSignalNotificationServiceExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		7B0E312A248CD4B100864515 /* NotificationService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NotificationService.h; sourceTree = "<group>"; };
+		7B0E312B248CD4B100864515 /* NotificationService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NotificationService.m; sourceTree = "<group>"; };
+		7B0E312D248CD4B100864515 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7B0E3135248CD72B00864515 /* OneSignalNotificationServiceExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OneSignalNotificationServiceExtension.entitlements; sourceTree = "<group>"; };
 		7B1301612345AF11000D9E6A /* cure8Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = cure8Debug.entitlements; path = cure8/cure8Debug.entitlements; sourceTree = "<group>"; };
 		7B1C6DF2236C5412004AC1D6 /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Fonts; sourceTree = "<group>"; };
 		7BF88DDC233F1EA0004B6B65 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -65,8 +96,10 @@
 		880CC23685E54205C871DABB /* libPods-cure8Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-cure8Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		90373F56B092D7841A8A6EDE /* Pods-cure8-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-cure8-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-cure8-tvOS/Pods-cure8-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		A1B0769376E24C1FAF52FE61 /* Pods-cure8.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-cure8.release.xcconfig"; path = "Target Support Files/Pods-cure8/Pods-cure8.release.xcconfig"; sourceTree = "<group>"; };
+		AA1A5F3264E78345389D7DCE /* Pods-OneSignalNotificationServiceExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OneSignalNotificationServiceExtension.debug.xcconfig"; path = "Target Support Files/Pods-OneSignalNotificationServiceExtension/Pods-OneSignalNotificationServiceExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		AB4A22E79F1D5414E770A396 /* libPods-cure8-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-cure8-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD2092C6873BFD612103B057 /* Pods-cure8.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-cure8.debug.xcconfig"; path = "Target Support Files/Pods-cure8/Pods-cure8.debug.xcconfig"; sourceTree = "<group>"; };
+		C19ED4CF20BFD18E649CBDEE /* Pods-OneSignalNotificationServiceExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OneSignalNotificationServiceExtension.release.xcconfig"; path = "Target Support Files/Pods-OneSignalNotificationServiceExtension/Pods-OneSignalNotificationServiceExtension.release.xcconfig"; sourceTree = "<group>"; };
 		E165C916FF35728647D5E28E /* Pods-cure8-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-cure8-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-cure8-tvOSTests/Pods-cure8-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		E798ACDE2600A396133AD31E /* Pods-cure8Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-cure8Tests.release.xcconfig"; path = "Target Support Files/Pods-cure8Tests/Pods-cure8Tests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -107,6 +140,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7B0E3125248CD4B100864515 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F7107E5A07F4306F192C51E4 /* libPods-OneSignalNotificationServiceExtension.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -130,6 +171,7 @@
 		13B07FAE1A68108700A75B9A /* cure8 */ = {
 			isa = PBXGroup;
 			children = (
+				7B0E3123248CC6BD00864515 /* cure8.entitlements */,
 				7B1301612345AF11000D9E6A /* cure8Debug.entitlements */,
 				7BF88DDC233F1EA0004B6B65 /* GoogleService-Info.plist */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
@@ -152,8 +194,20 @@
 				7E9B4846A87E40DBFC56CC44 /* libPods-cure8-tvOS.a */,
 				AB4A22E79F1D5414E770A396 /* libPods-cure8-tvOSTests.a */,
 				880CC23685E54205C871DABB /* libPods-cure8Tests.a */,
+				3CB90B4D0844ADAAA956B71F /* libPods-OneSignalNotificationServiceExtension.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		7B0E3129248CD4B100864515 /* OneSignalNotificationServiceExtension */ = {
+			isa = PBXGroup;
+			children = (
+				7B0E3135248CD72B00864515 /* OneSignalNotificationServiceExtension.entitlements */,
+				7B0E312A248CD4B100864515 /* NotificationService.h */,
+				7B0E312B248CD4B100864515 /* NotificationService.m */,
+				7B0E312D248CD4B100864515 /* Info.plist */,
+			);
+			path = OneSignalNotificationServiceExtension;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -170,6 +224,7 @@
 				13B07FAE1A68108700A75B9A /* cure8 */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* cure8Tests */,
+				7B0E3129248CD4B100864515 /* OneSignalNotificationServiceExtension */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				9612687CAFDFFFE0C58854E3 /* Pods */,
@@ -187,6 +242,7 @@
 				00E356EE1AD99517003FC87E /* cure8Tests.xctest */,
 				2D02E47B1E0B4A5D006451C7 /* cure8-tvOS.app */,
 				2D02E4901E0B4A5D006451C7 /* cure8-tvOSTests.xctest */,
+				7B0E3128248CD4B100864515 /* OneSignalNotificationServiceExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -209,6 +265,8 @@
 				4BB31BD38C77CC82054647B2 /* Pods-cure8-tvOSTests.release.xcconfig */,
 				85CAF4ACD0B70124A6F373B7 /* Pods-cure8Tests.debug.xcconfig */,
 				E798ACDE2600A396133AD31E /* Pods-cure8Tests.release.xcconfig */,
+				AA1A5F3264E78345389D7DCE /* Pods-OneSignalNotificationServiceExtension.debug.xcconfig */,
+				C19ED4CF20BFD18E649CBDEE /* Pods-OneSignalNotificationServiceExtension.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -246,10 +304,12 @@
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				50B5709998DC9190B83D0E33 /* [CP] Copy Pods Resources */,
+				7B0E3131248CD4B100864515 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				7B0E312F248CD4B100864515 /* PBXTargetDependency */,
 			);
 			name = cure8;
 			productName = cure8;
@@ -295,6 +355,24 @@
 			productReference = 2D02E4901E0B4A5D006451C7 /* cure8-tvOSTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		7B0E3127248CD4B100864515 /* OneSignalNotificationServiceExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7B0E3134248CD4B100864515 /* Build configuration list for PBXNativeTarget "OneSignalNotificationServiceExtension" */;
+			buildPhases = (
+				092547137410C084162C639B /* [CP] Check Pods Manifest.lock */,
+				7B0E3124248CD4B100864515 /* Sources */,
+				7B0E3125248CD4B100864515 /* Frameworks */,
+				7B0E3126248CD4B100864515 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OneSignalNotificationServiceExtension;
+			productName = OneSignalNotificationServiceExtension;
+			productReference = 7B0E3128248CD4B100864515 /* OneSignalNotificationServiceExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -320,6 +398,11 @@
 						ProvisioningStyle = Automatic;
 						TestTargetID = 2D02E47A1E0B4A5D006451C7;
 					};
+					7B0E3127248CD4B100864515 = {
+						CreatedOnToolsVersion = 11.5;
+						DevelopmentTeam = 92PDXG59PL;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "cure8" */;
@@ -340,6 +423,7 @@
 				00E356ED1AD99517003FC87E /* cure8Tests */,
 				2D02E47A1E0B4A5D006451C7 /* cure8-tvOS */,
 				2D02E48F1E0B4A5D006451C7 /* cure8-tvOSTests */,
+				7B0E3127248CD4B100864515 /* OneSignalNotificationServiceExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -378,6 +462,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7B0E3126248CD4B100864515 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -394,6 +485,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
+		};
+		092547137410C084162C639B /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-OneSignalNotificationServiceExtension-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
 		};
 		1570F17A30B13A36FBEBAC22 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -622,6 +735,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7B0E3124248CD4B100864515 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7B0E312C248CD4B100864515 /* NotificationService.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -634,6 +755,11 @@
 			isa = PBXTargetDependency;
 			target = 2D02E47A1E0B4A5D006451C7 /* cure8-tvOS */;
 			targetProxy = 2D02E4911E0B4A5D006451C7 /* PBXContainerItemProxy */;
+		};
+		7B0E312F248CD4B100864515 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7B0E3127248CD4B100864515 /* OneSignalNotificationServiceExtension */;
+			targetProxy = 7B0E312E248CD4B100864515 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -720,6 +846,7 @@
 			baseConfigurationReference = A1B0769376E24C1FAF52FE61 /* Pods-cure8.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = cure8/cure8.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 92PDXG59PL;
 				INFOPLIST_FILE = cure8/Info.plist;
@@ -842,6 +969,60 @@
 				SDKROOT = appletvos;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/cure8-tvOS.app/cure8-tvOS";
 				TVOS_DEPLOYMENT_TARGET = 10.1;
+			};
+			name = Release;
+		};
+		7B0E3132248CD4B100864515 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AA1A5F3264E78345389D7DCE /* Pods-OneSignalNotificationServiceExtension.debug.xcconfig */;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 92PDXG59PL;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ianlenehan.cure8.OneSignalNotificationServiceExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		7B0E3133248CD4B100864515 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C19ED4CF20BFD18E649CBDEE /* Pods-OneSignalNotificationServiceExtension.release.xcconfig */;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 92PDXG59PL;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ianlenehan.cure8.OneSignalNotificationServiceExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -979,6 +1160,15 @@
 			buildConfigurations = (
 				2D02E4991E0B4A5E006451C7 /* Debug */,
 				2D02E49A1E0B4A5E006451C7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7B0E3134248CD4B100864515 /* Build configuration list for PBXNativeTarget "OneSignalNotificationServiceExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7B0E3132248CD4B100864515 /* Debug */,
+				7B0E3133248CD4B100864515 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

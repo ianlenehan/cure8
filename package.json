@@ -10,6 +10,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@react-native-community/async-storage": "^1.11.0",
     "@react-native-community/geolocation": "^2.0.2",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-navigation/bottom-tabs": "^5.4.4",
@@ -38,6 +39,7 @@
     "react-native-gesture-handler": "^1.4.1",
     "react-native-gifted-chat": "^0.10.1",
     "react-native-keyboard-aware-scrollview": "^2.0.0",
+    "react-native-onesignal": "^3.7.3",
     "react-native-phone-input": "^0.2.4",
     "react-native-reanimated": "^1.3.0",
     "react-native-safari-view": "^2.1.0",
