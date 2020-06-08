@@ -14,7 +14,6 @@ import { get } from 'lodash';
 
 import {
   AppText,
-  Button,
   Spacer,
   Tag,
   TagContainer,
@@ -132,7 +131,7 @@ const Links = (props: Props) => {
   };
 
   const handleDeleteConfirm = async () => {
-    await onDelete(selectedCurationId);
+    onDelete(selectedCurationId);
     closeDeleteModal();
     useToast('Curation successfully deleted');
     setOpenRows([]);
@@ -383,7 +382,7 @@ const Links = (props: Props) => {
 
         <DeleteModal
           isVisible={isDeleteModalVisible}
-          onDeleteConfirm={handleArchiveConfirm}
+          onDeleteConfirm={handleDeleteConfirm}
           onDismiss={closeDeleteModal}
         />
       </View>

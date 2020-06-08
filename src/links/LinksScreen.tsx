@@ -18,7 +18,7 @@ const LinksScreen = ({ navigation }: any) => {
   const [fetchArchivedLinks, { data: archivedData }] = useLazyQuery(
     FETCH_ARCHIVED_LINKS,
     {
-      variables: { tagIds: [] },
+      variables: { tagIds: [], showItemCount: itemCount },
       fetchPolicy: 'network-only'
     }
   );

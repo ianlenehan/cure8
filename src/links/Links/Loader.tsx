@@ -10,8 +10,7 @@ import {
   ARCHIVE_CURATION,
   CREATE_CONVERSATION,
   DELETE_CURATION,
-  FETCH_TAGS,
-  FETCH_CURRENT_USER
+  FETCH_TAGS
 } from '../graphql';
 
 type Props = {
@@ -42,18 +41,15 @@ const LoaderLinks = (props: Props) => {
     refetch,
     setParams
   } = props;
-  const { data: currentUser, loading: loadingCurrentUser } = useQuery(
-    FETCH_CURRENT_USER
-  );
 
   const { data: tagsData, loading: loadingTags } = useQuery(FETCH_TAGS);
   const [archiveCuration] = useMutation(ARCHIVE_CURATION);
   const [deleteCuration] = useMutation(DELETE_CURATION);
   const [createConversation] = useMutation(CREATE_CONVERSATION);
 
-  const { setSelectedConversationId } = useAppContext();
+  const { setSelectedConversationId, currentUser } = useAppContext();
 
-  if (loadingCurrentUser || loadingTags) return null;
+  if (loadingTags) return null;
 
   const handleArchive = async (variables: ArchiveVariablesType) => {
     await archiveCuration({ variables });
@@ -63,7 +59,7 @@ const LoaderLinks = (props: Props) => {
 
   const handleDelete = async (id: string) => {
     await deleteCuration({ variables: { id } });
-    refetch();
+   await refetch();
   };
 
   const handleCreateConversation = async (
@@ -95,7 +91,7 @@ const LoaderLinks = (props: Props) => {
       onCreateConversation={handleCreateConversation}
       onDelete={handleDelete}
       onNewLinkSubmit={refetch}
-      currentUserId={currentUser.appUser.id}
+      currentUserId={currentUser?.id}
       onArchive={handleArchive}
     />
   );

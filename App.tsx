@@ -4,6 +4,7 @@ import firebase, { RNFirebase } from 'react-native-firebase';
 import ApolloClient from 'apollo-boost/lib/index';
 import { NavigationContainer } from '@react-navigation/native';
 import OneSignal from 'react-native-onesignal';
+import SplashScreen from 'react-native-splash-screen';
 
 import Main from './src/Main';
 import LoginScreen from './src/auth/LoginScreen';
@@ -47,7 +48,9 @@ const App = () => {
       kOSSettingsKeyInFocusDisplayOption: 2
     });
     requestNotificationPermissions();
-  });
+
+    SplashScreen.hide();
+  }, []);
 
   const requestNotificationPermissions = async () => {
     if (Platform.OS === 'ios') {

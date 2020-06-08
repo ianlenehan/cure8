@@ -18,6 +18,12 @@ const Main = (props: any) => {
     phoneNumbers: []
   });
   const [selectedConversationId, setSelectedConversationId] = useState('');
+  const [currentPushId, setCurrentPushId] = useState('');
+  const [currentUser, setCurrentUser] = useState({
+    id: '',
+    name: '',
+    pushToken: ''
+  });
 
   useEffect(() => {
     OneSignal.getPermissionSubscriptionState((status: any) => {
@@ -42,10 +48,7 @@ const Main = (props: any) => {
   const handleIds = () => {};
 
   const checkNotificationStatus = async (status: any) => {
-    const pushToken = await AsyncStorage.getItem('pushToken');
-    if (pushToken !== status.userId) {
-      await AsyncStorage.setItem('pushToken', status.userId);
-    }
+    setCurrentPushId(status.userId);
   };
 
   if (!apolloClient) {
@@ -59,6 +62,8 @@ const Main = (props: any) => {
           value={{
             authUser,
             setAuthUser,
+            currentUser,
+            setCurrentUser,
             newContact,
             setNewContact,
             selectedConversationId,
@@ -66,7 +71,11 @@ const Main = (props: any) => {
           }}>
           <StatusBar barStyle="light-content" />
           <View style={styles.container}>
-            {showSignupScreen ? <CompleteSignUpScreen /> : <RootTab />}
+            {showSignupScreen ? (
+              <CompleteSignUpScreen />
+            ) : (
+              <RootTab {...{ currentPushId }} />
+            )}
           </View>
         </AppContext.Provider>
       </Root>
