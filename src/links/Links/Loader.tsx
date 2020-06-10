@@ -21,10 +21,8 @@ type Props = {
   navigation: any;
   onClearTagFilter?: () => void;
   onLoadMore: () => void;
-  onSetOptions: any;
   onTagPress?: (tag: TagType) => void;
   refetch: () => void;
-  setParams?: any;
 };
 
 const LoaderLinks = (props: Props) => {
@@ -36,10 +34,8 @@ const LoaderLinks = (props: Props) => {
     navigation,
     onClearTagFilter,
     onLoadMore,
-    onSetOptions,
     onTagPress,
     refetch,
-    setParams
   } = props;
 
   const { data: tagsData, loading: loadingTags } = useQuery(FETCH_TAGS);
@@ -84,8 +80,6 @@ const LoaderLinks = (props: Props) => {
         onClearTagFilter,
         onLoadMore,
         onTagPress,
-        onSetOptions,
-        setParams,
         tags
       }}
       onCreateConversation={handleCreateConversation}

@@ -25,15 +25,19 @@ const FETCH_CURRENT_USER = gql`
       name
       pushToken
     }
+    pushTokens {
+      id
+      token
+    }
   }
 `;
 
-const SET_PUSH_TOKEN = gql`
-  mutation SetPushToken($pushToken: String!) {
-    setPushToken(pushToken: $pushToken) {
-      appUser {
+const CREATE_PUSH_TOKEN = gql`
+  mutation CreatePushToken($pushToken: String!) {
+    createPushToken(pushToken: $pushToken) {
+      pushTokens {
         id
-        pushToken
+        token
       }
     }
   }
@@ -41,19 +45,16 @@ const SET_PUSH_TOKEN = gql`
 
 const RootTab = ({ currentPushId }: { currentPushId?: string }) => {
   const { data, loading: loadingCurrentUser } = useQuery(FETCH_CURRENT_USER);
-  const [setPushToken] = useMutation(SET_PUSH_TOKEN);
+  const [createPushToken] = useMutation(CREATE_PUSH_TOKEN);
 
   const { setCurrentUser } = useAppContext();
 
   useEffect(() => {
-    if (
-      currentPushId &&
-      data?.appUser &&
-      currentPushId !== data.appUser.pushToken
-    ) {
-      setPushToken({ variables: { pushToken: currentPushId } });
+    const tokens = data?.pushTokens ? data.pushTokens.map(({token} : { token: string }) => token) : []
+    if (data && currentPushId && !tokens.includes(currentPushId)) {
+      createPushToken({ variables: { pushToken: currentPushId } });
     }
-  }, [currentPushId, data?.appUser]);
+  }, [currentPushId, data?.pushTokens]);
 
   useEffect(() => {
     if (data?.appUser) {

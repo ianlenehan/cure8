@@ -39,7 +39,7 @@ const Main = (props: any) => {
       OneSignal.removeEventListener('opened', handleOpened);
       OneSignal.removeEventListener('ids', handleIds);
     };
-  });
+  }, []);
 
   const handleReceived = (event: any) => {
     console.log('received', event);

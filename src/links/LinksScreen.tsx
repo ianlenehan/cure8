@@ -35,25 +35,10 @@ const LinksScreen = ({ navigation }: any) => {
     setPage(page + 1);
   };
 
-  const handleSetOptions = (onPress: () => void) => {
-    return navigation.setOptions({
-      headerRight: () => (
-        <Icon
-          name="plus"
-          type="font-awesome"
-          color="white"
-          containerStyle={{ marginRight: 25 }}
-          {...{ onPress }}
-        />
-      )
-    });
-  };
-
   return (
     <Links
       {...{ curations, refetch, fetchArchivedLinks, navigation }}
       onLoadMore={handleLoadMore}
-      onSetOptions={handleSetOptions}
     />
   );
 };

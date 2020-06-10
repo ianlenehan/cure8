@@ -42,7 +42,6 @@ type Props = {
   onLoadMore: () => void;
   onTagPress?: (tag: TagType) => void;
   onNewLinkSubmit: () => void;
-  onSetOptions: (onPress: () => void) => void;
   hello?: any;
   tags: TagType[];
 };
@@ -60,7 +59,6 @@ const Links = (props: Props) => {
     onLoadMore,
     onTagPress = () => {},
     onNewLinkSubmit,
-    onSetOptions,
     tags
   } = props;
 
@@ -82,15 +80,6 @@ const Links = (props: Props) => {
   const [isDeleteModalVisible, openDeleteModal, closeDeleteModal] = useBoolean(
     false
   );
-
-  useEffect(() => {
-    onSetOptions(showNewLink);
-  }, []);
-
-  const handleNewLinkPress = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    showNewLink();
-  };
 
   const handleRatingPress = (rating: string) => {
     if (rating === selectedRating) {
@@ -157,12 +146,13 @@ const Links = (props: Props) => {
     onNewLinkSubmit();
     setOpenRows([]);
     setForwardUrl('');
+    hideNewLink();
   };
 
   const renderHiddenItem = ({ item }: { item: CurationType }) => {
     const handleForwardLinkPress = () => {
       setForwardUrl(item.link.url);
-      handleNewLinkPress();
+      showNewLink();
     };
 
     const renderChatButton = () => {
@@ -284,7 +274,7 @@ const Links = (props: Props) => {
   };
 
   const renderTagSelector = () => {
-    if (!isArchivedLinks) return null;
+    if (!isArchivedLinks || showingNewLink) return null;
 
     const icon = tagSelectorOpen ? 'expand-less' : 'expand-more';
 
@@ -342,7 +332,7 @@ const Links = (props: Props) => {
               <IonIcon.Button
                 name="plus-square"
                 backgroundColor={colors.primaryGreen}
-                onPress={handleNewLinkPress}>
+                onPress={showNewLink}>
                 Create One
               </IonIcon.Button>
             )}
@@ -366,6 +356,14 @@ const Links = (props: Props) => {
           onRowDidClose={handleRowDidClose}
           onEndReachedThreshold={0.4}
           onEndReached={onLoadMore}
+        />
+
+        <NewLink
+          onSubmitComplete={handleNewLinkSubmit}
+          isOpen={showingNewLink}
+          onClose={hideNewLink}
+          onOpen={showNewLink}
+          {...{ forwardUrl }}
         />
 
         <ArchiveModal
@@ -392,12 +390,6 @@ const Links = (props: Props) => {
   return (
     <Fragment>
       {renderContent()}
-      <NewLink
-        onOverlayCancel={hideNewLink}
-        overlayIsOpen={showingNewLink}
-        onSubmitComplete={handleNewLinkSubmit}
-        {...{ forwardUrl }}
-      />
       <WebViewer
         onRequestClose={handleWebViewerClose}
         curationUrl={get(selectedCuration, 'link.url')}
