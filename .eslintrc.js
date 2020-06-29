@@ -6,5 +6,9 @@ module.exports = {
     curly: ['error', 'multi'],
     'comma-dangle': '0',
     'react-hooks/exhaustive-deps': 'warn',
-  },
+    'max-len': [
+      'warn',
+      { code: 120, ignoreUrls: true, ignoreTrailingComments: true }
+    ]
+  }
 };

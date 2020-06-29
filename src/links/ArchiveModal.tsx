@@ -1,6 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import {
   View,
+  ScrollView,
   StyleSheet,
   Text,
   Modal,
@@ -54,7 +55,7 @@ const ArchiveModal: FunctionComponent<Props> = props => {
     <Modal animationType="fade" visible={isVisible} transparent>
       <View style={styles.modalContainer}>
         <View style={styles.modalInner}>
-          <View style={{ flex: 1 }}>
+          <ScrollView>
             <Input
               autoCapitalize="none"
               color="grey"
@@ -85,7 +86,7 @@ const ArchiveModal: FunctionComponent<Props> = props => {
                 />
               ))}
             </TagContainer>
-          </View>
+          </ScrollView>
           <View style={styles.ratings}>
             {RATINGS.map(rating => {
               const activeStyle =

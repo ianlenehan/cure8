@@ -24,6 +24,8 @@ const QUERY = gql`
   }
 `;
 
+// TODO - Swipe to delete conversation: or remove yourself from the conversation
+
 const ConversationsScreen = ({ navigation }: any) => {
   const { data, loading } = useQuery(QUERY);
   const { selectedConversationId, setSelectedConversationId } = useAppContext();
@@ -44,17 +46,13 @@ const ConversationsScreen = ({ navigation }: any) => {
   };
 
   const renderItem = ({ item }: { item: ConversationType }) => {
-    return (
-      <ConversationItem conversation={item} onPress={handleConversationPress} />
-    );
+    return <ConversationItem conversation={item} onPress={handleConversationPress} />;
   };
 
   if (!data.conversations.length) {
     return (
       <View style={styles.emptyPage}>
-        <AppText size="medium">
-          You haven't started any conversations yet.
-        </AppText>
+        <AppText size="medium">You haven't started any conversations yet.</AppText>
       </View>
     );
   }

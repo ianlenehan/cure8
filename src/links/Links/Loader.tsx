@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery, useMutation } from 'react-apollo';
 
 import useAppContext from '../../hooks/useAppContext';
+import useToast from '../../hooks/useToast';
 import Links from './Links';
 import { ArchiveVariablesType, CurationType, TagType } from '../types';
 
@@ -48,12 +49,14 @@ const LoaderLinks = (props: Props) => {
 
   const handleArchive = async (variables: ArchiveVariablesType) => {
     await archiveCuration({ variables });
-    await refetch();
+    useToast('Curation successfully archived');
+    refetch();
     fetchArchivedLinks && fetchArchivedLinks();
   };
 
   const handleDelete = async (id: string) => {
     await deleteCuration({ variables: { id } });
+    useToast('Curation successfully deleted');
     refetch();
   };
 
