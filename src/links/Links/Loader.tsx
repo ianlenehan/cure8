@@ -1,5 +1,4 @@
 import React from 'react';
-import { View, Text } from 'react-native';
 import { useQuery, useMutation } from 'react-apollo';
 
 import useAppContext from '../../hooks/useAppContext';
@@ -55,7 +54,7 @@ const LoaderLinks = (props: Props) => {
 
   const handleDelete = async (id: string) => {
     await deleteCuration({ variables: { id } });
-   await refetch();
+    refetch();
   };
 
   const handleCreateConversation = async (

@@ -9,7 +9,7 @@ import {
   Platform
 } from 'react-native';
 import { Icon } from 'react-native-elements';
-import firebase from 'react-native-firebase';
+import firestore from '@react-native-firebase/firestore';
 import moment from 'moment';
 import { uniq } from 'lodash';
 import { useQuery, useMutation } from 'react-apollo';
@@ -77,8 +77,7 @@ const ConversationScreen = ({ route }: any) => {
     stopLoadingMessages
   ] = useBoolean(false);
 
-  const firestore = firebase.firestore();
-  const messageRef = firestore.collection('messages');
+  const messageRef = firestore().collection('messages');
 
   useEffect(() => {
     startLoadingMessages();

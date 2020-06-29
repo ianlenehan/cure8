@@ -1,4 +1,4 @@
-import React, { useState, FunctionComponent } from 'react';
+import React, { useState, FC } from 'react';
 import { FlatList, View, StyleSheet } from 'react-native';
 import { useQuery, useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
@@ -54,12 +54,12 @@ type GroupType = {
   contacts: any;
 };
 
-const GroupsTab: FunctionComponent<Props> = props => {
-  const { navigate, editMode, onDeleteCompletion, contacts } = props;
+const GroupsTab: FC<Props> = props => {
+  const { editMode, onDeleteCompletion, contacts } = props;
 
   const [selectedGroupId, setSelectedGroupId] = useState<string>('');
 
-  const { data, loading, error, refetch } = useQuery(FETCH_GROUPS);
+  const { data, loading, refetch } = useQuery(FETCH_GROUPS);
   const [deleteGroup] = useMutation(DELETE_GROUP);
 
   if (loading) {

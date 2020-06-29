@@ -92,10 +92,14 @@ export const ActivityStack = () => {
   );
 };
 
-export const SettingsStack = () => {
+export const SettingsStack = ({ route }: { route: any }) => {
   return (
     <Stack.Navigator {...{ screenOptions }}>
-      <Stack.Screen name="Settings" component={SettingsScreen} />
+      <Stack.Screen
+        name="Settings"
+        component={SettingsScreen}
+        initialParams={route.params}
+      />
     </Stack.Navigator>
   );
 };

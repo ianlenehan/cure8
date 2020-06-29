@@ -1,56 +1,70 @@
 import React from 'react';
 import { View, StyleSheet, Switch } from 'react-native';
-import firebase from 'react-native-firebase';
+import auth from '@react-native-firebase/auth';
 import { useQuery, useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import { Container, AppText, Button, Spinner, Spacer } from '../common';
 
-const FETCH_CURRENT_USER = gql`
-  query currentUser {
+const FETCH_PUSH_TOKEN = gql`
+  query pushToken($token: String!) {
+    pushToken(token: $token) {
+      id
+      token
+      notify
+      notifyNewLink
+      notifyNewMessage
+      notifyNewRating
+    }
     appUser {
       id
       name
       phone
-      notifications
-      notificationsNewLink
-      notificationsNewRating
     }
   }
 `;
 
-const TOGGLE_SETTING = gql`
-  mutation ToggleSetting($settingName: String!) {
-    toggleSetting(settingName: $settingName) {
-      user {
+const TOGGLE_NOTIFICATION = gql`
+  mutation toggleNotification($tokenId: String!, $field: String!) {
+    toggleNotification(tokenId: $tokenId, field: $field) {
+      pushToken {
         id
+        token
+        notify
+        notifyNewLink
+        notifyNewMessage
+        notifyNewRating
       }
     }
   }
 `;
 
-const SettingsScreen = () => {
-  const { data, loading, refetch } = useQuery(FETCH_CURRENT_USER);
+const SettingsScreen = ({ route }: { route: any }) => {
+  const { currentPushId: tokenId } = route.params;
 
-  const [toggleSetting] = useMutation(TOGGLE_SETTING);
+  const { data, loading, refetch } = useQuery(FETCH_PUSH_TOKEN, {
+    variables: { token: tokenId }
+  });
+
+  const [toggleNotification] = useMutation(TOGGLE_NOTIFICATION);
 
   if (loading || !data) return <Spinner />;
 
   const {
-    name,
-    phone,
-    notifications,
-    notificationsNewLink,
-    notificationsNewRating
-  } = data.appUser;
+    notify,
+    notifyNewLink,
+    notifyNewMessage,
+    notifyNewRating
+  } = data.pushToken;
+
+  const { name, phone } = data.appUser;
 
   const handleLogout = () => {
-    firebase.auth().signOut();
+    auth().signOut();
   };
 
-  const handleToggleSetting = async (settingName: string) => {
-    await toggleSetting({ variables: { settingName } });
-    refetch();
+  const handleToggleSetting = async (field: string) => {
+    await toggleNotification({ variables: { field, tokenId } });
   };
 
   return (
@@ -67,24 +81,32 @@ const SettingsScreen = () => {
         <View style={styles.listItemContainer}>
           <AppText size="medium">Notifications</AppText>
           <Switch
-            value={notifications}
-            onValueChange={() => handleToggleSetting('notifications')}
+            value={notify}
+            onValueChange={() => handleToggleSetting('notify')}
           />
         </View>
         <View style={styles.listItemContainer}>
           <AppText size="medium">New link notifications</AppText>
           <Switch
-            value={notificationsNewLink}
-            onValueChange={() => handleToggleSetting('notificationsNewLink')}
-            disabled={!notifications}
+            value={notifyNewLink}
+            onValueChange={() => handleToggleSetting('notify_new_link')}
+            disabled={!notify}
+          />
+        </View>
+        <View style={styles.listItemContainer}>
+          <AppText size="medium">New message notifications</AppText>
+          <Switch
+            value={notifyNewMessage}
+            onValueChange={() => handleToggleSetting('notify_new_message')}
+            disabled={!notify}
           />
         </View>
         <View style={styles.listItemContainer}>
           <AppText size="medium">New rating notifications</AppText>
           <Switch
-            value={notificationsNewRating}
-            onValueChange={() => handleToggleSetting('notificationsNewRating')}
-            disabled={!notifications}
+            value={notifyNewRating}
+            onValueChange={() => handleToggleSetting('notify_new_rating')}
+            disabled={!notify}
           />
         </View>
       </View>

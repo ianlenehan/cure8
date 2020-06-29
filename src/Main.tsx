@@ -3,7 +3,6 @@ import { StatusBar, StyleSheet, View } from 'react-native';
 import { Root } from 'native-base';
 import { ApolloProvider } from 'react-apollo';
 import OneSignal from 'react-native-onesignal';
-import AsyncStorage from '@react-native-community/async-storage';
 
 import AppContext from './utils/AppContext';
 import RootTab from './navigation/RootTab';
@@ -21,8 +20,7 @@ const Main = (props: any) => {
   const [currentPushId, setCurrentPushId] = useState('');
   const [currentUser, setCurrentUser] = useState({
     id: '',
-    name: '',
-    pushToken: ''
+    name: ''
   });
 
   useEffect(() => {
@@ -64,6 +62,7 @@ const Main = (props: any) => {
             setAuthUser,
             currentUser,
             setCurrentUser,
+            currentPushId,
             newContact,
             setNewContact,
             selectedConversationId,

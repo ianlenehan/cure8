@@ -1,5 +1,4 @@
 import React from 'react';
-import { analytics } from 'react-native-firebase';
 
 const AppContext = React.createContext({
   authUser: {
@@ -11,8 +10,7 @@ const AppContext = React.createContext({
   setAuthUser: (authUser: any) => {},
   currentUser: {
     id: '',
-    name: '',
-    pushToken: ''
+    name: ''
   },
   setCurrentUser: (currentUser: any) => {},
   newContact: {
@@ -22,7 +20,8 @@ const AppContext = React.createContext({
   },
   setNewContact: (contact: any) => {},
   selectedConversationId: '',
-  setSelectedConversationId: (conversationId: string) => {}
+  setSelectedConversationId: (conversationId: string) => {},
+  currentPushId: ''
 });
 
 export default AppContext;

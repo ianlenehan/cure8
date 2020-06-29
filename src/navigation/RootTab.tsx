@@ -23,7 +23,6 @@ const FETCH_CURRENT_USER = gql`
     appUser {
       id
       name
-      pushToken
     }
     pushTokens {
       id
@@ -97,7 +96,7 @@ const RootTab = ({ currentPushId }: { currentPushId?: string }) => {
       <Tab.Screen name="Conversations" component={ConversationsStack} />
       <Tab.Screen name="Contacts" component={ContactsStack} />
       <Tab.Screen name="Activity" component={ActivityStack} />
-      <Tab.Screen name="Settings" component={SettingsStack} />
+      <Tab.Screen name="Settings" component={SettingsStack} initialParams={{ currentPushId }} />
     </Tab.Navigator>
   );
 };

@@ -63,7 +63,7 @@ const Overlay = (props: Props) => {
     onSave && onSave();
   };
 
-  const height = fullscreen ? '100%' : '85%';
+  const height = fullscreen ? '95%' : '85%';
 
   if (hideMainButton && !open) return null;
 
@@ -112,7 +112,12 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingBottom: 0,
     borderTopLeftRadius: 20,
-    borderTopRightRadius: 20
+    borderTopRightRadius: 20,
+    shadowColor: 'black',
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 0.4,
+    elevation: 8,
+    shadowRadius: 10
   },
   overlayInner: {
     flex: 1,

@@ -1,28 +1,11 @@
-import React, { useState, useEffect, FunctionComponent } from 'react';
-import { FlatList, View, StyleSheet } from 'react-native';
-import { useQuery, useMutation } from 'react-apollo';
+import React, { FC } from 'react';
+import { Alert, FlatList, View, StyleSheet } from 'react-native';
+import { useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
 
+import useToast from '../hooks/useToast';
 import { Container, Spinner, ContactRow, EmptyPage } from '../common';
 import NewContact from './NewContact';
-
-const FETCH_CONTACTS = gql`
-  query contacts {
-    contacts {
-      id
-      name
-      user {
-        id
-        name
-      }
-      linkedUser {
-        id
-        name
-        phone
-      }
-    }
-  }
-`;
 
 const DELETE_CONTACT = gql`
   mutation DeleteContact($id: String!) {
@@ -53,7 +36,7 @@ type Props = {
   refetch: () => void;
 };
 
-const ContactsTab: FunctionComponent<Props> = props => {
+const ContactsTab: FC<Props> = props => {
   const {
     navigate,
     editMode,
@@ -63,18 +46,30 @@ const ContactsTab: FunctionComponent<Props> = props => {
     refetch
   } = props;
 
-  const [deleteContact, { error, loading: deleteLoading }] = useMutation(
+  const [deleteContact, { loading: deleteLoading }] = useMutation(
     DELETE_CONTACT
   );
 
-  const handleDelete = async (id: string) => {
+  const handleDeleteConfirm = async (id: string, name: string) => {
+    onDeleteCompletion();
     await deleteContact({ variables: { id } });
     await refetch();
-    onDeleteCompletion();
+    useToast(`Contact record for ${name} successfully deleted`);
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    Alert.alert('Delete Contact', `Are you sure you want to delete ${name}?`, [
+      { text: 'Yes', onPress: () => handleDeleteConfirm(id, name) },
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel'
+      }
+    ]);
   };
 
   const renderItem = ({ item }: { item: ContactType }) => {
-    const onDeletePress = () => handleDelete(item.id);
+    const onDeletePress = () => handleDelete(item.id, item.name);
 
     return (
       <ContactRow

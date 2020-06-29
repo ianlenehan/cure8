@@ -10,10 +10,8 @@ type Props = {
   editMode?: boolean;
   iconColour?: string;
   iconType?: string;
-  isGroup?: boolean;
   isMember?: boolean;
   onDeletePress?: () => void;
-  onEditPress?: () => void;
   onPress?: () => void;
   rightIcon?: any;
   rightTitle?: string;
@@ -28,45 +26,24 @@ const ContactRow: FunctionComponent<Props> = props => {
     editMode,
     iconColour,
     iconType,
-    isGroup,
     isMember,
     onDeletePress,
-    onEditPress,
     onPress,
-    rightTitle,
     rightIcon,
+    rightTitle,
     subtitle,
     title
   } = props;
 
   const getRightTitle = () => {
-    if (editMode && isGroup) {
-      return (
-        <View style={styles.row}>
-          <Icon
-            name="mode-edit"
-            color="#ddd"
-            onPress={onEditPress}
-            disabled={disabled}
-            containerStyle={{ paddingRight: 15 }}
-          />
-          <Icon
-            name="trash-o"
-            type="font-awesome"
-            color={colors.warningRed}
-            onPress={onDeletePress}
-            disabled={disabled}
-          />
-        </View>
-      );
-    } else if (editMode) {
+    if (editMode) {
       return (
         <Icon
-          name="trash-o"
+          name={'trash-o'}
           type="font-awesome"
           color={colors.warningRed}
           onPress={onDeletePress}
-          disabled={disabled}
+          {...{ disabled }}
         />
       );
     } else if (rightTitle) {
@@ -80,7 +57,7 @@ const ContactRow: FunctionComponent<Props> = props => {
         name={chevronType || 'chevron-right'}
         type={iconType}
         color={iconColour || '#f3f3f3'}
-        disabled={disabled}
+        {...{ disabled }}
       />
     );
   };
@@ -108,7 +85,7 @@ const ContactRow: FunctionComponent<Props> = props => {
         <View style={styles.details}>
           <View>
             {formatName()}
-            {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+            {!!subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
           </View>
           {getRightTitle()}
         </View>

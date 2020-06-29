@@ -11,7 +11,7 @@ const LinksScreen = ({ navigation }: any) => {
   const [page, setPage] = useState(1);
   const itemCount = page * 10;
 
-  const { data, loading, refetch } = useQuery(FETCH_NEW_LINKS, {
+  const { data, loading, refetch, error } = useQuery(FETCH_NEW_LINKS, {
     variables: { showItemCount: itemCount }
   });
 
