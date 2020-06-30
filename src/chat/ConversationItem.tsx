@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import moment from 'moment';
 
 import { colors } from '../common';
@@ -31,13 +31,15 @@ const ConversationItem = ({ conversation, onPress }: Props) => {
   };
 
   return (
-    <TouchableOpacity style={styles.wrapper} onPress={handlePress}>
-      <Text style={styles.title}>{conversation.title}</Text>
-      <View style={styles.footer}>
-        <Text style={[styles.footerText, { flex: 3 }]}>{users}</Text>
-        <Text style={[styles.footerText, { flex: 1, textAlign: 'right' }]}>{formatDate(conversation.updatedAt)}</Text>
+    <TouchableWithoutFeedback onPress={handlePress}>
+      <View style={styles.wrapper}>
+        <Text style={styles.title}>{conversation.title}</Text>
+        <View style={styles.footer}>
+          <Text style={[styles.footerText, { flex: 3 }]}>{users}</Text>
+          <Text style={[styles.footerText, { flex: 1, textAlign: 'right' }]}>{formatDate(conversation.updatedAt)}</Text>
+        </View>
       </View>
-    </TouchableOpacity>
+    </TouchableWithoutFeedback>
   );
 };
 

@@ -37,18 +37,9 @@ type Props = {
 };
 
 const ContactsTab: FC<Props> = props => {
-  const {
-    navigate,
-    editMode,
-    onDeleteCompletion,
-    contacts,
-    loading,
-    refetch
-  } = props;
+  const { navigate, editMode, onDeleteCompletion, contacts, loading, refetch } = props;
 
-  const [deleteContact, { loading: deleteLoading }] = useMutation(
-    DELETE_CONTACT
-  );
+  const [deleteContact, { loading: deleteLoading }] = useMutation(DELETE_CONTACT);
 
   const handleDeleteConfirm = async (id: string, name: string) => {
     onDeleteCompletion();
@@ -60,11 +51,7 @@ const ContactsTab: FC<Props> = props => {
   const handleDelete = async (id: string, name: string) => {
     Alert.alert('Delete Contact', `Are you sure you want to delete ${name}?`, [
       { text: 'Yes', onPress: () => handleDeleteConfirm(id, name) },
-      {
-        text: 'Cancel',
-        onPress: () => console.log('Cancel Pressed'),
-        style: 'cancel'
-      }
+      { text: 'Cancel', style: 'cancel' }
     ]);
   };
 

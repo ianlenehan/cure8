@@ -153,10 +153,7 @@ const Links = (props: Props) => {
             ? `Discuss article with ${item.curatorName} or with everyone ${item.curatorName} shared it with.`
             : `Discuss article with ${item.curatorName}.`;
 
-        const cancelOption = {
-          text: 'Cancel',
-          style: 'cancel'
-        };
+        const cancelOption = { text: 'Cancel', style: 'cancel' };
 
         const oneOptionButtons = [{ text: 'Discuss', onPress: discussWithOwner }, cancelOption];
         const twoOptionButtons = [
