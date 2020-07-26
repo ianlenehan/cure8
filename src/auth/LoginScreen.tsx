@@ -2,24 +2,12 @@ import React, { FC, useState, useRef } from 'react';
 import { View, TextInput, LayoutAnimation } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
-import PhoneInput, {
-  ReactNativePhoneInputProps
-} from 'react-native-phone-input';
+import PhoneInput, { ReactNativePhoneInputProps } from 'react-native-phone-input';
 
-import {
-  Container,
-  PageWrapper,
-  Logo,
-  Input,
-  InputLabel,
-  Header,
-  Spacer,
-  Button,
-  AppText
-} from '../common';
+import { Container, PageWrapper, Logo, Input, InputLabel, Header, Spacer, Button, AppText } from '../common';
 import useBoolean from '../hooks/useBoolean';
 
-const testPhoneNumber = '+61112223333';
+const testPhoneNumber = '+611112223333';
 // pin code is 123456
 
 const LoginScreen: FC = () => {
@@ -79,11 +67,7 @@ const LoginScreen: FC = () => {
     return (
       <View style={styles.codeInputWrapper}>
         <Spacer size={4} />
-        <TextInput
-          keyboardType="number-pad"
-          style={styles.codeInput}
-          onChangeText={handleCodeChange}
-        />
+        <TextInput keyboardType="number-pad" style={styles.codeInput} onChangeText={handleCodeChange} />
         <AppText color="white" style={{ textAlign: 'center' }}>
           Enter One Time Password that was sent to your mobile via SMS.
         </AppText>
@@ -101,11 +85,7 @@ const LoginScreen: FC = () => {
     }
 
     return (
-      <Button
-        {...{ loading }}
-        disabled={!isValid}
-        onPress={handleGetCode}
-        bordered>
+      <Button {...{ loading }} disabled={!isValid} onPress={handleGetCode} bordered>
         Get Code
       </Button>
     );
@@ -118,8 +98,7 @@ const LoginScreen: FC = () => {
 
   return (
     <Container>
-      <KeyboardAwareScrollView
-        contentContainerStyle={styles.keyboardScrollViewStyle}>
+      <KeyboardAwareScrollView contentContainerStyle={styles.keyboardScrollViewStyle}>
         <PageWrapper>
           <Spacer size={2} />
           <Header color="white">Login</Header>
@@ -137,9 +116,7 @@ const LoginScreen: FC = () => {
 
           {renderCodeInput()}
 
-          {!!error && (
-            <AppText style={{ fontSize: 14, color: 'red' }}>{error}</AppText>
-          )}
+          {!!error && <AppText style={{ fontSize: 14, color: 'red' }}>{error}</AppText>}
 
           <Spacer size={6} />
           {renderButton()}
