@@ -42,7 +42,7 @@ const TOGGLE_NOTIFICATION = gql`
 const SettingsScreen = ({ route }: { route: any }) => {
   const { currentPushId: tokenId } = route.params;
 
-  const { data, loading, refetch } = useQuery(FETCH_PUSH_TOKEN, {
+  const { data, loading } = useQuery(FETCH_PUSH_TOKEN, {
     variables: { token: tokenId }
   });
 
@@ -50,12 +50,7 @@ const SettingsScreen = ({ route }: { route: any }) => {
 
   if (loading || !data) return <Spinner />;
 
-  const {
-    notify,
-    notifyNewLink,
-    notifyNewMessage,
-    notifyNewRating
-  } = data.pushToken;
+  const { notify, notifyNewLink, notifyNewMessage, notifyNewRating } = data.pushToken;
 
   const { name, phone } = data.appUser;
 
@@ -80,10 +75,7 @@ const SettingsScreen = ({ route }: { route: any }) => {
         <AppText size="large">Notification Settings</AppText>
         <View style={styles.listItemContainer}>
           <AppText size="medium">Notifications</AppText>
-          <Switch
-            value={notify}
-            onValueChange={() => handleToggleSetting('notify')}
-          />
+          <Switch value={notify} onValueChange={() => handleToggleSetting('notify')} />
         </View>
         <View style={styles.listItemContainer}>
           <AppText size="medium">New link notifications</AppText>
