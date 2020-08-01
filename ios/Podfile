@@ -12,9 +12,9 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 
 target 'cure8' do
   # Pods for cure8
-  # pod 'Firebase/Core'
-  # pod 'Firebase/Firestore'
-  # pod 'Firebase/Auth'
+  pod 'Firebase/Core'
+  pod 'Firebase/Firestore'
+  pod 'Firebase/Auth'
 
 
   pod 'FBLazyVector', :path => "../node_modules/react-native/Libraries/FBLazyVector"
