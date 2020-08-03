@@ -4,8 +4,8 @@ import { Icon } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import moment from 'moment';
 import { uniq } from 'lodash';
-import { useQuery } from 'react-apollo';
-import gql from 'graphql-tag';
+import { useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
 
 import useAppContext from '../hooks/useAppContext';
 import useBoolean from '../hooks/useBoolean';

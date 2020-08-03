@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery, useLazyQuery } from 'react-apollo';
+import { useQuery, useLazyQuery } from '@apollo/client';
 import { Icon } from 'react-native-elements';
 
 import { Spinner } from '../common';

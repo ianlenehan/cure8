@@ -1,21 +1,96 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
 import { Root } from 'native-base';
-import { ApolloProvider } from 'react-apollo';
+import { ApolloProvider } from '@apollo/client';
+import AsyncStorage from '@react-native-community/async-storage';
+import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
+import { onError } from '@apollo/client/link/error';
 
 import AppContext from './utils/AppContext';
 import RootTab from './navigation/RootTab';
 import CompleteSignUpScreen from './auth/CompleteSignUpScreen';
+import LoginScreen from './auth/LoginScreen';
+import { rootURL } from '../env';
 
-const Main = (props: any) => {
-  const { apolloClient, authUser, setAuthUser, showSignupScreen } = props;
+type Props = {
+  storedToken: string | null;
+  setToken: (token: string | null) => void;
+  logout: () => void;
+};
 
+type User = {
+  id: string;
+  phone: string;
+};
+
+const Main = ({ logout, storedToken, setToken }: Props) => {
+  const [apolloClient, setApolloClient] = useState<any>();
+  const [registrationRequired, setRegistrationRequired] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | undefined>();
   const [newContact, setNewContact] = useState({
     familyName: '',
     givenName: '',
     phoneNumbers: []
   });
   const [selectedConversationId, setSelectedConversationId] = useState('');
+
+  const errorLink = onError(({ graphQLErrors, networkError }) => {
+    if (graphQLErrors)
+      graphQLErrors.forEach(({ message, locations, path }) =>
+        console.log(
+          `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+        )
+      );
+    if (networkError) {
+      console.log(`[Network error]: ${networkError}`);
+      logout();
+    }
+  });
+
+  const httpLink = createHttpLink({
+    uri: `${rootURL}graphql`
+  });
+
+  const authLink = setContext(() => ({
+    headers: { Authorization: `Basic ${storedToken}` }
+  }));
+
+  useEffect(() => {
+    if (storedToken) {
+      setTokenInAsyncStorage();
+      console.log({ storedToken });
+      const client = new ApolloClient({
+        cache: new InMemoryCache(),
+        link: errorLink.concat(authLink.concat(httpLink))
+      });
+
+      setApolloClient(client);
+    }
+  }, [storedToken]);
+
+  const handleUserUpdateComplete = () => {
+    setRegistrationRequired(false)
+  }
+
+  const setTokenInAsyncStorage = async () => {
+    if (storedToken) {
+      await AsyncStorage.setItem('@auth_token', storedToken);
+    }
+  };
+
+  if (!storedToken) {
+    return (
+      <LoginScreen
+        {...{
+          registrationRequired,
+          setRegistrationRequired,
+          setCurrentUser,
+          setToken
+        }}
+      />
+    );
+  }
 
   if (!apolloClient) {
     return null;
@@ -26,8 +101,7 @@ const Main = (props: any) => {
       <Root>
         <AppContext.Provider
           value={{
-            authUser,
-            setAuthUser,
+            logout,
             newContact,
             setNewContact,
             selectedConversationId,
@@ -35,7 +109,11 @@ const Main = (props: any) => {
           }}>
           <StatusBar barStyle="light-content" />
           <View style={styles.container}>
-            {showSignupScreen ? <CompleteSignUpScreen /> : <RootTab />}
+            {registrationRequired ? (
+              <CompleteSignUpScreen onUpdate={handleUserUpdateComplete} phone={currentUser?.phone} />
+            ) : (
+              <RootTab />
+            )}
           </View>
         </AppContext.Provider>
       </Root>

@@ -1,7 +1,10 @@
-import React, { Component } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, TextInput, LayoutAnimation } from 'react-native';
-import firebase from 'react-native-firebase';
+import axios from 'axios';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
+import AsyncStorage from '@react-native-community/async-storage';
+import PhoneInput from 'react-native-phone-input';
+
 import {
   Container,
   PageWrapper,
@@ -13,157 +16,189 @@ import {
   Button,
   AppText
 } from '../common';
-import PhoneInput from 'react-native-phone-input';
+
+import useBoolean from '../hooks/useBoolean';
+
+import { rootURL } from '../../env';
+
+const apiUrl = `${rootURL}api/v1/`;
 
 const testPhoneNumber = '+61112223333';
 // pin code is 123456
 
-type Props = {};
-
-type State = {
-  phoneNumber: string;
-  isValid: boolean;
-  showCodeField: boolean;
-  loading: boolean;
-  confirmResult: any;
-  otpCode: string;
-  error: string | null;
+type User = {
+  id: string;
+  phone: string;
 };
 
-type PhoneRefType = {
-  isValidNumber: () => boolean;
-  getNumberType: () => string;
-  getValue: () => string;
+type Props = {
+  registrationRequired: boolean;
+  setCurrentUser: (user: User) => void;
+  setRegistrationRequired: (registrationRequired: boolean) => void;
+  setToken: (token: string) => void;
 };
 
-class LoginScreen extends Component<Props, State> {
-  phoneRef: PhoneRefType;
-  recaptchaVerifier: any;
-  constructor(props: any) {
-    super(props);
-    this.state = {
-      phoneNumber: '',
-      isValid: false,
-      showCodeField: false,
-      loading: false,
-      error: null,
-      confirmResult: {
-        confirm: () => {}
-      },
-      otpCode: ''
-    };
+const LoginScreen = (props: Props) => {
+  const {
+    registrationRequired,
+    setCurrentUser,
+    setRegistrationRequired,
+    setToken
+  } = props;
 
-    this.phoneRef = {
-      isValidNumber: () => false,
-      getNumberType: () => '',
-      getValue: () => ''
-    };
-  }
+  const phoneRef = useRef<any>(null);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [showingCodeField, showCodeField] = useBoolean(false);
+  const [isValid, setIsValid] = useState(false);
+  const [loading, startLoading, stopLoading] = useBoolean(false);
+  const [error, setError] = useState('');
+  const [otpCode, setOtpCode] = useState('');
 
-  onPhoneChange = () => {
-    if (!this.phoneRef) return null;
-    const type = this.phoneRef.getNumberType();
-    const valid = this.phoneRef.isValidNumber();
-    const phoneNumber = this.phoneRef.getValue();
-    const isValid = phoneNumber === testPhoneNumber || valid;
-    this.setState({ phoneNumber, isValid });
+  const handlePhoneChange = () => {
+    if (!phoneRef.current) return null;
+    const type = phoneRef.current.getNumberType();
+    const valid = phoneRef.current.isValidNumber();
+    const fullPhone = phoneRef.current.getValue();
+
+    if (valid) {
+      setIsValid(fullPhone === testPhoneNumber || valid);
+    }
+
+    if (['MOBILE', 'FIXED_LINE_OR_MOBILE'].includes(type)) {
+      setError('');
+      setPhoneNumber(fullPhone);
+    } else {
+      setError('Phone number must be a mobile number that can receive SMS');
+    }
   };
 
-  handleGetCode = async () => {
-    const { isValid, phoneNumber } = this.state;
+  const handleGetCode = async () => {
     if (isValid) {
-      this.setState({ loading: true });
-      const confirmResult = await firebase
-        .auth()
-        .signInWithPhoneNumber(phoneNumber);
+      startLoading();
+      try {
+        const res = await axios.post(`${apiUrl}request_password`, {
+          phone: phoneNumber
+        });
+        console.log('handleGetCode -> res', res);
 
+        setRegistrationRequired(res.data.registration_required);
+        setError('');
+        showCodeField();
+      } catch (error) {
+        console.log('handleGetCode -> error', error);
+        setError(error.message);
+      }
+
+      stopLoading();
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      this.setState({ showCodeField: true, loading: false, confirmResult });
     }
   };
 
-  handleVerifyCode = async () => {
-    this.setState({ loading: true });
-    const { confirmResult, otpCode } = this.state;
+  const handleLogin = async () => {
+    startLoading();
     try {
-      const user = await confirmResult.confirm(otpCode);
-    } catch (error) {
-      this.setState({
-        error: 'The SMS verification code you entered is invalid.'
+      const res = await axios.post(`${apiUrl}authenticate`, {
+        phone: phoneNumber,
+        code: otpCode
       });
+      console.log('handleLogin -> res', res.data);
+      stopLoading();
+      setCurrentUser(res.data.current_user);
+      setToken(res.data.auth_token);
+    } catch (error) {
+      console.log('handleLogin -> error', error);
+      setError('The SMS verification code you entered is invalid.');
+      stopLoading();
     }
-    this.setState({ loading: false });
   };
 
-  handleCodeChange = (code: string) => {
-    this.setState({ otpCode: code, error: null });
+  const handleCodeChange = (code: string) => {
+    setError('');
+    setOtpCode(code);
   };
 
-  render() {
-    const { phoneNumber, isValid, loading, showCodeField, error } = this.state;
-    let label = 'Mobile Number';
-    if (phoneNumber.length > 0) {
-      label = `Mobile Number - ${phoneNumber}`;
+  const renderButton = () => {
+    if (showingCodeField) {
+      return (
+        <Button loading={loading} onPress={handleLogin} bordered>
+          {registrationRequired ? 'Create Account' : 'Login'}
+        </Button>
+      );
     }
 
     return (
-      <Container>
-        <KeyboardAwareScrollView
-          contentContainerStyle={styles.keyboardScrollViewStyle}>
-          <PageWrapper>
-            <Spacer size={2} />
-            <Header color="white">Login</Header>
-            <Spacer size={4} />
-            <InputLabel label={label} color="white" />
-            <PhoneInput
-              initialCountry="au"
-              flagStyle={styles.flagStyle}
-              textComponent={Input}
-              allowZeroAfterCountryCode={false}
-              onChangePhoneNumber={this.onPhoneChange}
-              style={{ width: '100%' }}
-              ref={(ref: PhoneRefType) => (this.phoneRef = ref)}
-            />
-            {showCodeField && (
-              <View style={styles.codeInputWrapper}>
-                <Spacer size={4} />
-                <TextInput
-                  keyboardType="number-pad"
-                  style={styles.codeInput}
-                  onChangeText={this.handleCodeChange}
-                />
-                <AppText color="white" style={{ textAlign: 'center' }}>
-                  Enter One Time Password that was sent to your mobile via SMS.
-                </AppText>
-              </View>
-            )}
-            {error && (
-              <AppText style={{ fontSize: 14, color: 'red' }}>{error}</AppText>
-            )}
-            <Spacer size={6} />
-            {showCodeField ? (
-              <Button
-                loading={loading}
-                onPress={this.handleVerifyCode}
-                bordered>
-                Verify Code
-              </Button>
-            ) : (
-              <Button
-                loading={loading}
-                disabled={!isValid}
-                onPress={this.handleGetCode}
-                bordered>
-                Get Code
-              </Button>
-            )}
-          </PageWrapper>
-          <Logo size="large" />
-        </KeyboardAwareScrollView>
-      </Container>
+      <Button
+        loading={loading}
+        disabled={!isValid}
+        onPress={handleGetCode}
+        bordered>
+        Get Code
+      </Button>
     );
+  };
+
+  const renderError = () => {
+    if (!error) return null;
+
+    return (
+      <AppText
+        style={{
+          fontSize: 14,
+          color: 'red',
+          textAlign: 'center',
+          margin: 25
+        }}>
+        {error}
+      </AppText>
+    );
+  };
+
+  let label = 'Mobile Number';
+  if (phoneNumber.length > 0) {
+    label = `Mobile Number - ${phoneNumber}`;
   }
-}
+
+  return (
+    <Container>
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.keyboardScrollViewStyle}>
+        <PageWrapper>
+          <Spacer size={2} />
+          <Header color="white">Login</Header>
+          <Spacer size={4} />
+          <InputLabel label={label} color="white" />
+          <PhoneInput
+            initialCountry="au"
+            flagStyle={styles.flagStyle}
+            textComponent={Input}
+            allowZeroAfterCountryCode={false}
+            onChangePhoneNumber={handlePhoneChange}
+            style={{ width: '100%' }}
+            ref={phoneRef}
+          />
+          {!!showingCodeField && (
+            <View style={styles.codeInputWrapper}>
+              <Spacer size={4} />
+              <TextInput
+                keyboardType="number-pad"
+                style={styles.codeInput}
+                onChangeText={handleCodeChange}
+              />
+              <AppText color="white" style={{ textAlign: 'center' }}>
+                Enter One Time Password that was sent to your mobile via SMS.
+              </AppText>
+            </View>
+          )}
+          {renderError()}
+          <Spacer size={6} />
+
+          {renderButton()}
+        </PageWrapper>
+        <Logo size="large" />
+      </KeyboardAwareScrollView>
+    </Container>
+  );
+};
 
 export default LoginScreen;
 

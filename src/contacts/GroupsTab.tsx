@@ -1,7 +1,7 @@
 import React, { useState, FunctionComponent } from 'react';
 import { FlatList, View, StyleSheet } from 'react-native';
-import { useQuery, useMutation } from 'react-apollo';
-import gql from 'graphql-tag';
+import { useQuery, useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
 
 import { Container, Spinner, ContactRow, EmptyPage } from '../common';
 import NewGroup from './NewGroup';

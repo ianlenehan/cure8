@@ -1,78 +1,44 @@
-import React, { useEffect, useState } from 'react';
-import firebase, { RNFirebase } from 'react-native-firebase';
-import ApolloClient from 'apollo-boost/lib/index';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-
-import Main from './src/Main';
-import LoginScreen from './src/auth/LoginScreen';
+import AsyncStorage from '@react-native-community/async-storage';
 
 import { Spinner } from './src/common';
-
-// export const rootURL = 'http://localhost:3001/';
-export const rootURL = 'https://cure8.herokuapp.com/';
-
-const getApolloClient = (token: string) => {
-  return new ApolloClient({
-    uri: `${rootURL}graphql`,
-    headers: { token }
-  });
-};
+import useBoolean from './src/hooks/useBoolean';
+import Main from './src/Main';
 
 const App = () => {
-  const [authUser, setAuthUser] = useState<RNFirebase.User>();
-  const [apolloClient, setApolloClient] = useState<any>();
-  const [loading, setLoading] = useState(true);
+  const [storedToken, setStoredToken] = useState<string | null>(null);
+  const [loading, startLoading, stopLoading] = useBoolean(false);
 
   useEffect(() => {
-    const unsubscriber = firebase
-      .auth()
-      .onAuthStateChanged(async userFromAuth => {
-        if (userFromAuth) {
-          setAuthUser(userFromAuth);
-          getIdToken(userFromAuth);
-        } else {
-          console.log('no user');
-          setAuthUser(undefined);
-          setLoading(false);
-        }
-      });
-
-    return () => unsubscriber();
+    getStoredToken();
   }, []);
 
-  const getIdToken = async (authUser: RNFirebase.User) => {
-    try {
-      const token = await authUser.getIdToken(true);
-      const client = getApolloClient(token);
-      setApolloClient(client);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching token', error);
-    }
+  const getStoredToken = async () => {
+    startLoading();
+    const token = await AsyncStorage.getItem('@auth_token');
+    setStoredToken(token);
+    stopLoading();
   };
 
-  const renderApp = () => {
-    if (!authUser) {
-      return <LoginScreen />;
-    }
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('@auth_token');
+    setStoredToken(null);
+  };
 
-    const showSignupScreen = authUser.uid && !authUser.displayName;
+  if (loading) {
+    return <Spinner />;
+  }
 
-    return (
+  return (
+    <NavigationContainer>
       <Main
-        {...{
-          apolloClient,
-          authUser,
-          setAuthUser,
-          showSignupScreen
-        }}
+        {...{ storedToken }}
+        setToken={setStoredToken}
+        logout={handleLogout}
       />
-    );
-  };
-
-  if (loading) return <Spinner />;
-
-  return <NavigationContainer>{renderApp()}</NavigationContainer>;
+    </NavigationContainer>
+  );
 };
 
 export default App;

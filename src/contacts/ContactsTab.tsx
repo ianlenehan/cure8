@@ -1,7 +1,7 @@
-import React, { useState, useEffect, FunctionComponent } from 'react';
+import React from 'react';
 import { FlatList, View, StyleSheet } from 'react-native';
-import { useQuery, useMutation } from 'react-apollo';
-import gql from 'graphql-tag';
+import { useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
 
 import { Container, Spinner, ContactRow, EmptyPage } from '../common';
 import NewContact from './NewContact';
@@ -53,7 +53,7 @@ type Props = {
   refetch: () => void;
 };
 
-const ContactsTab: FunctionComponent<Props> = props => {
+const ContactsTab = (props: Props) => {
   const {
     navigate,
     editMode,

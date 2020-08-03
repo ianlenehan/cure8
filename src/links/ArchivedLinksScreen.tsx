@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery } from 'react-apollo';
+import { useQuery } from '@apollo/client';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Icon } from 'react-native-elements';
 

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, FunctionComponent } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { CheckBox } from 'react-native-elements';
-import { useMutation, useQuery } from 'react-apollo';
-import gql from 'graphql-tag';
+import { useMutation, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
 import useForm from '../hooks/useForm';
 import useToast from '../hooks/useToast';
 import { Input, Spacer, Overlay, Spinner, colors } from '../common';

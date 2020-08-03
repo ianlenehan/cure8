@@ -6,8 +6,8 @@ import {
   NavigationBottomTabScreenComponent,
   NavigationTabScreenProps
 } from 'react-navigation-tabs';
-import { useQuery } from 'react-apollo';
-import gql from 'graphql-tag';
+import { useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
 
 import { Container, AppText, colors, Spinner } from '../common';
 import ContactsTab from './ContactsTab';
