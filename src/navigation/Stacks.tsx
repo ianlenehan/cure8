@@ -1,13 +1,7 @@
 import React from 'react';
 import { Image } from 'react-native';
-import {
-  createStackNavigator,
-  StackNavigationProp
-} from '@react-navigation/stack';
-import { RouteProp } from '@react-navigation/native';
-import { Icon } from 'react-native-elements';
+import { createStackNavigator } from '@react-navigation/stack';
 
-import RootTab from './RootTab';
 import LinksScreen from '../links/LinksScreen';
 import ArchivedLinksScreen from '../links/ArchivedLinksScreen';
 import ContactsScreen from '../contacts/ContactsScreen';
@@ -17,7 +11,7 @@ import ActivityScreen from '../activity/ActivityScreen';
 import ConversationsScreen from '../chat/ConversationsScreen';
 import ConversationScreen from '../chat/ConversationScreen';
 
-import { AppText, Button, colors } from '../common';
+import { colors } from '../common';
 
 export type RootStackParamList = {
   Main: undefined;
@@ -26,6 +20,7 @@ export type RootStackParamList = {
   Conversations: undefined;
   Conversation: undefined;
   Contacts: undefined;
+  AddContact: undefined;
   Activity: undefined;
   Settings: undefined;
 };
@@ -97,10 +92,14 @@ export const ActivityStack = () => {
   );
 };
 
-export const SettingsStack = () => {
+export const SettingsStack = ({ route }: { route: any }) => {
   return (
     <Stack.Navigator {...{ screenOptions }}>
-      <Stack.Screen name="Settings" component={SettingsScreen} />
+      <Stack.Screen
+        name="Settings"
+        component={SettingsScreen}
+        initialParams={route.params}
+      />
     </Stack.Navigator>
   );
 };

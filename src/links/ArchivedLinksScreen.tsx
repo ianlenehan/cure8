@@ -31,20 +31,6 @@ const ArchivedLinksScreen = ({ navigation }: any) => {
     }
   };
 
-  const handleSetOptions = (onPress: () => void) => {
-    return navigation.setOptions({
-      headerRight: () => (
-        <Icon
-          name="plus"
-          type="font-awesome"
-          color="white"
-          containerStyle={{ marginRight: 25 }}
-          {...{ onPress }}
-        />
-      )
-    });
-  };
-
   const handleClearTagFilter = () => setFilteredTagIds([]);
 
   if (loading && !data) return <Spinner />;
@@ -63,7 +49,6 @@ const ArchivedLinksScreen = ({ navigation }: any) => {
     <Links
       {...{ refetch, filteredTagIds, curations, navigation }}
       onLoadMore={handleLoadMore}
-      onSetOptions={handleSetOptions}
       onTagPress={handleTagPress}
       onClearTagFilter={handleClearTagFilter}
       isArchivedLinks

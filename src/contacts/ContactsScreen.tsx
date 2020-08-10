@@ -1,11 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet } from 'react-native';
+import React, { FC, useState, useEffect } from 'react';
 import { Tab, Tabs, TabHeading } from 'native-base';
-import { Icon } from 'react-native-elements';
-import {
-  NavigationBottomTabScreenComponent,
-  NavigationTabScreenProps
-} from 'react-navigation-tabs';
+import { Icon, Button as BaseButton } from 'react-native-elements';
 import { useQuery } from '@apollo/client';
 import { gql } from '@apollo/client';
 
@@ -31,17 +26,29 @@ const FETCH_CONTACTS = gql`
   }
 `;
 
-const ContactsScreen: NavigationBottomTabScreenComponent<
-  NavigationTabScreenProps
-> = ({ navigation }) => {
+type Props = {
+  navigation: any;
+};
+
+const ContactsScreen: FC<Props> = ({ navigation }) => {
   const [editMode, setEditMode] = useState(false);
   const buttonText: string = editMode ? 'Done' : 'Edit';
 
   useEffect(() => {
-    navigation.setParams({ buttonText, toggleEditMode });
-  }, [editMode]);
+    navigation.setOptions({
+      headerRight: () => (
+        <BaseButton
+          title={buttonText || ''}
+          type="clear"
+          onPress={toggleEditMode}
+          titleStyle={{ fontSize: 16, color: 'white' }}
+          containerStyle={{ marginRight: 10 }}
+        />
+      )
+    });
+  }, [navigation, editMode]);
 
-  const { data, loading, refetch } = useQuery(FETCH_CONTACTS);
+  const { data, loading, error, refetch } = useQuery(FETCH_CONTACTS);
 
   if (loading) return <Spinner text="Loading contacts..." />;
 
@@ -82,11 +89,7 @@ const ContactsScreen: NavigationBottomTabScreenComponent<
               <AppText size="medium">Groups</AppText>
             </TabHeading>
           }>
-          <GroupsTab
-            navigate={navigation.navigate}
-            onDeleteCompletion={toggleEditMode}
-            {...{ editMode, contacts }}
-          />
+          <GroupsTab navigate={navigation.navigate} onDeleteCompletion={toggleEditMode} {...{ editMode, contacts }} />
         </Tab>
       </Tabs>
     </Container>

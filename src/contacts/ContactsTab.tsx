@@ -1,28 +1,11 @@
-import React from 'react';
-import { FlatList, View, StyleSheet } from 'react-native';
+import React, { FC } from 'react';
+import { Alert, FlatList, View, StyleSheet } from 'react-native';
 import { useMutation } from '@apollo/client';
 import { gql } from '@apollo/client';
 
+import useToast from '../hooks/useToast';
 import { Container, Spinner, ContactRow, EmptyPage } from '../common';
 import NewContact from './NewContact';
-
-const FETCH_CONTACTS = gql`
-  query contacts {
-    contacts {
-      id
-      name
-      user {
-        id
-        name
-      }
-      linkedUser {
-        id
-        name
-        phone
-      }
-    }
-  }
-`;
 
 const DELETE_CONTACT = gql`
   mutation DeleteContact($id: String!) {
@@ -53,28 +36,27 @@ type Props = {
   refetch: () => void;
 };
 
-const ContactsTab = (props: Props) => {
-  const {
-    navigate,
-    editMode,
-    onDeleteCompletion,
-    contacts,
-    loading,
-    refetch
-  } = props;
+const ContactsTab: FC<Props> = props => {
+  const { navigate, editMode, onDeleteCompletion, contacts, loading, refetch } = props;
 
-  const [deleteContact, { error, loading: deleteLoading }] = useMutation(
-    DELETE_CONTACT
-  );
+  const [deleteContact, { loading: deleteLoading }] = useMutation(DELETE_CONTACT);
 
-  const handleDelete = async (id: string) => {
+  const handleDeleteConfirm = async (id: string, name: string) => {
+    onDeleteCompletion();
     await deleteContact({ variables: { id } });
     await refetch();
-    onDeleteCompletion();
+    useToast(`Contact record for ${name} successfully deleted`);
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    Alert.alert('Delete Contact', `Are you sure you want to delete ${name}?`, [
+      { text: 'Yes', onPress: () => handleDeleteConfirm(id, name) },
+      { text: 'Cancel', style: 'cancel' }
+    ]);
   };
 
   const renderItem = ({ item }: { item: ContactType }) => {
-    const onDeletePress = () => handleDelete(item.id);
+    const onDeletePress = () => handleDelete(item.id, item.name);
 
     return (
       <ContactRow

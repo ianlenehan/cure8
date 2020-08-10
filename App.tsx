@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-community/async-storage';
+import { Platform } from 'react-native';
+import OneSignal from 'react-native-onesignal';
+import SplashScreen from 'react-native-splash-screen';
 
 import { Spinner } from './src/common';
 import useBoolean from './src/hooks/useBoolean';
@@ -13,6 +16,26 @@ const App = () => {
   useEffect(() => {
     getStoredToken();
   }, []);
+
+  useEffect(() => {
+    OneSignal.init('3202b90a-81b5-4d06-9e51-c20c4417907d', {
+      kOSSettingsKeyInFocusDisplayOption: 2
+    });
+    requestNotificationPermissions();
+
+    SplashScreen.hide();
+  });
+
+  const requestNotificationPermissions = async () => {
+    if (Platform.OS === 'ios') {
+      const permissions = {
+        alert: true,
+        badge: true,
+        sound: true
+      };
+      OneSignal.requestPermissions(permissions);
+    }
+  };
 
   const getStoredToken = async () => {
     startLoading();

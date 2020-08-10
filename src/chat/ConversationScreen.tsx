@@ -1,17 +1,11 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useMemo,
-  useCallback
-} from 'react';
-import { StyleSheet, Text, View, SectionList, TextInput } from 'react-native';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { StyleSheet, Text, View, SectionList, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { Icon } from 'react-native-elements';
-import firebase from 'react-native-firebase';
+import firestore from '@react-native-firebase/firestore';
 import moment from 'moment';
 import { uniq } from 'lodash';
-import { useQuery } from '@apollo/client';
-import { gql } from '@apollo/client';
+import { useQuery, useMutation } from 'react-apollo';
+import gql from 'graphql-tag';
 import getSectionItemLayout from './helpers';
 import useHookWithRefCallback from './useHookWithRefCallback';
 
@@ -30,6 +24,16 @@ const FETCH_CURRENT_USER = gql`
       notifications
       notificationsNewLink
       notificationsNewRating
+    }
+  }
+`;
+
+const SEND_MESSAGE_NOTIFICATION = gql`
+  mutation SendMessageNotification($conversationId: String!, $message: String!) {
+    sendMessageNotification(conversationId: $conversationId, message: $message) {
+      conversation {
+        id
+      }
     }
   }
 `;
@@ -53,15 +57,11 @@ const ConversationScreen = ({ route }: any) => {
   const { conversationId } = route.params;
 
   const { data, loading } = useQuery(FETCH_CURRENT_USER);
+  const [sendMessageNotification, { error }] = useMutation(SEND_MESSAGE_NOTIFICATION);
 
-  const [
-    loadingMessages,
-    startLoadingMessages,
-    stopLoadingMessages
-  ] = useBoolean(false);
+  const [loadingMessages, startLoadingMessages, stopLoadingMessages] = useBoolean(false);
 
-  const firestore = firebase.firestore();
-  const messageRef = firestore.collection('messages');
+  const messageRef = firestore().collection('messages');
 
   useEffect(() => {
     startLoadingMessages();
@@ -107,6 +107,7 @@ const ConversationScreen = ({ route }: any) => {
       createdAt: new Date()
     };
     await messageRef.add(newMessage);
+    sendMessageNotification({ variables: { conversationId, message } });
     setMessage('');
   };
 
@@ -192,21 +193,13 @@ const ConversationScreen = ({ route }: any) => {
           )}
         />
       </View>
-      <View style={styles.chatFooter}>
-        <TextInput
-          style={styles.input}
-          value={message}
-          onChangeText={handleChangeText}
-          placeholder="Type message..."
-        />
-        <Icon
-          name="arrow-circle-right"
-          type="font-awesome"
-          color="#fff"
-          size={30}
-          onPress={handleNewMessage}
-        />
-      </View>
+      <KeyboardAvoidingView
+        style={styles.chatFooter}
+        keyboardVerticalOffset={90}
+        behavior={Platform.OS == 'ios' ? 'padding' : 'height'}>
+        <TextInput style={styles.input} value={message} onChangeText={handleChangeText} placeholder="Type message..." />
+        <Icon name="arrow-circle-right" type="font-awesome" color="#fff" size={30} onPress={handleNewMessage} />
+      </KeyboardAvoidingView>
     </View>
   );
 };
@@ -236,7 +229,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     flex: 1,
     margin: 8,
-    padding: 5
+    padding: 5,
+    color: colors.textGrey
   },
   sectionTitle: {
     textAlign: 'center',

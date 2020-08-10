@@ -15,13 +15,10 @@ const LinksScreen = ({ navigation }: any) => {
     variables: { showItemCount: itemCount }
   });
 
-  const [fetchArchivedLinks, { data: archivedData }] = useLazyQuery(
-    FETCH_ARCHIVED_LINKS,
-    {
-      variables: { tagIds: [] },
-      fetchPolicy: 'network-only'
-    }
-  );
+  const [fetchArchivedLinks] = useLazyQuery(FETCH_ARCHIVED_LINKS, {
+    variables: { tagIds: [], showItemCount: itemCount },
+    fetchPolicy: 'network-only'
+  });
 
   if (loading) return <Spinner />;
 
@@ -35,25 +32,10 @@ const LinksScreen = ({ navigation }: any) => {
     setPage(page + 1);
   };
 
-  const handleSetOptions = (onPress: () => void) => {
-    return navigation.setOptions({
-      headerRight: () => (
-        <Icon
-          name="plus"
-          type="font-awesome"
-          color="white"
-          containerStyle={{ marginRight: 25 }}
-          {...{ onPress }}
-        />
-      )
-    });
-  };
-
   return (
     <Links
       {...{ curations, refetch, fetchArchivedLinks, navigation }}
       onLoadMore={handleLoadMore}
-      onSetOptions={handleSetOptions}
     />
   );
 };

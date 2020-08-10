@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
+import OneSignal from 'react-native-onesignal';
 
 import AppContext from './utils/AppContext';
 import RootTab from './navigation/RootTab';
@@ -35,6 +36,33 @@ const Main = ({ logout, storedToken, setToken }: Props) => {
     phoneNumbers: []
   });
   const [selectedConversationId, setSelectedConversationId] = useState('');
+  const [currentPushId, setCurrentPushId] = useState('');
+
+  useEffect(() => {
+    OneSignal.getPermissionSubscriptionState((status: any) => {
+      checkNotificationStatus(status);
+    });
+
+    OneSignal.addEventListener('received', handleReceived);
+    OneSignal.addEventListener('opened', handleOpened);
+    OneSignal.addEventListener('ids', handleIds);
+
+    return () => {
+      OneSignal.removeEventListener('received', handleReceived);
+      OneSignal.removeEventListener('opened', handleOpened);
+      OneSignal.removeEventListener('ids', handleIds);
+    };
+  }, []);
+
+  const handleReceived = (event: any) => {
+    console.log('received', event);
+  };
+  const handleOpened = () => {};
+  const handleIds = () => {};
+
+  const checkNotificationStatus = async (status: any) => {
+    setCurrentPushId(status.userId);
+  };
 
   const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors)
@@ -116,6 +144,7 @@ const Main = ({ logout, storedToken, setToken }: Props) => {
       <Root>
         <AppContext.Provider
           value={{
+            currentPushId,
             logout,
             newContact,
             setNewContact,
@@ -127,7 +156,7 @@ const Main = ({ logout, storedToken, setToken }: Props) => {
             {registrationRequired ? (
               <CompleteSignUpScreen onUpdate={handleUserUpdateComplete} phone={currentUser?.phone} />
             ) : (
-              <RootTab />
+              <RootTab {...{ currentPushId }} />
             )}
           </View>
         </AppContext.Provider>

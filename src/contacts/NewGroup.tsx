@@ -55,8 +55,12 @@ const NewGroup: FunctionComponent<Props> = ({
     }
   }, [selectedGroup]);
 
-  const [createGroup, { loading, error }] = useMutation(CREATE_GROUP_MUTATION);
-  const [updateGroup] = useMutation(UPDATE_GROUP_MUTATION);
+  const [createGroup, { loading: processingCreate }] = useMutation(
+    CREATE_GROUP_MUTATION
+  );
+  const [updateGroup, { loading: processingUpdate }] = useMutation(
+    UPDATE_GROUP_MUTATION
+  );
 
   const handleCancel = () => {
     hideNewGroup();
@@ -102,20 +106,18 @@ const NewGroup: FunctionComponent<Props> = ({
       onSave={handleGroupSave}
       onPress={showNewGroup}
       onCancel={handleCancel}
+      loading={processingCreate || processingUpdate}
       isOpen={showingNewGroup}>
-      <View>
-        <Input
-          placeholder="Group name"
-          onChangeText={setName}
-          value={name}
-          color="white"
-        />
-        <ContactsPickList
-          onPress={handleContactPress}
-          selectedContactIds={selectedContactIds}
-          contacts={contacts}
-        />
-      </View>
+      <Input
+        placeholder="Group name"
+        onChangeText={setName}
+        value={name}
+        color="white"
+      />
+      <ContactsPickList
+        onPress={handleContactPress}
+        {...{ contacts, selectedContactIds }}
+      />
     </Overlay>
   );
 };

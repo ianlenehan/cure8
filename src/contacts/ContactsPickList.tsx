@@ -49,9 +49,9 @@ const ContactPickList: FunctionComponent<Props> = ({
   };
 
   const getSelectedMemberIds = (groupIds: string[]) => {
-    const selectedGroups:
-      | Group
-      | any = groups.filter(({ id }: { id: string }) => groupIds.includes(id));
+    const selectedGroups: Group | any = groups.filter(
+      ({ id }: { id: string }) => groupIds.includes(id)
+    );
 
     return uniq(
       selectedGroups
@@ -127,7 +127,7 @@ const ContactPickList: FunctionComponent<Props> = ({
         ]}
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
-        keyExtractor={item => item.id.toString()}
+        keyExtractor={(item: any) => item.id.toString()}
         removeClippedSubviews={false}
       />
     );

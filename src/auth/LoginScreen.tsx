@@ -5,17 +5,7 @@ import * as RNLocalize from 'react-native-localize';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import PhoneInput from 'react-native-phone-input';
 
-import {
-  Container,
-  PageWrapper,
-  Logo,
-  Input,
-  InputLabel,
-  Header,
-  Spacer,
-  Button,
-  AppText
-} from '../common';
+import { Container, PageWrapper, Logo, Input, InputLabel, Header, Spacer, Button, AppText } from '../common';
 
 import useBoolean from '../hooks/useBoolean';
 
@@ -39,12 +29,7 @@ type Props = {
 };
 
 const LoginScreen = (props: Props) => {
-  const {
-    registrationRequired,
-    setCurrentUser,
-    setRegistrationRequired,
-    setToken
-  } = props;
+  const { registrationRequired, setCurrentUser, setRegistrationRequired, setToken } = props;
 
   const phoneRef = useRef<any>(null);
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -125,11 +110,7 @@ const LoginScreen = (props: Props) => {
     }
 
     return (
-      <Button
-        loading={loading}
-        disabled={!isValid}
-        onPress={handleGetCode}
-        bordered>
+      <Button loading={loading} disabled={!isValid} onPress={handleGetCode} bordered>
         Get Code
       </Button>
     );
@@ -161,8 +142,7 @@ const LoginScreen = (props: Props) => {
 
   return (
     <Container>
-      <KeyboardAwareScrollView
-        contentContainerStyle={styles.keyboardScrollViewStyle}>
+      <KeyboardAwareScrollView contentContainerStyle={styles.keyboardScrollViewStyle}>
         <PageWrapper>
           <Spacer size={2} />
           <Header color="white">Login</Header>
@@ -180,11 +160,7 @@ const LoginScreen = (props: Props) => {
           {!!showingCodeField && (
             <View style={styles.codeInputWrapper}>
               <Spacer size={4} />
-              <TextInput
-                keyboardType="number-pad"
-                style={styles.codeInput}
-                onChangeText={handleCodeChange}
-              />
+              <TextInput keyboardType="number-pad" style={styles.codeInput} onChangeText={handleCodeChange} />
               <AppText color="white" style={{ textAlign: 'center' }}>
                 Enter One Time Password that was sent to your mobile via SMS.
               </AppText>

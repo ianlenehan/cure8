@@ -6,11 +6,7 @@ import { gql } from '@apollo/client';
 import { Container, Input, Header, Spacer, Button, Spinner } from '../common';
 
 const UPDATE_USER_MUTATION = gql`
-  mutation UpdateUser(
-    $firstName: String!
-    $lastName: String!
-    $phone: String!
-  ) {
+  mutation UpdateUser($firstName: String!, $lastName: String!, $phone: String!) {
     updateUser(firstName: $firstName, lastName: $lastName, phone: $phone) {
       user {
         id
@@ -66,10 +62,7 @@ const CompleteSignUpScreen = ({ onUpdate, phone }: Props) => {
         />
         <Spacer size={4} />
 
-        <Button
-          disabled={!firstName || !lastName}
-          bordered
-          onPress={handleSubmit}>
+        <Button disabled={!firstName || !lastName} bordered onPress={handleSubmit}>
           Continue
         </Button>
       </View>

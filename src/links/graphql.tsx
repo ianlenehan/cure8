@@ -76,15 +76,6 @@ export const FETCH_TAGS = gql`
   }
 `;
 
-export const FETCH_CURRENT_USER = gql`
-  query currentUser {
-    appUser {
-      id
-      name
-    }
-  }
-`;
-
 /* **************** MUTATIONS **************** */
 
 export const DELETE_CURATION = gql`

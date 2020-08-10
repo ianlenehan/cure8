@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FC } from 'react';
 import { View, StyleSheet } from 'react-native';
 
 type Props = {
@@ -6,7 +6,7 @@ type Props = {
   showBorder?: boolean;
 };
 
-const TagContainer: FunctionComponent<Props> = props => {
+const TagContainer: FC<Props> = props => {
   const borderStyle = props.showBorder ? styles.border : {};
 
   return (

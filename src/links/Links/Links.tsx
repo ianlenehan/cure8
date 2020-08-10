@@ -1,27 +1,12 @@
-import React, { Fragment, useState, useEffect } from 'react';
-import {
-  Alert,
-  View,
-  StyleSheet,
-  LayoutAnimation,
-  TouchableWithoutFeedback
-} from 'react-native';
+import React, { Fragment, useState } from 'react';
+import { Alert, View, StyleSheet, LayoutAnimation, TouchableWithoutFeedback } from 'react-native';
 
 import IonIcon from 'react-native-vector-icons/FontAwesome';
 import { Icon } from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { get } from 'lodash';
 
-import {
-  AppText,
-  Button,
-  Spacer,
-  Tag,
-  TagContainer,
-  colors,
-  EmptyPage
-} from '../../common';
-import useToast from '../../hooks/useToast';
+import { AppText, Spacer, Tag, TagContainer, colors, EmptyPage } from '../../common';
 import useBoolean from '../../hooks/useBoolean';
 import Card from '../Card';
 import NewLink from '../NewLink';
@@ -43,7 +28,6 @@ type Props = {
   onLoadMore: () => void;
   onTagPress?: (tag: TagType) => void;
   onNewLinkSubmit: () => void;
-  onSetOptions: (onPress: () => void) => void;
   hello?: any;
   tags: TagType[];
 };
@@ -61,37 +45,20 @@ const Links = (props: Props) => {
     onLoadMore,
     onTagPress = () => {},
     onNewLinkSubmit,
-    onSetOptions,
     tags
   } = props;
 
   const [openRows, setOpenRows] = useState<string[]>([]);
-  const [archiveModalVisible, setArchiveModalVisible] = useState<boolean>(
-    false
-  );
-
   const [tagNames, setTagNames] = useState<string[]>([]);
   const [tag, setTag] = useState<string>('');
   const [selectedCurationId, setSelectedCurationId] = useState<string>('');
-  const [selectedCuration, setSelectedCuration] = useState<
-    CurationType | undefined
-  >();
+  const [selectedCuration, setSelectedCuration] = useState<CurationType | undefined>();
   const [forwardUrl, setForwardUrl] = useState<string>('');
   const [selectedRating, setRating] = useState<string>('');
-  const [tagSelectorOpen, setTagSelectorOpen] = useState(false);
+  const [isTagSelectorOpen, openTagSelector, closeTagSelector] = useBoolean(false);
   const [showingNewLink, showNewLink, hideNewLink] = useBoolean(false);
-  const [isDeleteModalVisible, openDeleteModal, closeDeleteModal] = useBoolean(
-    false
-  );
-
-  useEffect(() => {
-    onSetOptions(showNewLink);
-  }, []);
-
-  const handleNewLinkPress = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    showNewLink();
-  };
+  const [isArchiveModalVisible, openArchiveModal, closeArchiveModal] = useBoolean(false);
+  const [isDeleteModalVisible, openDeleteModal, closeDeleteModal] = useBoolean(false);
 
   const handleRatingPress = (rating: string) => {
     if (rating === selectedRating) {
@@ -111,19 +78,19 @@ const Links = (props: Props) => {
   };
 
   const handleArchiveConfirm = async () => {
-    await onArchive({
+    onArchive({
       id: selectedCurationId,
       tags: tagNames,
       rating: selectedRating
     });
-    setArchiveModalVisible(false);
+    closeArchiveModal();
     setTag('');
     setOpenRows([]);
   };
 
   const handleArchivePress = (curationId: string) => {
     setSelectedCurationId(curationId);
-    setArchiveModalVisible(true);
+    openArchiveModal();
   };
 
   const handleDeletePress = async (curationId: string) => {
@@ -132,9 +99,8 @@ const Links = (props: Props) => {
   };
 
   const handleDeleteConfirm = async () => {
-    await onDelete(selectedCurationId);
+    onDelete(selectedCurationId);
     closeDeleteModal();
-    useToast('Curation successfully deleted');
     setOpenRows([]);
   };
 
@@ -158,19 +124,19 @@ const Links = (props: Props) => {
     onNewLinkSubmit();
     setOpenRows([]);
     setForwardUrl('');
+    hideNewLink();
   };
 
   const renderHiddenItem = ({ item }: { item: CurationType }) => {
     const handleForwardLinkPress = () => {
       setForwardUrl(item.link.url);
-      handleNewLinkPress();
+      showNewLink();
     };
 
     const renderChatButton = () => {
-      if (!item.sharedWith.length || item.curatorId === currentUserId)
-        // TODO should be ===
+      if (item.curatorId === currentUserId) {
         return null;
-      // const sharedWithOnlyYou = item.sharedWith.length > 1 &&
+      }
 
       const handlePress = () => {
         const discussWithOwner = () => {
@@ -184,41 +150,25 @@ const Links = (props: Props) => {
 
         const message =
           item.sharedWith.length > 1
-            ? `Discuss article with ${item.curatorName} or with everyone ${
-                item.curatorName
-              } shared it with.`
+            ? `Discuss article with ${item.curatorName} or with everyone ${item.curatorName} shared it with.`
             : `Discuss article with ${item.curatorName}.`;
 
-        const cancelOption = {
-          text: 'Cancel',
-          style: 'cancel'
-        };
+        const cancelOption = { text: 'Cancel', style: 'cancel' };
 
-        const oneOptionButtons = [
-          { text: 'Discuss', onPress: discussWithOwner },
-          cancelOption
-        ];
+        const oneOptionButtons = [{ text: 'Discuss', onPress: discussWithOwner }, cancelOption];
         const twoOptionButtons = [
           { text: item.curatorName, onPress: discussWithOwner },
           { text: 'Everyone', onPress: discussWithEveryone },
           cancelOption
         ];
 
-        const buttons =
-          item.sharedWith.length > 1 ? twoOptionButtons : oneOptionButtons;
+        const buttons = item.sharedWith.length > 1 ? twoOptionButtons : oneOptionButtons;
         // @ts-ignore
         Alert.alert('Discuss', message, buttons);
       };
 
       return (
-        <Icon
-          color={colors.tertiaryBlue}
-          name="comment"
-          type="font-awesome"
-          reverse
-          size={18}
-          onPress={handlePress}
-        />
+        <Icon color={colors.tertiaryBlue} name="comment" type="font-awesome" reverse size={18} onPress={handlePress} />
       );
     };
 
@@ -259,8 +209,7 @@ const Links = (props: Props) => {
   };
 
   const renderCuration = ({ item }: { item: CurationType }) => {
-    const curatorName =
-      item.curatorId === currentUserId ? 'you' : item.curatorName;
+    const curatorName = item.curatorId === currentUserId ? 'you' : item.curatorName;
     const { id, link, comment, createdAt, rating, tags, sharedWith } = item;
     const handlePress = () => setSelectedCuration(item);
     return (
@@ -271,7 +220,6 @@ const Links = (props: Props) => {
         date={createdAt}
         curatedBy={curatorName}
         onPress={handlePress}
-        sharedWith={sharedWith}
         {...{
           comment,
           rating,
@@ -285,16 +233,16 @@ const Links = (props: Props) => {
   };
 
   const renderTagSelector = () => {
-    if (!isArchivedLinks) return null;
+    if (!isArchivedLinks || showingNewLink) return null;
 
-    const icon = tagSelectorOpen ? 'expand-less' : 'expand-more';
+    const icon = isTagSelectorOpen ? 'expand-less' : 'expand-more';
 
     const toggleTagSelector = () => {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
-      if (tagSelectorOpen) {
-        setTagSelectorOpen(false);
+      if (isTagSelectorOpen) {
+        closeTagSelector();
       } else {
-        setTagSelectorOpen(true);
+        openTagSelector();
       }
     };
 
@@ -306,23 +254,12 @@ const Links = (props: Props) => {
             <Icon name={icon} color={colors.primaryGreen} size={32} />
           </View>
         </TouchableWithoutFeedback>
-        {tagSelectorOpen && (
+        {isTagSelectorOpen && (
           <TagContainer>
             {tags.map((tag: Tag) => (
-              <Tag
-                tag={tag}
-                key={tag.id}
-                onPress={onTagPress}
-                selected={filteredTagIds.includes(tag.id)}
-              />
+              <Tag tag={tag} key={tag.id} onPress={onTagPress} selected={filteredTagIds.includes(tag.id)} />
             ))}
-            <Icon
-              size={24}
-              containerStyle={{ margin: 5 }}
-              name="cancel"
-              color="#ddd"
-              onPress={onClearTagFilter}
-            />
+            <Icon size={24} containerStyle={{ margin: 5 }} name="cancel" color="#ddd" onPress={onClearTagFilter} />
           </TagContainer>
         )}
       </View>
@@ -331,19 +268,14 @@ const Links = (props: Props) => {
 
   const renderContent = () => {
     if (!curations.length) {
-      const message = isArchivedLinks
-        ? "You've not archived any links yet!"
-        : 'You have no new curations!';
+      const message = isArchivedLinks ? "You've not archived any links yet!" : 'You have no new curations!';
 
       return (
         <EmptyPage text={message}>
           <View>
             <Spacer size={2} />
             {!isArchivedLinks && (
-              <IonIcon.Button
-                name="plus-square"
-                backgroundColor={colors.primaryGreen}
-                onPress={handleNewLinkPress}>
+              <IonIcon.Button name="plus-square" backgroundColor={colors.primaryGreen} onPress={showNewLink}>
                 Create One
               </IonIcon.Button>
             )}
@@ -369,12 +301,20 @@ const Links = (props: Props) => {
           onEndReached={onLoadMore}
         />
 
+        <NewLink
+          onSubmitComplete={handleNewLinkSubmit}
+          isOpen={showingNewLink}
+          onClose={hideNewLink}
+          onOpen={showNewLink}
+          {...{ forwardUrl }}
+        />
+
         <ArchiveModal
-          isVisible={archiveModalVisible}
+          isVisible={isArchiveModalVisible}
           onTagChange={setTag}
           onTagPress={handleTagPress}
           onSaveNewTag={handleSaveNewTag}
-          onHideModal={() => setArchiveModalVisible(false)}
+          onHideModal={closeArchiveModal}
           onRatingPress={handleRatingPress}
           onArchive={handleArchiveConfirm}
           existingTags={tags}
@@ -383,7 +323,7 @@ const Links = (props: Props) => {
 
         <DeleteModal
           isVisible={isDeleteModalVisible}
-          onDeleteConfirm={handleArchiveConfirm}
+          onDeleteConfirm={handleDeleteConfirm}
           onDismiss={closeDeleteModal}
         />
       </View>
@@ -393,16 +333,7 @@ const Links = (props: Props) => {
   return (
     <Fragment>
       {renderContent()}
-      <NewLink
-        onOverlayCancel={hideNewLink}
-        overlayIsOpen={showingNewLink}
-        onSubmitComplete={handleNewLinkSubmit}
-        {...{ forwardUrl }}
-      />
-      <WebViewer
-        onRequestClose={handleWebViewerClose}
-        curationUrl={get(selectedCuration, 'link.url')}
-      />
+      <WebViewer onRequestClose={handleWebViewerClose} curationUrl={get(selectedCuration, 'link.url')} />
     </Fragment>
   );
 };
