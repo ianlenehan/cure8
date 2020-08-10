@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { View, TextInput, LayoutAnimation } from 'react-native';
 import axios from 'axios';
+import * as RNLocalize from 'react-native-localize';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
-import AsyncStorage from '@react-native-community/async-storage';
 import PhoneInput from 'react-native-phone-input';
 
 import {
@@ -156,6 +156,9 @@ const LoginScreen = (props: Props) => {
     label = `Mobile Number - ${phoneNumber}`;
   }
 
+  const [locale] = RNLocalize.getLocales();
+  const { countryCode } = locale;
+
   return (
     <Container>
       <KeyboardAwareScrollView
@@ -166,7 +169,7 @@ const LoginScreen = (props: Props) => {
           <Spacer size={4} />
           <InputLabel label={label} color="white" />
           <PhoneInput
-            initialCountry="au"
+            initialCountry={countryCode.toLowerCase()}
             flagStyle={styles.flagStyle}
             textComponent={Input}
             allowZeroAfterCountryCode={false}

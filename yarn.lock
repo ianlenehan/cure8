@@ -6758,6 +6758,11 @@ react-native-lightbox@^0.7.0:
   dependencies:
     prop-types "^15.5.10"
 
+react-native-localize@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/react-native-localize/-/react-native-localize-1.4.1.tgz#031bd2089f09cc16ee7daee03019684dda60c275"
+  integrity sha512-g1L1au6GtCd0Ci6lQ8JVPYgl7uvEtKY2jeVghJcV6qQEN9+qACyqjOIR8pskUyI+qcSj1z4/nZh3IFxDVu1drw==
+
 react-native-maps@~0.25.0:
   version "0.25.0"
   resolved "https://registry.yarnpkg.com/react-native-maps/-/react-native-maps-0.25.0.tgz#81bc51eb50e33811a9e1c345cc48869413ead67d"
