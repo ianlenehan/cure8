@@ -5,7 +5,7 @@ import React, {
   FunctionComponent
 } from 'react';
 import { View } from 'react-native';
-import firebase from 'react-native-firebase';
+import auth from '@react-native-firebase/auth';
 import { useQuery, useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
 import AppContext from '../utils/AppContext';
@@ -58,7 +58,7 @@ const CompleteSignUpScreen: FunctionComponent = () => {
     await authUser.updateProfile({
       displayName
     });
-    const newAuthUser = firebase.auth().currentUser;
+    const newAuthUser = auth().currentUser;
     setAuthUser(newAuthUser);
   };
 

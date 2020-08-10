@@ -1,3 +1,12 @@
+# Override Firebase SDK Version
+$FirebaseSDKVersion = '6.13.0'
+
+# Override Fabric SDK Version
+$FabricSDKVersion = '1.6.0'
+
+# Override Crashlytics SDK Version
+$CrashlyticsSDKVersion = '3.1.0'
+
 platform :ios, '9.0'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
@@ -40,6 +49,8 @@ target 'cure8' do
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 
 
+  pod 'react-native-onesignal', :path => '../node_modules/react-native-onesignal'
+
   target 'cure8Tests' do
     inherit! :search_paths
     # Pods for testing
@@ -56,4 +67,8 @@ target 'cure8-tvOS' do
     # Pods for testing
   end
 
+end
+
+target 'OneSignalNotificationServiceExtension' do
+  pod 'OneSignal', '>= 2.9.3', '< 3.0'
 end

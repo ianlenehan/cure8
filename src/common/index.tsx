@@ -97,7 +97,7 @@ type InputProps = {
   error?: boolean;
   label?: string;
   onButtonPress?: () => void;
-  onChange?: ({}: any) => void;
+  onChange?: ({  }: any) => void;
   onChangeText?: (value: string) => void;
   placeholder?: string;
   value?: string | undefined;
@@ -142,7 +142,11 @@ export const Input: FunctionComponent<InputProps> = props => {
     <View style={{ margin: 5 }}>
       {props.label && <InputLabel label={props.label} color={labelColor} />}
       <View style={{ display: 'flex', flexDirection: 'row' }}>
-        <TextInput {...props} style={textInputStyle} />
+        <TextInput
+          {...props}
+          placeholderTextColor="#bdc3c7"
+          style={textInputStyle}
+        />
         {props.buttonText && (
           <TouchableOpacity
             style={{

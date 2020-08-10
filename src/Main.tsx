@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
 import { Root } from 'native-base';
 import { ApolloProvider } from 'react-apollo';
+import OneSignal from 'react-native-onesignal';
 
 import AppContext from './utils/AppContext';
 import RootTab from './navigation/RootTab';
@@ -16,6 +17,37 @@ const Main = (props: any) => {
     phoneNumbers: []
   });
   const [selectedConversationId, setSelectedConversationId] = useState('');
+  const [currentPushId, setCurrentPushId] = useState('');
+  const [currentUser, setCurrentUser] = useState({
+    id: '',
+    name: ''
+  });
+
+  useEffect(() => {
+    OneSignal.getPermissionSubscriptionState((status: any) => {
+      checkNotificationStatus(status);
+    });
+
+    OneSignal.addEventListener('received', handleReceived);
+    OneSignal.addEventListener('opened', handleOpened);
+    OneSignal.addEventListener('ids', handleIds);
+
+    return () => {
+      OneSignal.removeEventListener('received', handleReceived);
+      OneSignal.removeEventListener('opened', handleOpened);
+      OneSignal.removeEventListener('ids', handleIds);
+    };
+  }, []);
+
+  const handleReceived = (event: any) => {
+    console.log('received', event);
+  };
+  const handleOpened = () => {};
+  const handleIds = () => {};
+
+  const checkNotificationStatus = async (status: any) => {
+    setCurrentPushId(status.userId);
+  };
 
   if (!apolloClient) {
     return null;
@@ -28,6 +60,9 @@ const Main = (props: any) => {
           value={{
             authUser,
             setAuthUser,
+            currentUser,
+            setCurrentUser,
+            currentPushId,
             newContact,
             setNewContact,
             selectedConversationId,
@@ -35,7 +70,11 @@ const Main = (props: any) => {
           }}>
           <StatusBar barStyle="light-content" />
           <View style={styles.container}>
-            {showSignupScreen ? <CompleteSignUpScreen /> : <RootTab />}
+            {showSignupScreen ? (
+              <CompleteSignUpScreen />
+            ) : (
+              <RootTab {...{ currentPushId }} />
+            )}
           </View>
         </AppContext.Provider>
       </Root>

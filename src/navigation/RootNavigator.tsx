@@ -2,16 +2,11 @@ import React from 'react';
 import { Image } from 'react-native';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
-// import Ionicons from 'react-native-vector-icons/Ionicons';
 import IonIcon from 'react-native-vector-icons/FontAwesome';
-import { Icon, Button } from 'react-native-elements';
+import { Icon } from 'react-native-elements';
 import { NavigationStackOptions } from 'react-navigation-stack';
 
 import { AppText, colors } from '../common';
-
-// type Props = {
-//   navigation: NavigationStackProp<{ userId: string }>;
-// };
 
 import LinksScreen from '../links/LinksScreen';
 import ArchivedLinksScreen from '../links/ArchivedLinksScreen';
@@ -127,18 +122,6 @@ const RootStackNavigator = createStackNavigator(
             color="white"
             onPress={linksParams.onNewLinkPress}
             containerStyle={{ marginRight: 25 }}
-          />
-        );
-      }
-
-      if (routeName === 'Contacts' && contactsParams) {
-        headerRight = () => (
-          <Button
-            title={contactsParams.buttonText || ''}
-            type="clear"
-            onPress={contactsParams.toggleEditMode}
-            titleStyle={{ fontSize: 16, color: 'white' }}
-            containerStyle={{ marginRight: 10 }}
           />
         );
       }

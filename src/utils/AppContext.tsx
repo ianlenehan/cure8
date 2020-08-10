@@ -8,6 +8,11 @@ const AppContext = React.createContext({
     updateProfile: ({  }: any) => {}
   },
   setAuthUser: (authUser: any) => {},
+  currentUser: {
+    id: '',
+    name: ''
+  },
+  setCurrentUser: (currentUser: any) => {},
   newContact: {
     familyName: '',
     givenName: '',
@@ -15,7 +20,8 @@ const AppContext = React.createContext({
   },
   setNewContact: (contact: any) => {},
   selectedConversationId: '',
-  setSelectedConversationId: (conversationId: string) => {}
+  setSelectedConversationId: (conversationId: string) => {},
+  currentPushId: ''
 });
 
 export default AppContext;

@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   LayoutAnimation,
@@ -6,9 +6,11 @@ import {
   StyleSheet
 } from 'react-native';
 import { Button, colors, AppText } from '../common';
+import useBoolean from '../hooks/useBoolean';
 
 type Props = {
   buttonText: string;
+  children: any;
   onSave?: () => void;
   isOpen: boolean;
   onCancel: () => void;
@@ -19,7 +21,7 @@ type Props = {
   loading?: boolean;
 };
 
-const Overlay: FunctionComponent<Props> = props => {
+const Overlay = (props: Props) => {
   const {
     buttonText,
     children,
@@ -33,9 +35,22 @@ const Overlay: FunctionComponent<Props> = props => {
     loading
   } = props;
 
+  const [open, setIsOpen] = useBoolean(isOpen);
+
+  useEffect(() => {
+    if (isOpen) {
+      handleOpen();
+    }
+  }, [isOpen]);
+
   const handlePress = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     onPress && onPress();
+  };
+
+  const handleOpen = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setIsOpen();
   };
 
   const handleCancel = () => {
@@ -50,7 +65,7 @@ const Overlay: FunctionComponent<Props> = props => {
 
   const height = fullscreen ? '95%' : '85%';
 
-  if (hideMainButton && !isOpen) return null;
+  if (hideMainButton && !open) return null;
 
   return (
     <View
@@ -97,7 +112,12 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingBottom: 0,
     borderTopLeftRadius: 20,
-    borderTopRightRadius: 20
+    borderTopRightRadius: 20,
+    shadowColor: 'black',
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 0.4,
+    elevation: 8,
+    shadowRadius: 10
   },
   overlayInner: {
     flex: 1,

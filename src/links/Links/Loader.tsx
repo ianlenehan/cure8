@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text } from 'react-native';
 import { useQuery, useMutation } from 'react-apollo';
 
 import useAppContext from '../../hooks/useAppContext';
+import useToast from '../../hooks/useToast';
 import Links from './Links';
 import { ArchiveVariablesType, CurationType, TagType } from '../types';
 
@@ -10,8 +10,7 @@ import {
   ARCHIVE_CURATION,
   CREATE_CONVERSATION,
   DELETE_CURATION,
-  FETCH_TAGS,
-  FETCH_CURRENT_USER
+  FETCH_TAGS
 } from '../graphql';
 
 type Props = {
@@ -22,10 +21,8 @@ type Props = {
   navigation: any;
   onClearTagFilter?: () => void;
   onLoadMore: () => void;
-  onSetOptions: any;
   onTagPress?: (tag: TagType) => void;
   refetch: () => void;
-  setParams?: any;
 };
 
 const LoaderLinks = (props: Props) => {
@@ -37,32 +34,29 @@ const LoaderLinks = (props: Props) => {
     navigation,
     onClearTagFilter,
     onLoadMore,
-    onSetOptions,
     onTagPress,
     refetch,
-    setParams
   } = props;
-  const { data: currentUser, loading: loadingCurrentUser } = useQuery(
-    FETCH_CURRENT_USER
-  );
 
   const { data: tagsData, loading: loadingTags } = useQuery(FETCH_TAGS);
   const [archiveCuration] = useMutation(ARCHIVE_CURATION);
   const [deleteCuration] = useMutation(DELETE_CURATION);
   const [createConversation] = useMutation(CREATE_CONVERSATION);
 
-  const { setSelectedConversationId } = useAppContext();
+  const { setSelectedConversationId, currentUser } = useAppContext();
 
-  if (loadingCurrentUser || loadingTags) return null;
+  if (loadingTags) return null;
 
   const handleArchive = async (variables: ArchiveVariablesType) => {
     await archiveCuration({ variables });
-    await refetch();
+    useToast('Curation successfully archived');
+    refetch();
     fetchArchivedLinks && fetchArchivedLinks();
   };
 
   const handleDelete = async (id: string) => {
     await deleteCuration({ variables: { id } });
+    useToast('Curation successfully deleted');
     refetch();
   };
 
@@ -88,14 +82,12 @@ const LoaderLinks = (props: Props) => {
         onClearTagFilter,
         onLoadMore,
         onTagPress,
-        onSetOptions,
-        setParams,
         tags
       }}
       onCreateConversation={handleCreateConversation}
       onDelete={handleDelete}
       onNewLinkSubmit={refetch}
-      currentUserId={currentUser.appUser.id}
+      currentUserId={currentUser?.id}
       onArchive={handleArchive}
     />
   );

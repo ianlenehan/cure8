@@ -1,10 +1,12 @@
-import React, { useState, useEffect, FunctionComponent } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 import { useMutation, useQuery } from 'react-apollo';
 import gql from 'graphql-tag';
+
 import useForm from '../hooks/useForm';
 import useToast from '../hooks/useToast';
+import useBoolean from '../hooks/useBoolean';
 import { Input, Spacer, Overlay, Spinner, colors } from '../common';
 import validate from './validate';
 import ContactsPickList from '../contacts/ContactsPickList';
@@ -61,28 +63,33 @@ const CREATE_CURATION = gql`
 `;
 
 type Props = {
-  onOverlayCancel: () => void;
-  overlayIsOpen: boolean;
   forwardUrl?: string;
+  isOpen?: boolean;
+  onClose: () => void;
+  onOpen: () => void;
   onSubmitComplete: () => void;
 };
 
-const NewLink: FunctionComponent<Props> = ({
-  onOverlayCancel,
-  overlayIsOpen,
-  forwardUrl,
-  onSubmitComplete
-}) => {
+const NewLink = (props: Props) => {
+  const { forwardUrl, isOpen, onClose, onOpen, onSubmitComplete } = props;
+
   const [saveToMyLinks, setSaveToMyLinks] = useState<boolean>(false);
   const [selectedContactIds, setSelectedContactIds] = useState<string[]>([]);
+  const [showingNewLink, showNewLink, hideNewLink] = useBoolean(false);
 
   const { data, loading: loadingContacts } = useQuery(
     FETCH_CONTACTS_AND_GROUPS
   );
 
-  const [createCuration, { loading: processing, error }] = useMutation(
+  const [createCuration, { loading: processing }] = useMutation(
     CREATE_CURATION
   );
+
+  useEffect(() => {
+    if (isOpen) {
+      showNewLink();
+    }
+  }, [isOpen]);
 
   const saveCuration = async (values: any) => {
     const { url, comment } = values;
@@ -99,7 +106,8 @@ const NewLink: FunctionComponent<Props> = ({
     setSaveToMyLinks(false);
     setSelectedContactIds([]);
 
-    onOverlayCancel();
+    hideNewLink();
+    onClose();
     onSubmitComplete();
     useToast('Curation successfully created');
   };
@@ -116,6 +124,16 @@ const NewLink: FunctionComponent<Props> = ({
       handleChange('url', forwardUrl);
     }
   }, [forwardUrl]);
+
+  const handleOpen = () => {
+    showNewLink();
+    onOpen();
+  };
+
+  const handleCancel = () => {
+    hideNewLink();
+    onClose();
+  };
 
   const handleCheckboxChange = () => {
     setSaveToMyLinks(!saveToMyLinks);
@@ -145,18 +163,18 @@ const NewLink: FunctionComponent<Props> = ({
 
   if (!data) return null;
 
-  const buttonText = 'New Link';
+  const buttonText = 'New Curation';
   const saveDisabled = !saveToMyLinks && !selectedContactIds.length;
 
   return (
     <Overlay
       {...{ buttonText, saveDisabled }}
-      fullscreen
-      hideMainButton
       onSave={handleSubmit}
-      onCancel={onOverlayCancel}
+      onCancel={handleCancel}
+      fullscreen
+      onPress={handleOpen}
       loading={processing}
-      isOpen={overlayIsOpen}>
+      isOpen={showingNewLink}>
       <View>
         <Input
           placeholder="Link URL"

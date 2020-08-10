@@ -1,169 +1,131 @@
-import React, { Component } from 'react';
+import React, { FC, useState, useRef } from 'react';
 import { View, TextInput, LayoutAnimation } from 'react-native';
-import firebase from 'react-native-firebase';
+import auth from '@react-native-firebase/auth';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
-import {
-  Container,
-  PageWrapper,
-  Logo,
-  Input,
-  InputLabel,
-  Header,
-  Spacer,
-  Button,
-  AppText
-} from '../common';
-import PhoneInput from 'react-native-phone-input';
+import PhoneInput, { ReactNativePhoneInputProps } from 'react-native-phone-input';
 
-const testPhoneNumber = '+61112223333';
+import { Container, PageWrapper, Logo, Input, InputLabel, Header, Spacer, Button, AppText } from '../common';
+import useBoolean from '../hooks/useBoolean';
+
+const testPhoneNumber = '+611112223333';
 // pin code is 123456
 
-type Props = {};
+const LoginScreen: FC = () => {
+  const [confirm, setConfirm] = useState<any>(null);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [isValid, setIsValid] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [error, setError] = useState('');
 
-type State = {
-  phoneNumber: string;
-  isValid: boolean;
-  showCodeField: boolean;
-  loading: boolean;
-  confirmResult: any;
-  otpCode: string;
-  error: string | null;
-};
+  const [loading, startLoading, cancelLoading] = useBoolean(false);
 
-type PhoneRefType = {
-  isValidNumber: () => boolean;
-  getNumberType: () => string;
-  getValue: () => string;
-};
+  const phoneRef = useRef<any>(null);
 
-class LoginScreen extends Component<Props, State> {
-  phoneRef: PhoneRefType;
-  recaptchaVerifier: any;
-  constructor(props: any) {
-    super(props);
-    this.state = {
-      phoneNumber: '',
-      isValid: false,
-      showCodeField: false,
-      loading: false,
-      error: null,
-      confirmResult: {
-        confirm: () => {}
-      },
-      otpCode: ''
-    };
+  const handlePhoneChange = () => {
+    if (!phoneRef || !phoneRef.current) return null;
+    const ref = phoneRef.current;
 
-    this.phoneRef = {
-      isValidNumber: () => false,
-      getNumberType: () => '',
-      getValue: () => ''
-    };
-  }
-
-  onPhoneChange = () => {
-    if (!this.phoneRef) return null;
-    const type = this.phoneRef.getNumberType();
-    const valid = this.phoneRef.isValidNumber();
-    const phoneNumber = this.phoneRef.getValue();
+    const valid = ref.isValidNumber();
+    const number = ref.getValue();
     const isValid = phoneNumber === testPhoneNumber || valid;
-    this.setState({ phoneNumber, isValid });
+
+    setPhoneNumber(number);
+    setIsValid(isValid);
   };
 
-  handleGetCode = async () => {
-    const { isValid, phoneNumber } = this.state;
+  const handleGetCode = async () => {
     if (isValid) {
-      this.setState({ loading: true });
-      const confirmResult = await firebase
-        .auth()
-        .signInWithPhoneNumber(phoneNumber);
+      startLoading();
+      const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
 
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      this.setState({ showCodeField: true, loading: false, confirmResult });
+      setConfirm(confirmation);
+      cancelLoading();
     }
   };
 
-  handleVerifyCode = async () => {
-    this.setState({ loading: true });
-    const { confirmResult, otpCode } = this.state;
+  const handleVerifyCode = async () => {
+    startLoading();
     try {
-      const user = await confirmResult.confirm(otpCode);
-    } catch (error) {
-      this.setState({
-        error: 'The SMS verification code you entered is invalid.'
-      });
+      await confirm.confirm(otpCode);
+    } catch (err) {
+      setError(`'The SMS verification code you entered is invalid.' ${err}`);
     }
-    this.setState({ loading: false });
+    cancelLoading();
   };
 
-  handleCodeChange = (code: string) => {
-    this.setState({ otpCode: code, error: null });
+  const handleCodeChange = (code: string) => {
+    setOtpCode(code);
+    setError('');
   };
 
-  render() {
-    const { phoneNumber, isValid, loading, showCodeField, error } = this.state;
-    let label = 'Mobile Number';
-    if (phoneNumber.length > 0) {
-      label = `Mobile Number - ${phoneNumber}`;
+  const renderCodeInput = () => {
+    if (!confirm) {
+      return null;
     }
 
     return (
-      <Container>
-        <KeyboardAwareScrollView
-          contentContainerStyle={styles.keyboardScrollViewStyle}>
-          <PageWrapper>
-            <Spacer size={2} />
-            <Header color="white">Login</Header>
-            <Spacer size={4} />
-            <InputLabel label={label} color="white" />
-            <PhoneInput
-              initialCountry="au"
-              flagStyle={styles.flagStyle}
-              textComponent={Input}
-              allowZeroAfterCountryCode={false}
-              onChangePhoneNumber={this.onPhoneChange}
-              style={{ width: '100%' }}
-              ref={(ref: PhoneRefType) => (this.phoneRef = ref)}
-            />
-            {showCodeField && (
-              <View style={styles.codeInputWrapper}>
-                <Spacer size={4} />
-                <TextInput
-                  keyboardType="number-pad"
-                  style={styles.codeInput}
-                  onChangeText={this.handleCodeChange}
-                />
-                <AppText color="white" style={{ textAlign: 'center' }}>
-                  Enter One Time Password that was sent to your mobile via SMS.
-                </AppText>
-              </View>
-            )}
-            {error && (
-              <AppText style={{ fontSize: 14, color: 'red' }}>{error}</AppText>
-            )}
-            <Spacer size={6} />
-            {showCodeField ? (
-              <Button
-                loading={loading}
-                onPress={this.handleVerifyCode}
-                bordered>
-                Verify Code
-              </Button>
-            ) : (
-              <Button
-                loading={loading}
-                disabled={!isValid}
-                onPress={this.handleGetCode}
-                bordered>
-                Get Code
-              </Button>
-            )}
-          </PageWrapper>
-          <Logo size="large" />
-        </KeyboardAwareScrollView>
-      </Container>
+      <View style={styles.codeInputWrapper}>
+        <Spacer size={4} />
+        <TextInput keyboardType="number-pad" style={styles.codeInput} onChangeText={handleCodeChange} />
+        <AppText color="white" style={{ textAlign: 'center' }}>
+          Enter One Time Password that was sent to your mobile via SMS.
+        </AppText>
+      </View>
     );
+  };
+
+  const renderButton = () => {
+    if (confirm) {
+      return (
+        <Button {...{ loading }} onPress={handleVerifyCode} bordered>
+          Verify Code
+        </Button>
+      );
+    }
+
+    return (
+      <Button {...{ loading }} disabled={!isValid} onPress={handleGetCode} bordered>
+        Get Code
+      </Button>
+    );
+  };
+
+  let label = 'Mobile Number';
+  if (phoneNumber.length > 0) {
+    label = `Mobile Number - ${phoneNumber}`;
   }
-}
+
+  return (
+    <Container>
+      <KeyboardAwareScrollView contentContainerStyle={styles.keyboardScrollViewStyle}>
+        <PageWrapper>
+          <Spacer size={2} />
+          <Header color="white">Login</Header>
+          <Spacer size={4} />
+          <InputLabel label={label} color="white" />
+          <PhoneInput
+            initialCountry="au"
+            flagStyle={styles.flagStyle}
+            textComponent={Input}
+            allowZeroAfterCountryCode={false}
+            onChangePhoneNumber={handlePhoneChange}
+            style={{ width: '100%' }}
+            ref={phoneRef}
+          />
+
+          {renderCodeInput()}
+
+          {!!error && <AppText style={{ fontSize: 14, color: 'red' }}>{error}</AppText>}
+
+          <Spacer size={6} />
+          {renderButton()}
+        </PageWrapper>
+        <Logo size="large" />
+      </KeyboardAwareScrollView>
+    </Container>
+  );
+};
 
 export default LoginScreen;
 

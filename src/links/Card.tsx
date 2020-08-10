@@ -1,13 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import {
-  Alert,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View
-} from 'react-native';
+import { Alert, Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { Icon } from 'react-native-elements';
 import moment from 'moment';
 import { AppText, Tag, colors } from '../common';
@@ -37,36 +29,33 @@ type Props = {
   sharedWith?: SharedWithType[];
 };
 
-const Card: FunctionComponent<Props> = ({
-  comment,
-  curatedBy,
-  date,
-  filteredTagIds = [],
-  image,
-  onPress,
-  onTagPress,
-  rating,
-  sharedWith = [],
-  tags,
-  title
-}) => {
+const Card: FunctionComponent<Props> = props => {
+  const {
+    comment,
+    curatedBy,
+    date,
+    filteredTagIds = [],
+    image,
+    onPress,
+    onTagPress,
+    rating,
+    sharedWith = [],
+    tags,
+    title
+  } = props;
+
   const formatDate = (date: string) => {
-    const currentDate = new Date();
     return moment(date)
       .local()
-      .from(currentDate);
+      .from(moment());
   };
 
   const handleShowSharedWith = () => {
     if (!sharedWith.length) return null;
 
-    const sharedWithNames = sharedWith.map(
-      (user: any) => user.name || user.phone
-    );
+    const sharedWithNames = sharedWith.map((user: any) => user.name || user.phone);
 
-    const message = `This has also been shared with ${sharedWithNames.join(
-      ', '
-    )}.`;
+    const message = `This has also been shared with ${sharedWithNames.join(', ')}.`;
     Alert.alert('Shared With', message);
   };
 
@@ -87,12 +76,7 @@ const Card: FunctionComponent<Props> = ({
     return (
       <View style={styles.tagContainer}>
         {tags.map((tag: TagType) => (
-          <Tag
-            key={tag.id}
-            tag={tag}
-            selected={filteredTagIds.includes(tag.id)}
-            onPress={onTagPress}
-          />
+          <Tag key={tag.id} tag={tag} selected={filteredTagIds.includes(tag.id)} onPress={onTagPress} />
         ))}
       </View>
     );
@@ -118,9 +102,7 @@ const Card: FunctionComponent<Props> = ({
         <View style={styles.footer}>
           <TouchableWithoutFeedback onPress={handleShowSharedWith}>
             <View style={styles.footerLeft}>
-              <Text style={styles.date}>{`${formatDate(
-                date
-              )} from ${curatedBy}`}</Text>
+              <Text style={styles.date}>{`${formatDate(date)} from ${curatedBy}`}</Text>
               {renderSharedWith()}
             </View>
           </TouchableWithoutFeedback>
