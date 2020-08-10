@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
 import { Root } from 'native-base';
+import firebase from 'react-native-firebase';
 import { ApolloProvider } from '@apollo/client';
 import AsyncStorage from '@react-native-community/async-storage';
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
@@ -44,7 +45,7 @@ const Main = ({ logout, storedToken, setToken }: Props) => {
       );
     if (networkError) {
       console.log(`[Network error]: ${networkError}`);
-      logout();
+      // logout();
     }
   });
 
@@ -59,7 +60,7 @@ const Main = ({ logout, storedToken, setToken }: Props) => {
   useEffect(() => {
     if (storedToken) {
       setTokenInAsyncStorage();
-      console.log({ storedToken });
+      signIntoFirebase()
       const client = new ApolloClient({
         cache: new InMemoryCache(),
         link: errorLink.concat(authLink.concat(httpLink))
@@ -68,6 +69,20 @@ const Main = ({ logout, storedToken, setToken }: Props) => {
       setApolloClient(client);
     }
   }, [storedToken]);
+
+  const signIntoFirebase = async () => {
+    try {
+      const user = firebase.auth().currentUser;
+
+      if (!user) {
+        await firebase.auth().signInWithCustomToken(storedToken || '')
+      }
+    } catch (error) {
+      // TODO request new token if necessary
+      console.log({error})
+    }
+    
+  }
 
   const handleUserUpdateComplete = () => {
     setRegistrationRequired(false)

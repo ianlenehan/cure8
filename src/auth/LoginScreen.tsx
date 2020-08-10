@@ -79,13 +79,12 @@ const LoginScreen = (props: Props) => {
         const res = await axios.post(`${apiUrl}request_password`, {
           phone: phoneNumber
         });
-        console.log('handleGetCode -> res', res);
 
         setRegistrationRequired(res.data.registration_required);
         setError('');
         showCodeField();
       } catch (error) {
-        console.log('handleGetCode -> error', error);
+        console.error('handleGetCode -> error', error);
         setError(error.message);
       }
 
@@ -101,7 +100,6 @@ const LoginScreen = (props: Props) => {
         phone: phoneNumber,
         code: otpCode
       });
-      console.log('handleLogin -> res', res.data);
       stopLoading();
       setCurrentUser(res.data.current_user);
       setToken(res.data.auth_token);

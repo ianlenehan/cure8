@@ -12,7 +12,6 @@ type Props = {
 };
 
 const ConversationItem = ({ conversation, onPress }: Props) => {
-  console.log('conversation', conversation);
   const users = useMemo(() => {
     const conversationUsers = conversation.users.map((user: UserType) => {
       const [firstName, secondName] = user.name.split(' ');

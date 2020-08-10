@@ -58,7 +58,6 @@ const NewContact: FunctionComponent<Props> = ({ navigate }) => {
 
   const getPermissions = () => {
     Contacts.checkPermission((err, permission) => {
-      console.log('TCL: getPermissions -> permission', permission);
       if (permission === 'authorized') {
         return true;
       }
