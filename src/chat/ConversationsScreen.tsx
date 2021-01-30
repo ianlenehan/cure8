@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Alert, LayoutAnimation } from 'react-native';
-import { useQuery, useMutation } from 'react-apollo';
-import gql from 'graphql-tag';
+import { useQuery, useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
 import { Icon } from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
 

@@ -6,8 +6,8 @@ import {
   ScrollView,
   TouchableOpacity
 } from 'react-native';
-import { useQuery } from 'react-apollo';
-import gql from 'graphql-tag';
+import { useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
 import moment from 'moment';
 import { get } from 'lodash';
 

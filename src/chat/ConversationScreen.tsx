@@ -1,19 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  SectionList,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform
-} from 'react-native';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { StyleSheet, Text, View, SectionList, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { Icon } from 'react-native-elements';
 import firestore from '@react-native-firebase/firestore';
 import moment from 'moment';
 import { uniq } from 'lodash';
-import { useQuery, useMutation } from 'react-apollo';
+import { useQuery, useMutation } from '@apollo/client';
 import gql from 'graphql-tag';
+import getSectionItemLayout from './helpers';
+import useHookWithRefCallback from './useHookWithRefCallback';
 
 import useBoolean from '../hooks/useBoolean';
 
@@ -35,14 +29,8 @@ const FETCH_CURRENT_USER = gql`
 `;
 
 const SEND_MESSAGE_NOTIFICATION = gql`
-  mutation SendMessageNotification(
-    $conversationId: String!
-    $message: String!
-  ) {
-    sendMessageNotification(
-      conversationId: $conversationId
-      message: $message
-    ) {
+  mutation SendMessageNotification($conversationId: String!, $message: String!) {
+    sendMessageNotification(conversationId: $conversationId, message: $message) {
       conversation {
         id
       }
@@ -64,18 +52,14 @@ const ConversationScreen = ({ route }: any) => {
   const [message, setMessage] = useState<string>();
   const [messages, setMessages] = useState<Message[]>([]);
 
+  const [listRef] = useHookWithRefCallback();
+
   const { conversationId } = route.params;
 
   const { data, loading } = useQuery(FETCH_CURRENT_USER);
-  const [sendMessageNotification, { error }] = useMutation(
-    SEND_MESSAGE_NOTIFICATION
-  );
+  const [sendMessageNotification, { error }] = useMutation(SEND_MESSAGE_NOTIFICATION);
 
-  const [
-    loadingMessages,
-    startLoadingMessages,
-    stopLoadingMessages
-  ] = useBoolean(false);
+  const [loadingMessages, startLoadingMessages, stopLoadingMessages] = useBoolean(false);
 
   const messageRef = firestore().collection('messages');
 
@@ -97,23 +81,22 @@ const ConversationScreen = ({ route }: any) => {
         });
         setMessages(updatedMessages);
         stopLoadingMessages();
-        console.log('unsubscribe -> updatedMessages', updatedMessages);
       });
 
     return () => unsubscribe();
-  }, []);
+  }, [conversationId]);
 
-  if (loading || loadingMessages) return <Spinner />;
-
-  const { currentUser } = data;
-
-  const getMessageSections = () => {
+  const messageSections = useMemo(() => {
     const sections = uniq(messages.map(message => message.date));
     return sections.map(section => {
       const data = messages.filter(message => message.date === section);
       return { title: section, data };
     });
-  };
+  }, [messages]);
+
+  if (loading || loadingMessages) return <Spinner />;
+
+  const { currentUser } = data;
 
   const handleNewMessage = async () => {
     const newMessage = {
@@ -155,12 +138,50 @@ const ConversationScreen = ({ route }: any) => {
     }
   };
 
+  // const getItemLayout = (data, index) => {
+  //   const linesCount = Math.ceil(data.text.length / 32);
+
+  //   const rowHasName = data.userId !== currentUser.id;
+  //   const baseHeight = rowHasName ? 83 : 65;
+  //   const itemHeight = (linesCount - 1) * 21 + baseHeight;
+  //   return {
+  //     length: itemHeight,
+  //     offset: itemHeight * index,
+  //     index
+  //   };
+  // };
+
+  // const getItemLayout = getSectionItemLayout({
+  //   // The height of the row with rowData at the given sectionIndex and rowIndex
+  //   getItemHeight: (rowData, sectionIndex, rowIndex) => {
+  //     console.log('rowIndex', rowIndex);
+  //     console.log('rowData', rowData);
+  //     console.log('sectionIndex', sectionIndex);
+  //     const linesCount = Math.ceil(rowData.text.length / 32);
+  //     console.log('linesCount', linesCount);
+  //     const rowHasName = rowData.userId !== currentUser.id;
+  //     const baseHeight = rowHasName ? 83 : 65;
+  //     return (linesCount - 1) * 21 + baseHeight;
+  //     // console.log('rowHeight', rowHeight);
+  //     // console.log('rowHasName', rowHasName);
+  //     // return sectionIndex === 0 ? 100 : 50;
+  //   },
+
+  //   // These five properties are optional
+  //   getSeparatorHeight: () => 0, // The height of your separators between items
+  //   getSectionHeaderHeight: () => 17.5, // The height of your section headers
+  //   getSectionFooterHeight: () => 0 // The height of your section footers
+  //   // listHeaderHeight: 40, // The height of your header
+  //   // listFooterHeight: 20 // The height of your footer
+  // });
+
   return (
     <View style={styles.container}>
       <View style={styles.conversationContainer}>
         {renderContent()}
         <SectionList
-          sections={getMessageSections()}
+          ref={listRef}
+          sections={messageSections}
           keyExtractor={item => item.id}
           renderItem={renderChatBubble}
           renderSectionHeader={({ section: { title } }) => (
@@ -176,19 +197,8 @@ const ConversationScreen = ({ route }: any) => {
         style={styles.chatFooter}
         keyboardVerticalOffset={90}
         behavior={Platform.OS == 'ios' ? 'padding' : 'height'}>
-        <TextInput
-          style={styles.input}
-          value={message}
-          onChangeText={handleChangeText}
-          placeholder="Type message..."
-        />
-        <Icon
-          name="arrow-circle-right"
-          type="font-awesome"
-          color="#fff"
-          size={30}
-          onPress={handleNewMessage}
-        />
+        <TextInput style={styles.input} value={message} onChangeText={handleChangeText} placeholder="Type message..." />
+        <Icon name="arrow-circle-right" type="font-awesome" color="#fff" size={30} onPress={handleNewMessage} />
       </KeyboardAvoidingView>
     </View>
   );

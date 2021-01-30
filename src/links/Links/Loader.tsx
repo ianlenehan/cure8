@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery, useMutation } from 'react-apollo';
+import { useQuery, useMutation } from '@apollo/client';
 
 import useAppContext from '../../hooks/useAppContext';
 import useToast from '../../hooks/useToast';

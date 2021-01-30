@@ -1,74 +1,40 @@
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  FunctionComponent
-} from 'react';
+import React, { useState } from 'react';
 import { View } from 'react-native';
-import auth from '@react-native-firebase/auth';
-import { useQuery, useMutation } from 'react-apollo';
-import gql from 'graphql-tag';
-import AppContext from '../utils/AppContext';
+import { useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
+
 import { Container, Input, Header, Spacer, Button, Spinner } from '../common';
 
-const USER_QUERY = gql`
-  query user($phone: String!) {
-    user(phone: $phone) {
-      name
-      id
-    }
-  }
-`;
-
-const CREATE_USER_MUTATION = gql`
-  mutation CreateUser(
-    $firstName: String!
-    $lastName: String!
-    $phone: String!
-  ) {
-    createUser(firstName: $firstName, lastName: $lastName, phone: $phone) {
+const UPDATE_USER_MUTATION = gql`
+  mutation UpdateUser($firstName: String!, $lastName: String!, $phone: String!) {
+    updateUser(firstName: $firstName, lastName: $lastName, phone: $phone) {
       user {
         id
         name
+        phone
       }
     }
   }
 `;
 
-const CompleteSignUpScreen: FunctionComponent = () => {
+type Props = {
+  onUpdate: () => void;
+  phone: string | undefined;
+};
+
+const CompleteSignUpScreen = ({ onUpdate, phone }: Props) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
 
-  const { authUser, setAuthUser } = useContext(AppContext);
-  const { data, loading } = useQuery(USER_QUERY, {
-    variables: { phone: authUser.phoneNumber }
-  });
-
-  useEffect(() => {
-    if (data && data.user) {
-      updateAuthUserName(data.user.name);
-    }
-  }, [data]);
-
-  const [createUser] = useMutation(CREATE_USER_MUTATION);
+  const [updateUser, { loading }] = useMutation(UPDATE_USER_MUTATION);
 
   if (loading) return <Spinner />;
 
-  const updateAuthUserName = async (displayName: string) => {
-    await authUser.updateProfile({
-      displayName
-    });
-    const newAuthUser = auth().currentUser;
-    setAuthUser(newAuthUser);
-  };
-
   const handleSubmit = async () => {
-    if (authUser) {
-      await updateAuthUserName(`${firstName} ${lastName}`);
-      await createUser({
-        variables: { firstName, lastName, phone: authUser.phoneNumber }
-      });
-    }
+    await updateUser({
+      variables: { firstName, lastName, phone }
+    });
+    onUpdate();
   };
 
   return (
@@ -96,10 +62,7 @@ const CompleteSignUpScreen: FunctionComponent = () => {
         />
         <Spacer size={4} />
 
-        <Button
-          disabled={!firstName || !lastName}
-          bordered
-          onPress={handleSubmit}>
+        <Button disabled={!firstName || !lastName} bordered onPress={handleSubmit}>
           Continue
         </Button>
       </View>

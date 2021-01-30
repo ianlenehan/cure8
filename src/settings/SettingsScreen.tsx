@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, StyleSheet, Switch } from 'react-native';
-import auth from '@react-native-firebase/auth';
-import { useQuery, useMutation } from 'react-apollo';
-import gql from 'graphql-tag';
+import { useQuery, useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
+
+import useAppContext from '../hooks/useAppContext';
 
 import { Container, AppText, Button, Spinner, Spacer } from '../common';
 
@@ -48,15 +49,13 @@ const SettingsScreen = ({ route }: { route: any }) => {
 
   const [toggleNotification] = useMutation(TOGGLE_NOTIFICATION);
 
+  const { logout } = useAppContext();
+
   if (loading || !data) return <Spinner />;
 
   const { notify, notifyNewLink, notifyNewMessage, notifyNewRating } = data.pushToken;
 
   const { name, phone } = data.appUser;
-
-  const handleLogout = () => {
-    auth().signOut();
-  };
 
   const handleToggleSetting = async (field: string) => {
     await toggleNotification({ variables: { field, tokenId } });
@@ -102,7 +101,7 @@ const SettingsScreen = ({ route }: { route: any }) => {
           />
         </View>
       </View>
-      <Button size="small" onPress={handleLogout}>
+      <Button size="small" onPress={logout}>
         Logout
       </Button>
     </Container>

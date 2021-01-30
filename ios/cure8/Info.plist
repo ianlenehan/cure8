@@ -36,7 +36,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -55,6 +55,8 @@
 	<key>NSContactsUsageDescription</key>
 	<string>To add contacts to share links with</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We require your location only to set the country code when signing in and adding a new contact</string>
+	<key>NSLocationAlwaysUsageDescription</key>
 	<string>We require your location only to set the country code when signing in and adding a new contact</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We require your location only to set the country code when signing in and adding a new contact</string>

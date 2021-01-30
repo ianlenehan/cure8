@@ -1,7 +1,7 @@
 import React, { useState, useEffect, FunctionComponent } from 'react';
 import { View, LayoutAnimation } from 'react-native';
-import { useMutation } from 'react-apollo';
-import gql from 'graphql-tag';
+import { useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
 
 import { Input, Overlay } from '../common';
 import ContactsPickList from './ContactsPickList';

@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { Alert, FlatList, View, StyleSheet } from 'react-native';
-import { useMutation } from 'react-apollo';
-import gql from 'graphql-tag';
+import { useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
 
 import useToast from '../hooks/useToast';
 import { Container, Spinner, ContactRow, EmptyPage } from '../common';

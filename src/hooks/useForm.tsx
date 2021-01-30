@@ -1,9 +1,6 @@
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect } from 'react';
 
-export const useForm = (
-  onSubmitCallback: (values: any) => any,
-  validate: (values: any) => any
-) => {
+export const useForm = (onSubmitCallback: (values: any) => any, validate: (values: any) => any) => {
   const [values, setValues] = useState({});
   const [errors, setErrors] = useState({} as any);
   const [hasErrors, setHasErrors] = useState(false);
@@ -17,10 +14,14 @@ export const useForm = (
   useEffect(() => {
     const noErrors = !hasErrors;
     if (noErrors && isSubmitting) {
-      onSubmitCallback(values);
-      setValues({});
+      submitForm();
     }
   }, [errors, isSubmitting]);
+
+  const submitForm = async () => {
+    await onSubmitCallback(values);
+    setValues({});
+  };
 
   /**
    * Here we are checking for the presence of errors in a passed in errors object.
@@ -28,9 +29,7 @@ export const useForm = (
    * We are also returning the boolean so it can be used immediately if necessary.
    */
   const checkForErrors = (errorsObject: {}) => {
-    const errorsExist =
-      Object.keys(errorsObject).length > 0 &&
-      errorsObject.constructor === Object;
+    const errorsExist = Object.keys(errorsObject).length > 0 && errorsObject.constructor === Object;
     setHasErrors(errorsExist);
     return errorsExist;
   };

@@ -1,8 +1,8 @@
 import React, { FC, useState, useEffect } from 'react';
 import { Tab, Tabs, TabHeading } from 'native-base';
 import { Icon, Button as BaseButton } from 'react-native-elements';
-import { useQuery } from 'react-apollo';
-import gql from 'graphql-tag';
+import { useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
 
 import { Container, AppText, colors, Spinner } from '../common';
 import ContactsTab from './ContactsTab';
@@ -89,11 +89,7 @@ const ContactsScreen: FC<Props> = ({ navigation }) => {
               <AppText size="medium">Groups</AppText>
             </TabHeading>
           }>
-          <GroupsTab
-            navigate={navigation.navigate}
-            onDeleteCompletion={toggleEditMode}
-            {...{ editMode, contacts }}
-          />
+          <GroupsTab navigate={navigation.navigate} onDeleteCompletion={toggleEditMode} {...{ editMode, contacts }} />
         </Tab>
       </Tabs>
     </Container>

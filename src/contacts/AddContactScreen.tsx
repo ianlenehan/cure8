@@ -6,10 +6,10 @@ import CountryPicker, {
   CountryCode,
   getCallingCode
 } from 'react-native-country-picker-modal';
-import { useMutation } from 'react-apollo';
-import gql from 'graphql-tag';
+import { useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
 
-import { rootURL } from '../../App';
+import { rootURL } from '../../env';
 import { AppText, colors, ContactRow } from '../common';
 
 import useAppContext from '../hooks/useAppContext';

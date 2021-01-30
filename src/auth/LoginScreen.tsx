@@ -1,93 +1,135 @@
-import React, { FC, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, TextInput, LayoutAnimation } from 'react-native';
-import auth from '@react-native-firebase/auth';
+import axios from 'axios';
+import * as RNLocalize from 'react-native-localize';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
-import PhoneInput, { ReactNativePhoneInputProps } from 'react-native-phone-input';
+import PhoneInput from 'react-native-phone-input';
 
 import { Container, PageWrapper, Logo, Input, InputLabel, Header, Spacer, Button, AppText } from '../common';
+
 import useBoolean from '../hooks/useBoolean';
 
-const testPhoneNumber = '+611112223333';
+import { rootURL } from '../../env';
+
+const apiUrl = `${rootURL}api/v1/`;
+
+const testPhoneNumber = '+61112223333';
 // pin code is 123456
 
-const LoginScreen: FC = () => {
-  const [confirm, setConfirm] = useState<any>(null);
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [isValid, setIsValid] = useState(false);
-  const [otpCode, setOtpCode] = useState('');
-  const [error, setError] = useState('');
+type User = {
+  id: string;
+  phone: string;
+};
 
-  const [loading, startLoading, cancelLoading] = useBoolean(false);
+type Props = {
+  registrationRequired: boolean;
+  setCurrentUser: (user: User) => void;
+  setRegistrationRequired: (registrationRequired: boolean) => void;
+  setToken: (token: string) => void;
+};
+
+const LoginScreen = (props: Props) => {
+  const { registrationRequired, setCurrentUser, setRegistrationRequired, setToken } = props;
 
   const phoneRef = useRef<any>(null);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [showingCodeField, showCodeField] = useBoolean(false);
+  const [isValid, setIsValid] = useState(false);
+  const [loading, startLoading, stopLoading] = useBoolean(false);
+  const [error, setError] = useState('');
+  const [otpCode, setOtpCode] = useState('');
 
   const handlePhoneChange = () => {
-    if (!phoneRef || !phoneRef.current) return null;
-    const ref = phoneRef.current;
+    if (!phoneRef.current) return null;
+    const type = phoneRef.current.getNumberType();
+    const valid = phoneRef.current.isValidNumber();
+    console.log('handlePhoneChange -> valid', valid);
+    const fullPhone = phoneRef.current.getValue();
+    setPhoneNumber(fullPhone);
 
-    const valid = ref.isValidNumber();
-    const number = ref.getValue();
-    const isValid = phoneNumber === testPhoneNumber || valid;
+    if (valid) {
+      setIsValid(fullPhone === testPhoneNumber || valid);
+    }
 
-    setPhoneNumber(number);
-    setIsValid(isValid);
+    if (['MOBILE', 'FIXED_LINE_OR_MOBILE'].includes(type)) {
+      setError('');
+    } else {
+      setError('Phone number must be a mobile number that can receive SMS');
+    }
   };
 
   const handleGetCode = async () => {
     if (isValid) {
       startLoading();
-      const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+      try {
+        const res = await axios.post(`${apiUrl}request_password`, {
+          phone: phoneNumber
+        });
 
+        setRegistrationRequired(res.data.registration_required);
+        setError('');
+        showCodeField();
+      } catch (error) {
+        console.error('handleGetCode -> error', error);
+        setError(error.message);
+      }
+
+      stopLoading();
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      setConfirm(confirmation);
-      cancelLoading();
     }
   };
 
-  const handleVerifyCode = async () => {
+  const handleLogin = async () => {
     startLoading();
     try {
-      await confirm.confirm(otpCode);
-    } catch (err) {
-      setError(`'The SMS verification code you entered is invalid.' ${err}`);
+      const res = await axios.post(`${apiUrl}authenticate`, {
+        phone: phoneNumber,
+        code: otpCode
+      });
+      stopLoading();
+      setCurrentUser(res.data.current_user);
+      setToken(res.data.auth_token);
+    } catch (error) {
+      console.log('handleLogin -> error', error);
+      setError('The SMS verification code you entered is invalid.');
+      stopLoading();
     }
-    cancelLoading();
   };
 
   const handleCodeChange = (code: string) => {
-    setOtpCode(code);
     setError('');
-  };
-
-  const renderCodeInput = () => {
-    if (!confirm) {
-      return null;
-    }
-
-    return (
-      <View style={styles.codeInputWrapper}>
-        <Spacer size={4} />
-        <TextInput keyboardType="number-pad" style={styles.codeInput} onChangeText={handleCodeChange} />
-        <AppText color="white" style={{ textAlign: 'center' }}>
-          Enter One Time Password that was sent to your mobile via SMS.
-        </AppText>
-      </View>
-    );
+    setOtpCode(code);
   };
 
   const renderButton = () => {
-    if (confirm) {
+    if (showingCodeField) {
       return (
-        <Button {...{ loading }} onPress={handleVerifyCode} bordered>
-          Verify Code
+        <Button loading={loading} onPress={handleLogin} bordered>
+          {registrationRequired ? 'Create Account' : 'Login'}
         </Button>
       );
     }
 
     return (
-      <Button {...{ loading }} disabled={!isValid} onPress={handleGetCode} bordered>
+      <Button loading={loading} disabled={!isValid} onPress={handleGetCode} bordered>
         Get Code
       </Button>
+    );
+  };
+
+  const renderError = () => {
+    if (!error) return null;
+
+    return (
+      <AppText
+        style={{
+          fontSize: 14,
+          color: 'red',
+          textAlign: 'center',
+          margin: 25
+        }}>
+        {error}
+      </AppText>
     );
   };
 
@@ -95,6 +137,9 @@ const LoginScreen: FC = () => {
   if (phoneNumber.length > 0) {
     label = `Mobile Number - ${phoneNumber}`;
   }
+
+  const [locale] = RNLocalize.getLocales();
+  const { countryCode } = locale;
 
   return (
     <Container>
@@ -105,7 +150,7 @@ const LoginScreen: FC = () => {
           <Spacer size={4} />
           <InputLabel label={label} color="white" />
           <PhoneInput
-            initialCountry="au"
+            initialCountry={'au'}
             flagStyle={styles.flagStyle}
             textComponent={Input}
             allowZeroAfterCountryCode={false}
@@ -113,12 +158,18 @@ const LoginScreen: FC = () => {
             style={{ width: '100%' }}
             ref={phoneRef}
           />
-
-          {renderCodeInput()}
-
-          {!!error && <AppText style={{ fontSize: 14, color: 'red' }}>{error}</AppText>}
-
+          {!!showingCodeField && (
+            <View style={styles.codeInputWrapper}>
+              <Spacer size={4} />
+              <TextInput keyboardType="number-pad" style={styles.codeInput} onChangeText={handleCodeChange} />
+              <AppText color="white" style={{ textAlign: 'center' }}>
+                Enter One Time Password that was sent to your mobile via SMS.
+              </AppText>
+            </View>
+          )}
+          {renderError()}
           <Spacer size={6} />
+
           {renderButton()}
         </PageWrapper>
         <Logo size="large" />
