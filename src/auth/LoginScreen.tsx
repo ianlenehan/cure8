@@ -43,7 +43,9 @@ const LoginScreen = (props: Props) => {
     if (!phoneRef.current) return null;
     const type = phoneRef.current.getNumberType();
     const valid = phoneRef.current.isValidNumber();
+    console.log('handlePhoneChange -> valid', valid);
     const fullPhone = phoneRef.current.getValue();
+    setPhoneNumber(fullPhone);
 
     if (valid) {
       setIsValid(fullPhone === testPhoneNumber || valid);
@@ -51,7 +53,6 @@ const LoginScreen = (props: Props) => {
 
     if (['MOBILE', 'FIXED_LINE_OR_MOBILE'].includes(type)) {
       setError('');
-      setPhoneNumber(fullPhone);
     } else {
       setError('Phone number must be a mobile number that can receive SMS');
     }
@@ -149,7 +150,7 @@ const LoginScreen = (props: Props) => {
           <Spacer size={4} />
           <InputLabel label={label} color="white" />
           <PhoneInput
-            initialCountry={countryCode.toLowerCase()}
+            initialCountry={'au'}
             flagStyle={styles.flagStyle}
             textComponent={Input}
             allowZeroAfterCountryCode={false}

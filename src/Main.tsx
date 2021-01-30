@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { StatusBar, StyleSheet, View } from 'react-native';
+import { StatusBar, StyleSheet, View, Text } from 'react-native';
 import { Root } from 'native-base';
-import firebase from 'react-native-firebase';
+import auth from '@react-native-firebase/auth';
 import { ApolloProvider } from '@apollo/client';
 import AsyncStorage from '@react-native-community/async-storage';
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
@@ -100,10 +100,10 @@ const Main = ({ logout, storedToken, setToken }: Props) => {
 
   const signIntoFirebase = async () => {
     try {
-      const user = firebase.auth().currentUser;
+      const user = auth().currentUser;
 
       if (!user) {
-        await firebase.auth().signInWithCustomToken(storedToken || '')
+        await auth().signInWithCustomToken(storedToken || '')
       }
     } catch (error) {
       // TODO request new token if necessary
@@ -149,7 +149,8 @@ const Main = ({ logout, storedToken, setToken }: Props) => {
             newContact,
             setNewContact,
             selectedConversationId,
-            setSelectedConversationId
+            setSelectedConversationId,
+            setCurrentUser
           }}>
           <StatusBar barStyle="light-content" />
           <View style={styles.container}>

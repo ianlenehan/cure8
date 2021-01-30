@@ -4,7 +4,7 @@ import { Icon } from 'react-native-elements';
 import firestore from '@react-native-firebase/firestore';
 import moment from 'moment';
 import { uniq } from 'lodash';
-import { useQuery, useMutation } from 'react-apollo';
+import { useQuery, useMutation } from '@apollo/client';
 import gql from 'graphql-tag';
 import getSectionItemLayout from './helpers';
 import useHookWithRefCallback from './useHookWithRefCallback';
