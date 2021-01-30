@@ -4,6 +4,7 @@ import axios from 'axios';
 import * as RNLocalize from 'react-native-localize';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import PhoneInput from 'react-native-phone-input';
+import auth from '@react-native-firebase/auth';
 
 import { Container, PageWrapper, Logo, Input, InputLabel, Header, Spacer, Button, AppText } from '../common';
 
@@ -38,12 +39,12 @@ const LoginScreen = (props: Props) => {
   const [loading, startLoading, stopLoading] = useBoolean(false);
   const [error, setError] = useState('');
   const [otpCode, setOtpCode] = useState('');
+  const [confirm, setConfirm] = useState<any>(null);
 
   const handlePhoneChange = () => {
     if (!phoneRef.current) return null;
     const type = phoneRef.current.getNumberType();
     const valid = phoneRef.current.isValidNumber();
-    console.log('handlePhoneChange -> valid', valid);
     const fullPhone = phoneRef.current.getValue();
     setPhoneNumber(fullPhone);
 
@@ -61,21 +62,24 @@ const LoginScreen = (props: Props) => {
   const handleGetCode = async () => {
     if (isValid) {
       startLoading();
-      try {
-        const res = await axios.post(`${apiUrl}request_password`, {
-          phone: phoneNumber
-        });
+      const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+      console.log("🚀 ~ file: LoginScreen.tsx ~ line 66 ~ handleGetCode ~ confirmation", confirmation)
+      // try {
+      //   const res = await axios.post(`${apiUrl}request_password`, {
+      //     phone: phoneNumber
+      //   });
 
-        setRegistrationRequired(res.data.registration_required);
-        setError('');
-        showCodeField();
-      } catch (error) {
-        console.error('handleGetCode -> error', error);
-        setError(error.message);
-      }
+      //   setRegistrationRequired(res.data.registration_required);
+      //   setError('');
+      //   showCodeField();
+      // } catch (error) {
+      //   console.error('handleGetCode -> error', error);
+      //   setError(error.message);
+      // }
 
-      stopLoading();
+      // stopLoading();
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setConfirm(confirmation);
     }
   };
 
@@ -150,7 +154,7 @@ const LoginScreen = (props: Props) => {
           <Spacer size={4} />
           <InputLabel label={label} color="white" />
           <PhoneInput
-            initialCountry={'au'}
+            initialCountry={'gb'}
             flagStyle={styles.flagStyle}
             textComponent={Input}
             allowZeroAfterCountryCode={false}
