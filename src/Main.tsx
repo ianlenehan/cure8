@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
-import OneSignal from 'react-native-onesignal';
+// import OneSignal from 'react-native-onesignal';
 
 import AppContext from './utils/AppContext';
 import RootTab from './navigation/RootTab';
@@ -38,21 +38,21 @@ const Main = ({ logout, storedToken, setToken }: Props) => {
   const [selectedConversationId, setSelectedConversationId] = useState('');
   const [currentPushId, setCurrentPushId] = useState('');
 
-  useEffect(() => {
-    OneSignal.getPermissionSubscriptionState((status: any) => {
-      checkNotificationStatus(status);
-    });
+  // useEffect(() => {
+  //   OneSignal.getPermissionSubscriptionState((status: any) => {
+  //     checkNotificationStatus(status);
+  //   });
 
-    OneSignal.addEventListener('received', handleReceived);
-    OneSignal.addEventListener('opened', handleOpened);
-    OneSignal.addEventListener('ids', handleIds);
+  //   OneSignal.addEventListener('received', handleReceived);
+  //   OneSignal.addEventListener('opened', handleOpened);
+  //   OneSignal.addEventListener('ids', handleIds);
 
-    return () => {
-      OneSignal.removeEventListener('received', handleReceived);
-      OneSignal.removeEventListener('opened', handleOpened);
-      OneSignal.removeEventListener('ids', handleIds);
-    };
-  }, []);
+  //   return () => {
+  //     OneSignal.removeEventListener('received', handleReceived);
+  //     OneSignal.removeEventListener('opened', handleOpened);
+  //     OneSignal.removeEventListener('ids', handleIds);
+  //   };
+  // }, []);
 
   const handleReceived = (event: any) => {
     console.log('received', event);

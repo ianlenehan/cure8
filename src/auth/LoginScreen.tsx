@@ -6,11 +6,11 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview'
 import PhoneInput from 'react-native-phone-input';
 import auth from '@react-native-firebase/auth';
 
-import { Container, PageWrapper, Logo, Input, InputLabel, Header, Spacer, Button, AppText } from '../common';
-
-import useBoolean from '../hooks/useBoolean';
+import { Container, PageWrapper, Logo, Input, InputLabel, Header, Spacer, Button, AppText } from '@cure8/common';
+import useBoolean from '@cure8/hooks/useBoolean';
 
 import { rootURL } from '../../env';
+import useFirestore from '@cure8/hooks/useFirestore';
 
 const apiUrl = `${rootURL}api/v1/`;
 
@@ -32,9 +32,10 @@ type Props = {
 const LoginScreen = (props: Props) => {
   const { registrationRequired, setCurrentUser, setRegistrationRequired, setToken } = props;
 
+  const { firestore, getDocument } = useFirestore()
+
   const phoneRef = useRef<any>(null);
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [showingCodeField, showCodeField] = useBoolean(false);
   const [isValid, setIsValid] = useState(false);
   const [loading, startLoading, stopLoading] = useBoolean(false);
   const [error, setError] = useState('');
@@ -44,8 +45,8 @@ const LoginScreen = (props: Props) => {
   const handlePhoneChange = () => {
     if (!phoneRef.current) return null;
     const type = phoneRef.current.getNumberType();
-    const valid = phoneRef.current.isValidNumber();
     const fullPhone = phoneRef.current.getValue();
+    const valid = fullPhone === testPhoneNumber || phoneRef.current.isValidNumber();
     setPhoneNumber(fullPhone);
 
     if (valid) {
@@ -63,25 +64,30 @@ const LoginScreen = (props: Props) => {
     if (isValid) {
       startLoading();
       const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-      console.log("🚀 ~ file: LoginScreen.tsx ~ line 66 ~ handleGetCode ~ confirmation", confirmation)
-      // try {
-      //   const res = await axios.post(`${apiUrl}request_password`, {
-      //     phone: phoneNumber
-      //   });
-
-      //   setRegistrationRequired(res.data.registration_required);
-      //   setError('');
-      //   showCodeField();
-      // } catch (error) {
-      //   console.error('handleGetCode -> error', error);
-      //   setError(error.message);
-      // }
-
-      // stopLoading();
+      stopLoading();
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       setConfirm(confirmation);
     }
   };
+
+  const handleVerifyCode = async () => {
+    startLoading()
+    try {
+      const confirmResult = await confirm.confirm(otpCode);
+      
+      const authUser = confirmResult.user;
+      const docRef = firestore().collection('users').doc(authUser.uid)
+      const user = await getDocument(docRef)
+
+      if (user.exists) {
+        // log user in
+      }
+      stopLoading()
+    } catch (error) {
+      stopLoading()
+      setError(`'The SMS verification code you entered is invalid.' ${error}`);
+    }
+  }
 
   const handleLogin = async () => {
     startLoading();
@@ -106,9 +112,9 @@ const LoginScreen = (props: Props) => {
   };
 
   const renderButton = () => {
-    if (showingCodeField) {
+    if (confirm) {
       return (
-        <Button loading={loading} onPress={handleLogin} bordered>
+        <Button loading={loading} onPress={handleVerifyCode} bordered>
           {registrationRequired ? 'Create Account' : 'Login'}
         </Button>
       );
@@ -151,10 +157,12 @@ const LoginScreen = (props: Props) => {
         <PageWrapper>
           <Spacer size={2} />
           <Header color="white">Login</Header>
+          <Spacer />
+          <AppText align="center" color="white">Enter your phone number below to login to an existing account or to create a new account.</AppText>
           <Spacer size={4} />
           <InputLabel label={label} color="white" />
           <PhoneInput
-            initialCountry={'gb'}
+            initialCountry={'au'}
             flagStyle={styles.flagStyle}
             textComponent={Input}
             allowZeroAfterCountryCode={false}
@@ -162,7 +170,7 @@ const LoginScreen = (props: Props) => {
             style={{ width: '100%' }}
             ref={phoneRef}
           />
-          {!!showingCodeField && (
+          {!!confirm && (
             <View style={styles.codeInputWrapper}>
               <Spacer size={4} />
               <TextInput keyboardType="number-pad" style={styles.codeInput} onChangeText={handleCodeChange} />
