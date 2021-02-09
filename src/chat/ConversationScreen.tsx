@@ -65,6 +65,7 @@ const ConversationScreen = ({ route }: any) => {
 
   useEffect(() => {
     startLoadingMessages();
+
     const unsubscribe = messageRef
       .orderBy('createdAt')
       .where('conversationId', '==', conversationId)

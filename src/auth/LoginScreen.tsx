@@ -1,6 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, FC } from 'react';
 import { View, TextInput, LayoutAnimation } from 'react-native';
-import axios from 'axios';
 import * as RNLocalize from 'react-native-localize';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import PhoneInput from 'react-native-phone-input';
@@ -8,31 +7,18 @@ import auth from '@react-native-firebase/auth';
 
 import { Container, PageWrapper, Logo, Input, InputLabel, Header, Spacer, Button, AppText } from '@cure8/common';
 import useBoolean from '@cure8/hooks/useBoolean';
-
-import { rootURL } from '../../env';
 import useFirestore from '@cure8/hooks/useFirestore';
-
-const apiUrl = `${rootURL}api/v1/`;
 
 const testPhoneNumber = '+61112223333';
 // pin code is 123456
 
-type User = {
-  id: string;
-  phone: string;
-};
-
 type Props = {
-  registrationRequired: boolean;
-  setCurrentUser: (user: User) => void;
-  setRegistrationRequired: (registrationRequired: boolean) => void;
-  setToken: (token: string) => void;
+  onCreateAuthAccount: () => void;
+  setCurrentUser: (currentUser: any) => void;
 };
 
-const LoginScreen = (props: Props) => {
-  const { registrationRequired, setCurrentUser, setRegistrationRequired, setToken } = props;
-
-  const { firestore, getDocument } = useFirestore()
+const LoginScreen: FC<Props> = ({ onCreateAuthAccount, setCurrentUser }) => {
+  const { firestore, getDocument } = useFirestore();
 
   const phoneRef = useRef<any>(null);
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -71,38 +57,23 @@ const LoginScreen = (props: Props) => {
   };
 
   const handleVerifyCode = async () => {
-    startLoading()
-    try {
-      const confirmResult = await confirm.confirm(otpCode);
-      
-      const authUser = confirmResult.user;
-      const docRef = firestore().collection('users').doc(authUser.uid)
-      const user = await getDocument(docRef)
-
-      if (user.exists) {
-        // log user in
-      }
-      stopLoading()
-    } catch (error) {
-      stopLoading()
-      setError(`'The SMS verification code you entered is invalid.' ${error}`);
-    }
-  }
-
-  const handleLogin = async () => {
     startLoading();
     try {
-      const res = await axios.post(`${apiUrl}authenticate`, {
-        phone: phoneNumber,
-        code: otpCode
-      });
+      const confirmResult = await confirm.confirm(otpCode);
+      const authUser = confirmResult.user;
+      const docRef = firestore().collection('users').doc(authUser.uid);
+      const user = await getDocument(docRef);
+
+      if (user.exists) {
+        setCurrentUser(user);
+      } else {
+        onCreateAuthAccount();
+        setCurrentUser({ id: authUser.uid, phoneNumber });
+      }
       stopLoading();
-      setCurrentUser(res.data.current_user);
-      setToken(res.data.auth_token);
     } catch (error) {
-      console.log('handleLogin -> error', error);
-      setError('The SMS verification code you entered is invalid.');
       stopLoading();
+      setError(`'The SMS verification code you entered is invalid.' ${error}`);
     }
   };
 
@@ -115,7 +86,7 @@ const LoginScreen = (props: Props) => {
     if (confirm) {
       return (
         <Button loading={loading} onPress={handleVerifyCode} bordered>
-          {registrationRequired ? 'Create Account' : 'Login'}
+          Continue
         </Button>
       );
     }
@@ -136,7 +107,7 @@ const LoginScreen = (props: Props) => {
           fontSize: 14,
           color: 'red',
           textAlign: 'center',
-          margin: 25
+          margin: 25,
         }}>
         {error}
       </AppText>
@@ -158,7 +129,9 @@ const LoginScreen = (props: Props) => {
           <Spacer size={2} />
           <Header color="white">Login</Header>
           <Spacer />
-          <AppText align="center" color="white">Enter your phone number below to login to an existing account or to create a new account.</AppText>
+          <AppText align="center" color="white">
+            Enter your phone number below to login to an existing account or to create a new account.
+          </AppText>
           <Spacer size={4} />
           <InputLabel label={label} color="white" />
           <PhoneInput
@@ -196,7 +169,7 @@ const styles = {
   keyboardScrollViewStyle: {
     justifyContent: 'space-between',
     alignItems: 'center',
-    flex: 1
+    flex: 1,
   },
   codeInputWrapper: { marginLeft: 20, marginRight: 20 },
   codeInput: {
@@ -205,10 +178,10 @@ const styles = {
     borderBottomColor: 'white',
     borderBottomWidth: 1,
     marginBottom: 20,
-    color: 'white'
+    color: 'white',
   },
   flagStyle: {
     width: 50,
-    height: 30
-  }
+    height: 30,
+  },
 };

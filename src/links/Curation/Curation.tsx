@@ -1,8 +1,12 @@
-import React, { FunctionComponent } from 'react';
+import React, { FC } from 'react';
 import { Alert, Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { Icon } from 'react-native-elements';
 import moment from 'moment';
-import { AppText, Tag, colors } from '../common';
+
+import { AppText, Tag, colors } from '@cure8/common';
+import { CurationType } from '@cure8/links/types';
+
+import useApi from './useApi';
 
 type TagType = {
   id: string;
@@ -16,38 +20,33 @@ type SharedWithType = {
 };
 
 type Props = {
-  comment?: string;
-  curatedBy: string;
-  date: any;
-  filteredTagIds: string[];
-  image: string;
+  curation: CurationType;
   onPress: () => void;
-  onTagPress: (tag: TagType) => void;
+  // onTagPress: (tag: TagType) => void;
   rating?: string;
   tags?: any;
-  title: string;
-  sharedWith?: SharedWithType[];
 };
 
-const Card: FunctionComponent<Props> = props => {
+const Card: FC<Props> = (props) => {
   const {
-    comment,
-    curatedBy,
-    date,
-    filteredTagIds = [],
-    image,
+    curation,
     onPress,
-    onTagPress,
+    // onTagPress,
     rating,
-    sharedWith = [],
     tags,
-    title
   } = props;
 
+  const { date, linkId, comment, url } = curation;
+
+  const { curatorName, sharedWith = [], title, image, loading } = useApi(linkId);
+  const filteredTagIds = [];
+
+  if (loading) {
+    return null;
+  }
+
   const formatDate = (date: string) => {
-    return moment(date)
-      .local()
-      .from(moment());
+    return moment(date).local().from(moment());
   };
 
   const handleShowSharedWith = () => {
@@ -90,7 +89,7 @@ const Card: FunctionComponent<Props> = props => {
       <View style={styles.textArea}>
         <TouchableOpacity {...{ onPress }}>
           <AppText size="medium" style={styles.centredText}>
-            {title}
+            {title || url}
           </AppText>
         </TouchableOpacity>
         {comment ? (
@@ -102,7 +101,7 @@ const Card: FunctionComponent<Props> = props => {
         <View style={styles.footer}>
           <TouchableWithoutFeedback onPress={handleShowSharedWith}>
             <View style={styles.footerLeft}>
-              <Text style={styles.date}>{`${formatDate(date)} from ${curatedBy}`}</Text>
+              <Text style={styles.date}>{`${formatDate(date)} from ${curatorName}`}</Text>
               {renderSharedWith()}
             </View>
           </TouchableWithoutFeedback>
@@ -129,52 +128,52 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 2
+    shadowRadius: 2,
   },
   image: {
     height: 220,
     paddingBottom: 5,
     borderTopRightRadius: 5,
-    borderTopLeftRadius: 5
+    borderTopLeftRadius: 5,
   },
   centredText: {
-    textAlign: 'center'
+    textAlign: 'center',
   },
   subtitle: {
     fontWeight: '200',
     textAlign: 'center',
-    marginTop: 8
+    marginTop: 8,
   },
   date: {
     fontSize: 11,
     color: 'grey',
-    marginRight: 10
+    marginRight: 10,
   },
   textArea: {
-    padding: 10
+    padding: 10,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    marginTop: 10
+    marginTop: 10,
   },
   footerLeft: {
     flexDirection: 'row',
     flex: 1,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   tagContainer: {
     paddingTop: 5,
     flexDirection: 'row',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
   },
   sharedWith: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   count: {
     fontSize: 10,
-    color: colors.darkerGreen
-  }
+    color: colors.darkerGreen,
+  },
 });

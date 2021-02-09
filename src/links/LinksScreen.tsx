@@ -1,41 +1,30 @@
-import React, { useState } from 'react';
-import { useQuery, useLazyQuery } from '@apollo/client';
+import React, { useState, useEffect } from 'react';
+import { View, Text } from 'react-native';
 import { Icon } from 'react-native-elements';
 
-import { Spinner } from '../common';
+import useCurrentUser from '@cure8/hooks/useCurrentUser';
+import { Spinner } from '@cure8/common';
 
 import Links from './Links';
-import { FETCH_NEW_LINKS, FETCH_ARCHIVED_LINKS } from './graphql';
+import useApi from './useApi';
 
 const LinksScreen = ({ navigation }: any) => {
-  const [page, setPage] = useState(1);
-  const itemCount = page * 10;
+  const { getArchivedLinks, getLinks, links, loading } = useApi();
 
-  const { data, loading, refetch } = useQuery(FETCH_NEW_LINKS, {
-    variables: { showItemCount: itemCount }
-  });
+  // const [page, setPage] = useState(1);
+  // const itemCount = page * 10;
 
-  const [fetchArchivedLinks] = useLazyQuery(FETCH_ARCHIVED_LINKS, {
-    variables: { tagIds: [], showItemCount: itemCount },
-    fetchPolicy: 'network-only'
-  });
-
-  if (loading) return <Spinner />;
-
-  const { curations, hasMorePages } = data;
-
-  const handleLoadMore = () => {
-    if (!hasMorePages) {
-      return null;
-    }
-
-    setPage(page + 1);
-  };
+  if (loading && !links.length) {
+    return <Spinner />;
+  }
 
   return (
     <Links
-      {...{ curations, refetch, fetchArchivedLinks, navigation }}
-      onLoadMore={handleLoadMore}
+      curations={links}
+      refetch={getLinks}
+      fetchArchivedLinks={getArchivedLinks}
+      {...{ navigation }}
+      // onLoadMore={handleLoadMore}
     />
   );
 };

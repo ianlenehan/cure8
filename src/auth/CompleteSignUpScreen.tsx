@@ -1,40 +1,33 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
-import { useMutation } from '@apollo/client';
-import { gql } from '@apollo/client';
+import { Alert, View } from 'react-native';
+import firestore from '@react-native-firebase/firestore';
 
 import { Container, Input, Header, Spacer, Button, Spinner } from '../common';
 
-const UPDATE_USER_MUTATION = gql`
-  mutation UpdateUser($firstName: String!, $lastName: String!, $phone: String!) {
-    updateUser(firstName: $firstName, lastName: $lastName, phone: $phone) {
-      user {
-        id
-        name
-        phone
-      }
-    }
-  }
-`;
-
 type Props = {
+  currentUser: any;
+  setCurrentUser: (user: any) => void;
   onUpdate: () => void;
-  phone: string | undefined;
 };
 
-const CompleteSignUpScreen = ({ onUpdate, phone }: Props) => {
+const CompleteSignUpScreen = ({ onUpdate, currentUser, setCurrentUser }: Props) => {
+  console.log('🚀 ~ file: CompleteSignUpScreen.tsx ~ line 15 ~ CompleteSignUpScreen ~ currentUser', currentUser);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
 
-  const [updateUser, { loading }] = useMutation(UPDATE_USER_MUTATION);
-
-  if (loading) return <Spinner />;
-
   const handleSubmit = async () => {
-    await updateUser({
-      variables: { firstName, lastName, phone }
-    });
-    onUpdate();
+    try {
+      await firestore()
+        .collection('users')
+        .doc(currentUser.id)
+        .set({ firstName, lastName, phoneNumber: currentUser.phoneNumber });
+
+      setCurrentUser({ ...currentUser, firstName, lastName });
+      onUpdate();
+    } catch (error) {
+      console.log('🚀 ~ file: CompleteSignUpScreen.tsx ~ line 23 ~ handleSubmit ~ error', error);
+      Alert.alert('Error', 'There was an error saving your details. Please try again.');
+    }
   };
 
   return (
@@ -76,9 +69,9 @@ const styles = {
   innerContainer: {
     marginLeft: '7.5%',
     marginRight: '7.5%',
-    flex: 1
+    flex: 1,
   },
   inputWrapper: {
-    flex: 1
-  }
+    flex: 1,
+  },
 };

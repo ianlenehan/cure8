@@ -8,45 +8,45 @@ import { get } from 'lodash';
 
 import { AppText, Spacer, Tag, TagContainer, colors, EmptyPage } from '../../common';
 import useBoolean from '../../hooks/useBoolean';
-import Card from '../Card';
+import Curation from '../Curation';
 import NewLink from '../NewLink';
 import ArchiveModal from '../ArchiveModal';
 import WebViewer from '../WebViewer';
 import DeleteModal from './DeleteModal';
 
-import { ArchiveVariablesType, CurationType, TagType } from '../types';
+import useApi from '../useApi';
+
+import { CurationType, TagType } from '../types';
 
 type Props = {
   curations: [CurationType];
   currentUserId: string;
   filteredTagIds?: string[];
   isArchivedLinks?: boolean;
-  onArchive: (variables: ArchiveVariablesType) => void;
   onClearTagFilter?: () => void;
   onCreateConversation: (id: string, userIds: string[]) => void;
   onDelete: (id: string) => void;
   onLoadMore: () => void;
   onTagPress?: (tag: TagType) => void;
-  onNewLinkSubmit: () => void;
   hello?: any;
   tags: TagType[];
 };
 
 const Links = (props: Props) => {
   const {
-    curations = [],
+    curations,
     currentUserId,
-    filteredTagIds = [],
+    filteredTagIds = [], // TODO
     isArchivedLinks,
-    onArchive,
     onClearTagFilter = () => {},
     onCreateConversation,
     onDelete,
     onLoadMore,
     onTagPress = () => {},
-    onNewLinkSubmit,
-    tags
+    tags,
   } = props;
+
+  const { archiveLink } = useApi();
 
   const [openRows, setOpenRows] = useState<string[]>([]);
   const [tagNames, setTagNames] = useState<string[]>([]);
@@ -69,19 +69,19 @@ const Links = (props: Props) => {
   };
 
   const handleScrollEnabled = (rowKey: string) => {
-    setOpenRows(prevState => [...prevState, rowKey]);
+    setOpenRows((prevState) => [...prevState, rowKey]);
   };
 
   const handleRowDidClose = (rowKey: string) => {
-    const newOpenRows = openRows.filter(row => row !== rowKey);
+    const newOpenRows = openRows.filter((row) => row !== rowKey);
     setOpenRows(newOpenRows);
   };
 
   const handleArchiveConfirm = async () => {
-    onArchive({
+    archiveLink({
       id: selectedCurationId,
       tags: tagNames,
-      rating: selectedRating
+      rating: selectedRating,
     });
     closeArchiveModal();
     setTag('');
@@ -105,33 +105,32 @@ const Links = (props: Props) => {
   };
 
   const handleSaveNewTag = () => {
-    setTagNames(prevState => [...prevState, tag]);
+    setTagNames((prevState) => [...prevState, tag]);
     setTag('');
   };
 
   const handleTagPress = (tag: TagType) => {
     if (tagNames.includes(tag.name)) {
-      const otherTags = tagNames.filter(t => t !== tag.name);
+      const otherTags = tagNames.filter((t) => t !== tag.name);
       setTagNames(otherTags);
     } else {
-      setTagNames(prevState => [...prevState, tag.name]);
+      setTagNames((prevState) => [...prevState, tag.name]);
     }
   };
 
   const handleWebViewerClose = () => setSelectedCuration(undefined);
 
   const handleNewLinkSubmit = () => {
-    onNewLinkSubmit();
     setOpenRows([]);
     setForwardUrl('');
     hideNewLink();
   };
 
   const renderHiddenItem = ({ item }: { item: CurationType }) => {
-    const handleForwardLinkPress = () => {
-      setForwardUrl(item.link.url);
-      showNewLink();
-    };
+    // const handleForwardLinkPress = () => {
+    //   setForwardUrl(item.link.url);
+    //   showNewLink();
+    // };
 
     const renderChatButton = () => {
       if (item.curatorId === currentUserId) {
@@ -159,7 +158,7 @@ const Links = (props: Props) => {
         const twoOptionButtons = [
           { text: item.curatorName, onPress: discussWithOwner },
           { text: 'Everyone', onPress: discussWithEveryone },
-          cancelOption
+          cancelOption,
         ];
 
         const buttons = item.sharedWith.length > 1 ? twoOptionButtons : oneOptionButtons;
@@ -183,7 +182,7 @@ const Links = (props: Props) => {
             type="font-awesome"
             reverse
             size={18}
-            onPress={handleForwardLinkPress}
+            // onPress={handleForwardLinkPress}
           />
           <Icon
             color={colors.tertiaryBlue}
@@ -209,24 +208,15 @@ const Links = (props: Props) => {
   };
 
   const renderCuration = ({ item }: { item: CurationType }) => {
-    const curatorName = item.curatorId === currentUserId ? 'you' : item.curatorName;
-    const { id, link, comment, createdAt, rating, tags, sharedWith } = item;
-    const handlePress = () => setSelectedCuration(item);
+    const onPress = () => setSelectedCuration(item);
     return (
-      <Card
-        key={id}
-        image={link.image}
-        title={link.title}
-        date={createdAt}
-        curatedBy={curatorName}
-        onPress={handlePress}
+      <Curation
+        key={item.id}
+        curation={item}
         {...{
-          comment,
-          rating,
-          tags,
-          onTagPress,
-          filteredTagIds,
-          sharedWith
+          onPress,
+          // onTagPress,
+          // filteredTagIds,
         }}
       />
     );
@@ -290,7 +280,7 @@ const Links = (props: Props) => {
         <SwipeListView
           data={curations}
           renderItem={renderCuration}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item) => item.id.toString()}
           removeClippedSubviews={false}
           renderHiddenItem={renderHiddenItem}
           disableRightSwipe
@@ -301,15 +291,7 @@ const Links = (props: Props) => {
           onEndReached={onLoadMore}
         />
 
-        <NewLink
-          onSubmitComplete={handleNewLinkSubmit}
-          isOpen={showingNewLink}
-          onClose={hideNewLink}
-          onOpen={showNewLink}
-          {...{ forwardUrl }}
-        />
-
-        <ArchiveModal
+        {/* <ArchiveModal
           isVisible={isArchiveModalVisible}
           onTagChange={setTag}
           onTagPress={handleTagPress}
@@ -319,13 +301,13 @@ const Links = (props: Props) => {
           onArchive={handleArchiveConfirm}
           existingTags={tags}
           {...{ tagNames, tag, selectedRating }}
-        />
+        /> */}
 
-        <DeleteModal
+        {/* <DeleteModal
           isVisible={isDeleteModalVisible}
           onDeleteConfirm={handleDeleteConfirm}
           onDismiss={closeDeleteModal}
-        />
+        /> */}
       </View>
     );
   };
@@ -333,6 +315,15 @@ const Links = (props: Props) => {
   return (
     <Fragment>
       {renderContent()}
+
+      <NewLink
+        onSubmitComplete={handleNewLinkSubmit}
+        isOpen={showingNewLink}
+        onClose={hideNewLink}
+        onOpen={showNewLink}
+        {...{ forwardUrl }}
+      />
+
       <WebViewer onRequestClose={handleWebViewerClose} curationUrl={get(selectedCuration, 'link.url')} />
     </Fragment>
   );
@@ -344,20 +335,20 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     backgroundColor: '#ecf0f1',
-    flex: 1
+    flex: 1,
   },
   noLinks: {
-    alignItems: 'center'
+    alignItems: 'center',
   },
   rowBack: {
     flex: 1,
     flexDirection: 'row',
-    paddingRight: 15
+    paddingRight: 15,
   },
   rightBack: {
     justifyContent: 'space-around',
     flex: 1,
-    alignItems: 'flex-end'
+    alignItems: 'flex-end',
   },
   tagContainer: {
     borderTopWidth: 1,
@@ -365,17 +356,17 @@ const styles = StyleSheet.create({
     marginTop: 5,
     paddingTop: 5,
     flexDirection: 'row',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
   },
   tagSelector: {
     backgroundColor: 'rgba(255, 255, 255, 0.4)',
     padding: 5,
     paddingLeft: 15,
-    paddingRight: 15
+    paddingRight: 15,
   },
   tagSelectorTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center'
-  }
+    alignItems: 'center',
+  },
 });
