@@ -21,3 +21,30 @@ exports.performWebScrape = functions.firestore.document('links/{linkId}').onCrea
 
   await admin.firestore().collection('links').doc(linkId).update({ image, title });
 });
+
+exports.addSharedWith = functions.firestore.document('curations/{curationId}').onCreate(async (snapshot, context) => {
+  const curation = snapshot.data();
+  console.log('🚀 ~ file: index.js ~ line 27 ~ addSharedWith ~ curation', curation);
+  const linkSnapshot = await admin.firestore().collection('links').doc(curation.linkId);
+  const link = linkSnapshot.data();
+  console.log('🚀 ~ file: index.js ~ line 30 ~ addSharedWith ~ link', link);
+
+  const curatedForSnapshot = await admin
+    .firestore()
+    .collection('users')
+    .where('phoneNumber', '==', curation.phoneNumber);
+  const curatedFor = curatedForSnapshot.data();
+  console.log('🚀 ~ file: index.js ~ line 37 ~ addSharedWith ~ curatedFor', curatedFor);
+
+  if (curatedForSnapshot.id === link.curatorId) return;
+
+  let sharedWith = link.sharedWith;
+  if (!sharedWith) {
+    sharedWith = [curatedFor];
+  } else {
+    sharedWith = [...sharedWith, curatedFor];
+  }
+  console.log('🚀 ~ file: index.js ~ line 42 ~ addSharedWith ~ sharedWith', sharedWith);
+
+  await admin.firestore().collection('links').doc(linkId).update({ sharedWith });
+});
