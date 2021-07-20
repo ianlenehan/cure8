@@ -35,7 +35,7 @@
     "native-base": "^2.13.8",
     "react": "16.13.1",
     "react-apollo": "^3.1.1",
-    "react-native": "0.63.4",
+    "react-native": "0.64.1",
     "react-native-contacts": "^4.0.3",
     "react-native-country-picker-modal": "^1.9.8",
     "react-native-elements": "^1.2.3",
